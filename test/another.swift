@@ -9,6 +9,12 @@
 import Foundation
 import Flynn
 
+extension FooActor {
+    public func xyz() {
+        
+    }
+}
+
 class FooActor: Actor {
 
 }

@@ -24,7 +24,7 @@ class ParseFile: Actor {
                 let syntax = try JSONDecoder().decode(SyntaxStructure.self, from: jsonData)
 
                 if let target = protected_nextTarget() {
-                    recurse(target, syntax)
+                    recurse(path, target, syntax)
                 }
 
                 return (false, [])
@@ -36,16 +36,21 @@ class ParseFile: Actor {
         return (false, [])
     }
 
-    private func recurse(_ target: Actor, _ syntax: SyntaxStructure) {
+    private func recurse(_ path: String, _ target: Actor, _ syntax: SyntaxStructure) {
         if syntax.name != nil {
-            if syntax.kind == .class {
-                target.flow(path, syntax)
+            if let kind = syntax.kind {
+                switch syntax.kind {
+                case .class, .extension:
+                    target.flow(path, syntax)
+                default:
+                    print("ParseFile: unhandled kind \(kind)...")
+                }
             }
         }
 
         if let substructures = syntax.substructure {
             for substructure in substructures {
-                recurse(target, substructure)
+                recurse(path, target, substructure)
             }
         }
     }

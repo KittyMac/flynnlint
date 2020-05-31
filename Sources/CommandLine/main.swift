@@ -7,8 +7,8 @@
 //
 
 import Foundation
+import FlynnLintFramework
 import Flynn
-import SourceKittenFramework
 
 if CommandLine.argc != 2 {
     print("usage: flynnlint <path_to_source_directory>")
@@ -17,11 +17,4 @@ if CommandLine.argc != 2 {
 
 let path = CommandLine.arguments[1]
 
-var ast: AST = AST()
-
-let findFiles = FindFiles(["swift"]) |> Array(count: 28) { ParseFile() } |> ASTBuilder()
-
-findFiles.flow(path)
-findFiles.flow()
-
-Flynn.shutdown()
+FlynnLintFramework.Process(path)

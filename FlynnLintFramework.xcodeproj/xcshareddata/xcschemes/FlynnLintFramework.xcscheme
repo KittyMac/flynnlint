@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "46B6485024819924006F0DA4"
-               BuildableName = "flynnlint"
-               BlueprintName = "flynnlint"
-               ReferencedContainer = "container:flynnlint.xcodeproj">
+               BlueprintIdentifier = "46AB458824840D5A0032B99E"
+               BuildableName = "FlynnLintFramework.framework"
+               BlueprintName = "FlynnLintFramework"
+               ReferencedContainer = "container:FlynnLintFramework.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -28,6 +28,16 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "46AB459124840D5A0032B99E"
+               BuildableName = "FlynnLintFrameworkTests.xctest"
+               BlueprintName = "FlynnLintFrameworkTests"
+               ReferencedContainer = "container:FlynnLintFramework.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -40,22 +50,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "46B6485024819924006F0DA4"
-            BuildableName = "flynnlint"
-            BlueprintName = "flynnlint"
-            ReferencedContainer = "container:flynnlint.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
-      <CommandLineArguments>
-         <CommandLineArgument
-            argument = "/Volumes/Development/Development/chimerasw2/flynnlint/test"
-            isEnabled = "YES">
-         </CommandLineArgument>
-      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -63,16 +57,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "46B6485024819924006F0DA4"
-            BuildableName = "flynnlint"
-            BlueprintName = "flynnlint"
-            ReferencedContainer = "container:flynnlint.xcodeproj">
+            BlueprintIdentifier = "46AB458824840D5A0032B99E"
+            BuildableName = "FlynnLintFramework.framework"
+            BlueprintName = "FlynnLintFramework"
+            ReferencedContainer = "container:FlynnLintFramework.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
