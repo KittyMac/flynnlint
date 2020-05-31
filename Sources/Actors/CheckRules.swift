@@ -12,7 +12,7 @@ import Flynn
 
 class CheckRules: Actor {
     // input: an AST and one syntax structure
-    // output: none
+    // output: error string if rule failed
     let rules: Ruleset
 
     init(_ rules: Ruleset) {
@@ -22,12 +22,13 @@ class CheckRules: Actor {
     override func protected_flowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
         if args.isEmpty == false {
             let ast: AST = args[x:0]
-            let syntax: SyntaxStructure = args[x:1]
+            let syntax: FileSyntax = args[x:1]
+            let target = protected_nextTarget()
 
-            if let kind = syntax.kind {
+            if let kind = syntax.1.kind {
                 if let rules = rules.byKind[kind] {
                     for rule in rules {
-                        rule.check(ast, syntax)
+                        rule.check(ast, syntax, target)
                     }
                 }
             }

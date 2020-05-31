@@ -31,7 +31,7 @@
       </Testables>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -51,6 +51,10 @@
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
+         <CommandLineArgument
+            argument = "/Volumes/Development/Development/chimerasw2/flynnlint/benchmark"
+            isEnabled = "NO">
+         </CommandLineArgument>
          <CommandLineArgument
             argument = "/Volumes/Development/Development/chimerasw2/flynnlint/test"
             isEnabled = "YES">

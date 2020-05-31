@@ -14,8 +14,8 @@ struct PrivateFunctionInActorRule: Rule {
 
     let description = RuleDescription(
         identifier: "actors_private_func",
-        name: "Private Functions In Actors",
-        description: "Only private functions are allowed in Actors",
+        name: "Access Level Violation",
+        description: "Non-private functions are not allowed in Actors; make this function private or convert it to a behavior.",
         syntaxTriggers: [.class, .extension],
         nonTriggeringExamples: [
             Example("class SomeClass {}\n"),
@@ -34,8 +34,28 @@ struct PrivateFunctionInActorRule: Rule {
         ]
     )
 
-    func check(_ ast: AST, _ syntax: SyntaxStructure) {
-        print("PrivateFunctionInActorRule: \(syntax)")
+    func check(_ ast: AST, _ syntax: FileSyntax, _ output: Actor?) -> Bool {
+        // Every function defined in a class which is a subclass of Actor must follow these rules:
+        // 1. its access control level (ACL) must be set to private
+        // 2. if it starts with protected_, its ACL may be anything
+        // 3. if it is an init function
+
+        if let resolvedClass = ast.getClass(syntax.1.name) {
+            if ast.isActor(resolvedClass) {
+                if let functions = syntax.1.substructure {
+                    for function in functions where
+                        function.kind == .functionMethodInstance &&
+                        function.accessibility != .private {
+                            if let output = output {
+                                output.flow(error(function.offset, syntax))
+                            }
+                        return false
+                    }
+                }
+            }
+        }
+
+        return true
     }
 
 }

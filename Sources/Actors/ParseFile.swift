@@ -12,7 +12,7 @@ import Flynn
 
 class ParseFile: Actor {
     // input: path to swift file
-    // output: path to swift file, SourceKitten Structure
+    // output: SourceKitten File, SourceKitten Structure
     override func protected_flowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
         if args.isEmpty { return (true, args) }
 
@@ -24,7 +24,7 @@ class ParseFile: Actor {
                 let syntax = try JSONDecoder().decode(SyntaxStructure.self, from: jsonData)
 
                 if let target = protected_nextTarget() {
-                    recurse(path, target, syntax)
+                    recurse(file, target, syntax)
                 }
 
                 return (false, [])
@@ -36,21 +36,22 @@ class ParseFile: Actor {
         return (false, [])
     }
 
-    private func recurse(_ path: String, _ target: Actor, _ syntax: SyntaxStructure) {
+    private func recurse(_ file: File, _ target: Actor, _ syntax: SyntaxStructure) {
         if syntax.name != nil {
             if let kind = syntax.kind {
                 switch syntax.kind {
                 case .class, .extension:
-                    target.flow(path, syntax)
+                    target.flow(file, syntax)
                 default:
-                    print("ParseFile: unhandled kind \(kind)...")
+                    //print("ParseFile: unhandled kind \(kind)...")
+                    break
                 }
             }
         }
 
         if let substructures = syntax.substructure {
             for substructure in substructures {
-                recurse(path, target, substructure)
+                recurse(file, target, substructure)
             }
         }
     }

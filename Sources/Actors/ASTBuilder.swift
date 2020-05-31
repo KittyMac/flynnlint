@@ -10,23 +10,27 @@ import Foundation
 import SourceKittenFramework
 import Flynn
 
+typealias FileSyntax = (File, SyntaxStructure)
+
 class ASTBuilder: Actor {
     // input: a syntax structure
     // output: an immutable AST and pass all syntax
-    var classes: [String: SyntaxStructure] = [:]
-    var extensions: [String: SyntaxStructure] = [:]
+    var classes: [String: FileSyntax] = [:]
+    var extensions: [FileSyntax] = []
 
     override func protected_flowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
         if args.isEmpty == false {
+            let file: File = args[x:0]
             let syntax: SyntaxStructure = args[x:1]
+            let fileSyntax = (file, syntax)
 
             if let name = syntax.name {
                 if let kind = syntax.kind {
                     switch syntax.kind {
                     case .class:
-                        classes[name] = syntax
+                        classes[name] = fileSyntax
                     case .extension:
-                        extensions[name] = syntax
+                        extensions.append(fileSyntax)
                     default:
                         print("ASTBuilder: unhandled kind \(kind)...")
                     }
@@ -44,6 +48,11 @@ class ASTBuilder: Actor {
 
         // Run through every syntax structure and pass it to the rulesets
         for syntax in classes.values {
+            if let target = protected_nextTarget() {
+                target.flow(ast, syntax)
+            }
+        }
+        for syntax in extensions {
             if let target = protected_nextTarget() {
                 target.flow(ast, syntax)
             }

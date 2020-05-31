@@ -35,6 +35,7 @@
 		46AB459324840D5A0032B99E /* FlynnLintFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46AB458924840D5A0032B99E /* FlynnLintFramework.framework */; };
 		46AB459824840D5A0032B99E /* FlynnLintFrameworkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46AB459724840D5A0032B99E /* FlynnLintFrameworkTests.swift */; };
 		46AB459A24840D5A0032B99E /* FlynnLint.h in Headers */ = {isa = PBXBuildFile; fileRef = 46AB458C24840D5A0032B99E /* FlynnLint.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		46FFAE7424843D69003F961E /* PrintError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46FFAE7324843D69003F961E /* PrintError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -111,12 +112,14 @@
 		463DA57124840E7A0017025B /* RuleDescription.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleDescription.swift; sourceTree = "<group>"; };
 		463DA57F24840F420017025B /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		463DA58124840F5D0017025B /* FlynnLintFramework.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlynnLintFramework.swift; sourceTree = "<group>"; };
+		463DA58A24841A570017025B /* test */ = {isa = PBXFileReference; lastKnownFileType = text; path = test; sourceTree = SOURCE_ROOT; };
 		46AB458924840D5A0032B99E /* FlynnLintFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FlynnLintFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		46AB458C24840D5A0032B99E /* FlynnLint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FlynnLint.h; sourceTree = "<group>"; };
 		46AB458D24840D5A0032B99E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		46AB459224840D5A0032B99E /* FlynnLintFrameworkTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlynnLintFrameworkTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		46AB459724840D5A0032B99E /* FlynnLintFrameworkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlynnLintFrameworkTests.swift; sourceTree = "<group>"; };
 		46AB459924840D5A0032B99E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		46FFAE7324843D69003F961E /* PrintError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrintError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,10 +171,10 @@
 			isa = PBXGroup;
 			children = (
 				463DA58124840F5D0017025B /* FlynnLintFramework.swift */,
+				463DA56D24840E7A0017025B /* Rules */,
 				463DA57E24840F300017025B /* CommandLine */,
 				463DA56424840E7A0017025B /* Actors */,
 				463DA56924840E7A0017025B /* AST */,
-				463DA56D24840E7A0017025B /* Rules */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -179,10 +182,11 @@
 		463DA56424840E7A0017025B /* Actors */ = {
 			isa = PBXGroup;
 			children = (
-				463DA56524840E7A0017025B /* ASTBuilder.swift */,
-				463DA56624840E7A0017025B /* CheckRules.swift */,
 				463DA56724840E7A0017025B /* FindFiles.swift */,
 				463DA56824840E7A0017025B /* ParseFile.swift */,
+				463DA56524840E7A0017025B /* ASTBuilder.swift */,
+				463DA56624840E7A0017025B /* CheckRules.swift */,
+				46FFAE7324843D69003F961E /* PrintError.swift */,
 			);
 			path = Actors;
 			sourceTree = "<group>";
@@ -190,8 +194,8 @@
 		463DA56924840E7A0017025B /* AST */ = {
 			isa = PBXGroup;
 			children = (
-				463DA56A24840E7A0017025B /* AST.swift */,
 				463DA56B24840E7A0017025B /* SourceKittenConstants.swift */,
+				463DA56A24840E7A0017025B /* AST.swift */,
 			);
 			path = AST;
 			sourceTree = "<group>";
@@ -255,6 +259,7 @@
 		46AB459624840D5A0032B99E /* FlynnLintFrameworkTests */ = {
 			isa = PBXGroup;
 			children = (
+				463DA58A24841A570017025B /* test */,
 				46AB459724840D5A0032B99E /* FlynnLintFrameworkTests.swift */,
 				46AB459924840D5A0032B99E /* Info.plist */,
 			);
@@ -298,6 +303,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 46AB459D24840D5A0032B99E /* Build configuration list for PBXNativeTarget "FlynnLintFramework" */;
 			buildPhases = (
+				463DA58B24841D030017025B /* SwiftLint */,
 				46AB458424840D5A0032B99E /* Headers */,
 				46AB458524840D5A0032B99E /* Sources */,
 				46AB458624840D5A0032B99E /* Frameworks */,
@@ -389,6 +395,27 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		463DA58B24841D030017025B /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint --path ${SRCROOT}/Sources/\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		463DA55624840E610017025B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -402,6 +429,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				46FFAE7424843D69003F961E /* PrintError.swift in Sources */,
 				463DA57924840E7A0017025B /* PrivateFunctionInActorRule.swift in Sources */,
 				463DA57424840E7A0017025B /* FindFiles.swift in Sources */,
 				463DA57A24840E7A0017025B /* Rule.swift in Sources */,
@@ -442,12 +470,19 @@
 		463DA55F24840E610017025B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/FlynnLintFramework.framework/Versions/Current/Frameworks",
+					"@executable_path",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_FORCE_DYNAMIC_LINK_STDLIB = YES;
+				SWIFT_FORCE_STATIC_LINK_STDLIB = NO;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -455,12 +490,19 @@
 		463DA56024840E610017025B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/FlynnLintFramework.framework/Versions/Current/Frameworks",
+					"@executable_path",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_FORCE_DYNAMIC_LINK_STDLIB = YES;
+				SWIFT_FORCE_STATIC_LINK_STDLIB = NO;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;

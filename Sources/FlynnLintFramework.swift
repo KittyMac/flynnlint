@@ -11,16 +11,17 @@ import Flynn
 import SourceKittenFramework
 
 public struct Process {
-    
+
     @discardableResult
     public init(_ path: String) {
         let ruleset = Ruleset()
 
         // TODO: Replace 28 with a Flynn.numCores() or equivalent
         let findFiles = FindFiles(["swift"]) |>
-                        Array(count: 28) { ParseFile() } |>
+                        Array(count: 14) { ParseFile() } |>
                         ASTBuilder() |>
-                        Array(count: 28) { CheckRules(ruleset) }
+                        Array(count: 14) { CheckRules(ruleset) } |>
+                        PrintError()
 
         findFiles.flow(path)
         findFiles.flow()

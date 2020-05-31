@@ -28,7 +28,7 @@ struct RuleDescription: Equatable {
     public let triggeringExamples: [Example]
 
     /// The console-printable string for this description.
-    public var consoleDescription: String { return "\(name) (\(identifier)): \(description)" }
+    public var consoleDescription: String { return "\(name): \(description)" }
 
     // MARK: Equatable
 
