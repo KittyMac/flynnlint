@@ -7,6 +7,21 @@
 //
 
 import Foundation
+import Flynn
+import SourceKittenFramework
 
-print("Hello, World!")
+if CommandLine.argc != 2 {
+    print("usage: flynnlint <path_to_source_directory>")
+    exit(0)
+}
 
+let path = CommandLine.arguments[1]
+
+var ast: AST = AST()
+
+let findFiles = FindFiles(["swift"]) |> Array(count: 28) { ParseFile() } |> ASTBuilder()
+
+findFiles.flow(path)
+findFiles.flow()
+
+Flynn.shutdown()

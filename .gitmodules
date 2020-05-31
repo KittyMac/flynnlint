@@ -10,3 +10,6 @@
 [submodule "Carthage/Checkouts/SWXMLHash"]
 	path = Carthage/Checkouts/SWXMLHash
 	url = https://github.com/drmohundro/SWXMLHash.git
+[submodule "Carthage/Checkouts/Flynn"]
+	path = Carthage/Checkouts/Flynn
+	url = https://github.com/kittymac/Flynn.git

@@ -1,2 +1,3 @@
-github "jpsim/SourceKitten" ~> 0.29.0
-github "scottrhoyt/SwiftyTextTable" ~> 0.9.0
+github "jpsim/SourceKitten"
+github "scottrhoyt/SwiftyTextTable"
+github "kittymac/Flynn"

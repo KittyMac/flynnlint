@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		461408492482FA4900D952C1 /* FindFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 461408482482FA4900D952C1 /* FindFiles.swift */; };
+		4614084E248341C900D952C1 /* ParseFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4614084D248341C900D952C1 /* ParseFile.swift */; };
+		4614085224835E5B00D952C1 /* ASTBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4614085124835E5B00D952C1 /* ASTBuilder.swift */; };
+		4614085424835EDE00D952C1 /* AST.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4614085324835EDE00D952C1 /* AST.swift */; };
+		46140858248365FB00D952C1 /* SourceKittenConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46140857248365FB00D952C1 /* SourceKittenConstants.swift */; };
 		4640FB5E24819D43007D1BF0 /* SWXMLHash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4640FB5A24819D43007D1BF0 /* SWXMLHash.framework */; };
 		4640FB5F24819D43007D1BF0 /* SWXMLHash.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4640FB5A24819D43007D1BF0 /* SWXMLHash.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4640FB6024819D43007D1BF0 /* SwiftyTextTable.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4640FB5B24819D43007D1BF0 /* SwiftyTextTable.framework */; };
@@ -15,6 +20,8 @@
 		4640FB6324819D43007D1BF0 /* Yams.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4640FB5C24819D43007D1BF0 /* Yams.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4640FB6424819D43007D1BF0 /* SourceKittenFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4640FB5D24819D43007D1BF0 /* SourceKittenFramework.framework */; };
 		4640FB6524819D43007D1BF0 /* SourceKittenFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4640FB5D24819D43007D1BF0 /* SourceKittenFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		4640FB6A2481A640007D1BF0 /* Flynn.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4640FB672481A625007D1BF0 /* Flynn.framework */; };
+		4640FB6B2481A640007D1BF0 /* Flynn.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4640FB672481A625007D1BF0 /* Flynn.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		46B6485524819924006F0DA4 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B6485424819924006F0DA4 /* main.swift */; };
 /* End PBXBuildFile section */
 
@@ -27,6 +34,7 @@
 			files = (
 				4640FB6324819D43007D1BF0 /* Yams.framework in Embed Frameworks */,
 				4640FB6524819D43007D1BF0 /* SourceKittenFramework.framework in Embed Frameworks */,
+				4640FB6B2481A640007D1BF0 /* Flynn.framework in Embed Frameworks */,
 				4640FB6124819D43007D1BF0 /* SwiftyTextTable.framework in Embed Frameworks */,
 				4640FB5F24819D43007D1BF0 /* SWXMLHash.framework in Embed Frameworks */,
 			);
@@ -45,10 +53,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		461408482482FA4900D952C1 /* FindFiles.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FindFiles.swift; sourceTree = "<group>"; };
+		4614084D248341C900D952C1 /* ParseFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParseFile.swift; sourceTree = "<group>"; };
+		4614085124835E5B00D952C1 /* ASTBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ASTBuilder.swift; sourceTree = "<group>"; };
+		4614085324835EDE00D952C1 /* AST.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AST.swift; sourceTree = "<group>"; };
+		46140857248365FB00D952C1 /* SourceKittenConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SourceKittenConstants.swift; sourceTree = "<group>"; };
 		4640FB5A24819D43007D1BF0 /* SWXMLHash.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SWXMLHash.framework; path = Carthage/Build/Mac/SWXMLHash.framework; sourceTree = "<group>"; };
 		4640FB5B24819D43007D1BF0 /* SwiftyTextTable.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyTextTable.framework; path = Carthage/Build/Mac/SwiftyTextTable.framework; sourceTree = "<group>"; };
 		4640FB5C24819D43007D1BF0 /* Yams.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Yams.framework; path = Carthage/Build/Mac/Yams.framework; sourceTree = "<group>"; };
 		4640FB5D24819D43007D1BF0 /* SourceKittenFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SourceKittenFramework.framework; path = Carthage/Build/Mac/SourceKittenFramework.framework; sourceTree = "<group>"; };
+		4640FB672481A625007D1BF0 /* Flynn.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Flynn.framework; path = Carthage/Build/Mac/Flynn.framework; sourceTree = "<group>"; };
 		46B6485124819924006F0DA4 /* flynnlint */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = flynnlint; sourceTree = BUILT_PRODUCTS_DIR; };
 		46B6485424819924006F0DA4 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -60,6 +74,7 @@
 			files = (
 				4640FB6224819D43007D1BF0 /* Yams.framework in Frameworks */,
 				4640FB6424819D43007D1BF0 /* SourceKittenFramework.framework in Frameworks */,
+				4640FB6A2481A640007D1BF0 /* Flynn.framework in Frameworks */,
 				4640FB6024819D43007D1BF0 /* SwiftyTextTable.framework in Frameworks */,
 				4640FB5E24819D43007D1BF0 /* SWXMLHash.framework in Frameworks */,
 			);
@@ -68,9 +83,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4614085524835F6B00D952C1 /* Actors */ = {
+			isa = PBXGroup;
+			children = (
+				461408482482FA4900D952C1 /* FindFiles.swift */,
+				4614084D248341C900D952C1 /* ParseFile.swift */,
+				4614085124835E5B00D952C1 /* ASTBuilder.swift */,
+			);
+			path = Actors;
+			sourceTree = "<group>";
+		};
+		4614085624835F7B00D952C1 /* AST */ = {
+			isa = PBXGroup;
+			children = (
+				46140857248365FB00D952C1 /* SourceKittenConstants.swift */,
+				4614085324835EDE00D952C1 /* AST.swift */,
+			);
+			path = AST;
+			sourceTree = "<group>";
+		};
 		4640FB5924819D43007D1BF0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4640FB672481A625007D1BF0 /* Flynn.framework */,
 				4640FB5D24819D43007D1BF0 /* SourceKittenFramework.framework */,
 				4640FB5B24819D43007D1BF0 /* SwiftyTextTable.framework */,
 				4640FB5A24819D43007D1BF0 /* SWXMLHash.framework */,
@@ -99,6 +134,8 @@
 		46B6485324819924006F0DA4 /* flynnlint */ = {
 			isa = PBXGroup;
 			children = (
+				4614085624835F7B00D952C1 /* AST */,
+				4614085524835F6B00D952C1 /* Actors */,
 				46B6485424819924006F0DA4 /* main.swift */,
 			);
 			path = flynnlint;
@@ -111,6 +148,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 46B6485824819924006F0DA4 /* Build configuration list for PBXNativeTarget "flynnlint" */;
 			buildPhases = (
+				4614084A2482FAD500D952C1 /* SwiftLint */,
 				46B6484D24819924006F0DA4 /* Sources */,
 				46B6484E24819924006F0DA4 /* Frameworks */,
 				46B6484F24819924006F0DA4 /* CopyFiles */,
@@ -158,12 +196,38 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		4614084A2482FAD500D952C1 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint --path ${SRCROOT}/flynnlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		46B6484D24819924006F0DA4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				46B6485524819924006F0DA4 /* main.swift in Sources */,
+				46140858248365FB00D952C1 /* SourceKittenConstants.swift in Sources */,
+				461408492482FA4900D952C1 /* FindFiles.swift in Sources */,
+				4614084E248341C900D952C1 /* ParseFile.swift in Sources */,
+				4614085424835EDE00D952C1 /* AST.swift in Sources */,
+				4614085224835E5B00D952C1 /* ASTBuilder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
