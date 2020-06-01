@@ -37,13 +37,16 @@ struct PrivateFunctionInActorRule: Rule {
     func check(_ ast: AST, _ syntax: FileSyntax, _ output: Actor?) -> Bool {
         // Every function defined in a class which is a subclass of Actor must follow these rules:
         // 1. its access control level (ACL) must be set to private
-        // 2. if it starts with protected_, its ACL may be anything
+        // 2. if it starts with protected_, its ACL may be anything. Other rules will keep anything
+        //    but a subclass of this Actor calling protected methods
         // 3. if it is an init function
 
         if let resolvedClass = ast.getClass(syntax.1.name) {
             if ast.isActor(resolvedClass) {
                 if let functions = syntax.1.substructure {
                     for function in functions where
+                        !(function.name ?? "").hasPrefix("protected_") &&
+                        !(function.name ?? "").hasPrefix("init(") &&
                         function.kind == .functionMethodInstance &&
                         function.accessibility != .private {
                             if let output = output {

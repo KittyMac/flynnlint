@@ -32,8 +32,9 @@ class CheckRules: Actor {
                     }
                 }
             }
+            return (false, [])
         }
 
-        return (false, [])
+        return (true, args)
     }
 }

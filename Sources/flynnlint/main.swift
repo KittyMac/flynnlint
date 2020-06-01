@@ -10,11 +10,14 @@ import Foundation
 import FlynnLintFramework
 import Flynn
 
-if CommandLine.argc != 2 {
-    print("usage: flynnlint <path_to_source_directory>")
+if CommandLine.argc < 2 {
+    print("usage: flynnlint <paths_to_directories>")
     exit(0)
 }
 
-let path = CommandLine.arguments[1]
+let flynnlint = FlynnLint()
+for iii in 1..<CommandLine.argc {
+    flynnlint.process(directory: CommandLine.arguments[Int(iii)])
+}
 
-FlynnLintFramework.Process(path)
+exit(Int32(flynnlint.finish()))

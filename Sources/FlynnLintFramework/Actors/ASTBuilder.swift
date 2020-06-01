@@ -58,6 +58,6 @@ class ASTBuilder: Actor {
             }
         }
 
-        return (false, [])
+        return (true, [])
     }
 }

@@ -801,10 +801,10 @@
 		OBJ_12 /* Actors */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_13 /* ASTBuilder.swift */,
-				OBJ_14 /* CheckRules.swift */,
 				OBJ_15 /* FindFiles.swift */,
 				OBJ_16 /* ParseFile.swift */,
+				OBJ_13 /* ASTBuilder.swift */,
+				OBJ_14 /* CheckRules.swift */,
 				OBJ_17 /* PrintError.swift */,
 			);
 			path = Actors;

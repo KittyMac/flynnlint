@@ -10,22 +10,32 @@ import Foundation
 import Flynn
 import SourceKittenFramework
 
-public struct Process {
+public class FlynnLint {
 
-    @discardableResult
-    public init(_ path: String) {
+    private var pipeline: Actor = Actor()
+    private var numErrors: Int = 0
+
+    public init() {
         let ruleset = Ruleset()
 
         // TODO: Replace 28 with a Flynn.numCores() or equivalent
-        let findFiles = FindFiles(["swift"]) |>
-                        Array(count: 14) { ParseFile() } |>
-                        ASTBuilder() |>
-                        Array(count: 14) { CheckRules(ruleset) } |>
-                        PrintError()
+        pipeline = FindFiles(["swift"]) |>
+            Array(count: 28) { ParseFile() } |>
+            ASTBuilder() |>
+            Array(count: 28) { CheckRules(ruleset) } |>
+            PrintError { (numErrors: Int) in
+                self.numErrors += numErrors
+            }
+    }
 
-        findFiles.flow(path)
-        findFiles.flow()
+    public func process(directory path: String) {
+        pipeline.flow(path)
+        pipeline.flow()
+    }
 
+    @discardableResult
+    public func finish() -> Int {
         Flynn.shutdown()
+        return numErrors
     }
 }

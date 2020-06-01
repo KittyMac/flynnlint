@@ -10,15 +10,27 @@ import Foundation
 import SourceKittenFramework
 import Flynn
 
+typealias PrintErrorResult = ((Int) -> Void)
+
 class PrintError: Actor {
     // input: error string
     // output: none
+    let onComplete: PrintErrorResult
+    var numErrors: Int = 0
+
+    init(_ onComplete: @escaping PrintErrorResult) {
+        self.onComplete = onComplete
+    }
 
     override func protected_flowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
         if args.isEmpty == false {
             let error: String = args[x:0]
             print(error)
+            numErrors += 1
+            return (false, [])
         }
+
+        onComplete(numErrors)
 
         return (false, [])
     }
