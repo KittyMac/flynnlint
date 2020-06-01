@@ -14,9 +14,17 @@ class FlynnLintTests: XCTestCase {
     override func setUpWithError() throws { }
 
     override func tearDownWithError() throws { }
+    
+    func testOneRule() throws {
+        let rule = ProtectedFunctionRule()
+        XCTAssert(rule.test())
+    }
 
     func testAllRules() throws {
-        
+        let rules = Ruleset()
+        for rule in rules.all {
+            XCTAssert(rule.test())
+        }
     }
 
     func testSampleSet() throws {
@@ -36,7 +44,7 @@ class FlynnLintTests: XCTestCase {
     func testReleasePerformanceSet() throws {
         measure {
             let task = Process()
-            task.launchPath = "/Volumes/Development/Development/chimerasw2/flynnlint/.build/x86_64-apple-macosx/release/flynnlint"
+            task.launchPath = "/Volumes/Development/Development/chimerasw2/flynnlint/.build/release/flynnlint"
             task.arguments = ["/Volumes/Development/Development/chimerasw2/flynnlint/Tests/benchmark"]
             task.launch()
             task.waitUntilExit()

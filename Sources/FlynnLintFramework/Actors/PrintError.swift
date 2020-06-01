@@ -15,8 +15,12 @@ typealias PrintErrorResult = ((Int) -> Void)
 class PrintError: Actor {
     // input: error string
     // output: none
-    let onComplete: PrintErrorResult
+    var onComplete: PrintErrorResult?
     var numErrors: Int = 0
+
+    override init() {
+        super.init()
+    }
 
     init(_ onComplete: @escaping PrintErrorResult) {
         self.onComplete = onComplete
@@ -30,7 +34,9 @@ class PrintError: Actor {
             return (false, [])
         }
 
-        onComplete(numErrors)
+        if let onComplete = onComplete {
+            onComplete(numErrors)
+        }
 
         return (false, [])
     }

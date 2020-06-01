@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		46311532248549C10018B698 /* ProtectedFunctionRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46311531248549C10018B698 /* ProtectedFunctionRule.swift */; };
 		OBJ_191 /* api.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_105 /* api.c */; };
 		OBJ_192 /* emitter.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_106 /* emitter.c */; };
 		OBJ_193 /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_107 /* parser.c */; };
@@ -55,7 +56,7 @@
 		OBJ_248 /* Pony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Flynn::Pony::Product" /* Pony.framework */; };
 		OBJ_256 /* AST.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* AST.swift */; };
 		OBJ_257 /* SourceKittenConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* SourceKittenConstants.swift */; };
-		OBJ_258 /* ASTBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* ASTBuilder.swift */; };
+		OBJ_258 /* BuildCombinedAST.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* BuildCombinedAST.swift */; };
 		OBJ_259 /* CheckRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_14 /* CheckRules.swift */; };
 		OBJ_260 /* FindFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* FindFiles.swift */; };
 		OBJ_261 /* ParseFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* ParseFile.swift */; };
@@ -444,6 +445,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		46311531248549C10018B698 /* ProtectedFunctionRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProtectedFunctionRule.swift; sourceTree = "<group>"; };
 		"Commandant::Commandant::Product" /* Commandant.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Commandant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Flynn::Flynn::Product" /* Flynn.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Flynn.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Flynn::Pony::Product" /* Pony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Pony.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -476,7 +478,7 @@
 		OBJ_127 /* String+Yams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Yams.swift"; sourceTree = "<group>"; };
 		OBJ_128 /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		OBJ_129 /* YamlError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YamlError.swift; sourceTree = "<group>"; };
-		OBJ_13 /* ASTBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASTBuilder.swift; sourceTree = "<group>"; };
+		OBJ_13 /* BuildCombinedAST.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildCombinedAST.swift; sourceTree = "<group>"; };
 		OBJ_130 /* shim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = shim.swift; sourceTree = "<group>"; };
 		OBJ_131 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = Package.swift; path = /Volumes/Development/Development/chimerasw2/flynnlint/.build/checkouts/Yams/Package.swift; sourceTree = "<group>"; };
 		OBJ_133 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = Package.swift; path = /Volumes/Development/Development/chimerasw2/flynnlint/.build/checkouts/SWXMLHash/Package.swift; sourceTree = "<group>"; };
@@ -803,7 +805,7 @@
 			children = (
 				OBJ_15 /* FindFiles.swift */,
 				OBJ_16 /* ParseFile.swift */,
-				OBJ_13 /* ASTBuilder.swift */,
+				OBJ_13 /* BuildCombinedAST.swift */,
 				OBJ_14 /* CheckRules.swift */,
 				OBJ_17 /* PrintError.swift */,
 			);
@@ -921,6 +923,7 @@
 		OBJ_19 /* Rules */ = {
 			isa = PBXGroup;
 			children = (
+				46311531248549C10018B698 /* ProtectedFunctionRule.swift */,
 				OBJ_20 /* PrivateFunctionInActorRule.swift */,
 				OBJ_21 /* Shared */,
 			);
@@ -1050,7 +1053,7 @@
 			path = include;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -1061,7 +1064,6 @@
 				OBJ_184 /* Makefile */,
 				OBJ_185 /* README.md */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_52 /* SourceKittenFramework */ = {
@@ -1549,7 +1551,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_170 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1663,10 +1665,11 @@
 			files = (
 				OBJ_256 /* AST.swift in Sources */,
 				OBJ_257 /* SourceKittenConstants.swift in Sources */,
-				OBJ_258 /* ASTBuilder.swift in Sources */,
+				OBJ_258 /* BuildCombinedAST.swift in Sources */,
 				OBJ_259 /* CheckRules.swift in Sources */,
 				OBJ_260 /* FindFiles.swift in Sources */,
 				OBJ_261 /* ParseFile.swift in Sources */,
+				46311532248549C10018B698 /* ProtectedFunctionRule.swift in Sources */,
 				OBJ_262 /* PrintError.swift in Sources */,
 				OBJ_263 /* FlynnLintFramework.swift in Sources */,
 				OBJ_264 /* PrivateFunctionInActorRule.swift in Sources */,

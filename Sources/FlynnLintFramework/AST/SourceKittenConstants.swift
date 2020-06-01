@@ -52,12 +52,25 @@ struct SyntaxStructure: Codable {
 
 // MARK: - Default to the last item in enum if codable fails
 
+enum CaseIterableDefaultsLastError: Error {
+    case error
+}
+
 protocol CaseIterableDefaultsLast: Decodable & CaseIterable & RawRepresentable
 where RawValue: Decodable, AllCases: BidirectionalCollection { }
 
 extension CaseIterableDefaultsLast {
     public init(from decoder: Decoder) throws {
-        self = try Self(rawValue: decoder.singleValueContainer().decode(RawValue.self)) ?? Self.allCases.last!
+        do {
+            if let converted = Self(rawValue: try decoder.singleValueContainer().decode(RawValue.self)) {
+                self = converted
+            } else {
+                throw CaseIterableDefaultsLastError.error
+            }
+        } catch {
+            print("missing \(try RawValue(from: decoder) as? String ?? "blah")")
+            self = Self.allCases.last!
+        }
     }
 }
 
@@ -151,6 +164,46 @@ public enum SwiftDeclarationKind: String, Codable, CaseIterableDefaultsLast {
     case varParameter = "source.lang.swift.decl.var.parameter"
     /// `var.static`.
     case varStatic = "source.lang.swift.decl.var.static"
+    /// `elem.typeref`.
+    case elemTypeRef = "source.lang.swift.structure.elem.typeref"
+    /// `expr.call`.
+    case exprCall = "source.lang.swift.expr.call"
+    /// `expr.argument`.
+    case exprArgument = "source.lang.swift.expr.argument"
+    /// `elem.init_expr`.
+    case elemInitExpr = "source.lang.swift.structure.elem.init_expr"
+    /// `elem.expr`.
+    case elemExpr = "source.lang.swift.structure.elem.expr"
+    /// `expr.array`.
+    case elemExprArray = "source.lang.swift.expr.array"
+    /// `comment.mark`.
+    case commentMark = "source.lang.swift.syntaxtype.comment.mark"
+    /// `expr.closure`.
+    case exprClosure = "source.lang.swift.expr.closure"
+    /// `expr.tuple`.
+    case exprTuple = "source.lang.swift.expr.tuple"
+    /// `stmt.brace`.
+    case stmtBrace = "source.lang.swift.stmt.brace"
+    /// `elem.condition_expr`.
+    case elemConditionExpr = "source.lang.swift.structure.elem.condition_expr"
+    /// `stmt.if`.
+    case stmtIf = "source.lang.swift.stmt.if"
+    /// `stmt.switch`.
+    case stmtSwitch = "source.lang.swift.stmt.switch"
+    /// `elem.pattern`.
+    case elemPattern = "source.lang.swift.structure.elem.pattern"
+    /// `stmt.case`.
+    case stmtCase = "source.lang.swift.stmt.case"
+    /// `stmt.guard`.
+    case stmtGuard = "source.lang.swift.stmt.guard"
+    /// `expr.dictionary`.
+    case exprDictionary = "source.lang.swift.expr.dictionary"
+    /// `stmt.while`.
+    case stmtWhile = "source.lang.swift.stmt.while"
+    /// `elem.id`.
+    case elemId = "source.lang.swift.structure.elem.id"
+    /// `stmt.foreach`.
+    case stmtForeach = "source.lang.swift.stmt.foreach"
     /// Unknown
     case unknown
 }

@@ -21,7 +21,7 @@ public class FlynnLint {
         // TODO: Replace 28 with a Flynn.numCores() or equivalent
         pipeline = FindFiles(["swift"]) |>
             Array(count: 28) { ParseFile() } |>
-            ASTBuilder() |>
+            BuildCombinedAST() |>
             Array(count: 28) { CheckRules(ruleset) } |>
             PrintError { (numErrors: Int) in
                 self.numErrors += numErrors

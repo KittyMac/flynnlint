@@ -11,15 +11,20 @@ import Flynn
 import SourceKittenFramework
 
 struct Ruleset {
+    var all: [Rule] = []
     var byKind: [SwiftDeclarationKind: [Rule]] = [:]
 
     init() {
-        let allRules = [
-            PrivateFunctionInActorRule.self
+        let allRules: [Rule.Type] = [
+            PrivateFunctionInActorRule.self,
+            ProtectedFunctionRule.self
         ]
 
         for ruleClass in allRules {
             let rule = ruleClass.init()
+
+            all.append(rule)
+
             for trigger in rule.description.syntaxTriggers {
                 if self.byKind[trigger] == nil {
                     self.byKind[trigger] = []
@@ -31,6 +36,9 @@ struct Ruleset {
 }
 
 protocol Rule {
+
+    init()
+
     var description: RuleDescription { get }
 
     @discardableResult
@@ -75,5 +83,50 @@ extension Rule {
             return "\(path):\(line):\(character): warning: \(description.consoleDescription)"
         }
         return "\(path): warning: \(description.consoleDescription)"
+    }
+
+    func test(_ code: String) -> Bool {
+        //let printError = PrintError()
+
+        do {
+            let file = File(contents: code)
+            let structure = try Structure(file: file)
+            let jsonData = structure.description.data(using: .utf8)!
+            let syntax = try JSONDecoder().decode(SyntaxStructure.self, from: jsonData)
+            let fileSyntax = FileSyntax(file, syntax)
+
+            let astBuilder = ASTBuilder()
+            astBuilder.add(fileSyntax)
+
+            let ast = astBuilder.build()
+
+            for syntax in astBuilder {
+                if description.syntaxTriggers.contains(syntax.1.kind!) {
+                    if !check(ast, syntax, nil) {
+                        return false
+                    }
+                }
+            }
+
+        } catch {
+            print("Parsing error: \(error)")
+        }
+        return true
+    }
+
+    func test() -> Bool {
+        for example in description.nonTriggeringExamples {
+            if test(example) != true {
+                print("\(description.identifier) failed on nonTriggeringExample:\n\(example)")
+                return false
+            }
+        }
+        for example in description.triggeringExamples {
+            if test(example) != false {
+                print("\(description.identifier) failed on triggeringExamples:\n\(example)")
+                return false
+            }
+        }
+        return true
     }
 }
