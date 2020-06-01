@@ -9,6 +9,7 @@
 import Foundation
 import SourceKittenFramework
 import Flynn
+import DictionaryDecoder
 
 class ParseFile: Actor {
     // input: path to swift file
@@ -20,8 +21,7 @@ class ParseFile: Actor {
         if let file = File(path: path) {
             do {
                 let structure = try Structure(file: file)
-                let jsonData = structure.description.data(using: .utf8)!
-                let syntax = try JSONDecoder().decode(SyntaxStructure.self, from: jsonData)
+                let syntax = try DictionaryDecoder().decode(SyntaxStructure.self, from: structure.dictionary)
                 return (true, [file, syntax])
             } catch {
                 print("Parsing error: \(error)")
