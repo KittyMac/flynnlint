@@ -8,7 +8,6 @@ let package = Package(
         .library(name: "FlynnLintFramework", targets: ["FlynnLintFramework"])
     ],
     dependencies: [
-		.package(url: "https://github.com/KittyMac/DictionaryDecoder.git", from: "0.0.0"),
 		.package(url: "https://github.com/KittyMac/Flynn.git", from: "0.0.0"),
         .package(url: "https://github.com/Carthage/Commandant.git", .upToNextMinor(from: "0.17.0")),
         .package(url: "https://github.com/jpsim/SourceKitten.git", .upToNextMinor(from: "0.29.0")),
@@ -30,8 +29,7 @@ let package = Package(
             dependencies: [
                 "SourceKittenFramework",
                 "Yams",
-                "Flynn",
-				"DictionaryDecoder"
+                "Flynn"
             ]
         ),
         .testTarget(

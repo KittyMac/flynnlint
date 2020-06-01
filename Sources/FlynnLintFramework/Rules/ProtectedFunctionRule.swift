@@ -78,6 +78,42 @@ struct ProtectedFunctionRule: Rule {
 
                     actor.wait(0)
                 }
+            """),
+            Example("""
+                open class Actor {
+                    public func protected_nextTarget() -> Actor? {
+                        switch numTargets {
+                        case 0:
+                            return nil
+                        case 1:
+                            return flowTarget
+                        default:
+                            poolIdx = (poolIdx + 1) % numTargets
+                            return flowTargets[poolIdx]
+                        }
+                    }
+                }
+
+                func testCallSiteUncertainty() {
+                    // https://github.com/KittyMac/flynn/issues/8
+
+                    let actor = WhoseCallWasThisAnyway()
+
+                    // Since calls to functions and calls to behaviors are visually similar,
+                    // and we cannot enforce developers NOT to have non-private functions,
+                    // someone reading this would think it would print a bunch of "foo"
+                    // followed by a bunch of "bar".  Oh, they'd be so wrong.
+                    actor.printFoo()
+                    actor.printFoo()
+                    actor.printFoo()
+                    actor.printFoo()
+                    actor.printFoo()
+                    actor.printFoo()
+                    actor.printFoo()
+                    actor.protected_nextTarget()
+
+                    actor.wait(0)
+                }
             """)
         ]
     )

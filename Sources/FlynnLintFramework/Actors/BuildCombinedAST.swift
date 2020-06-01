@@ -44,18 +44,16 @@ class ASTBuilder: Sequence {
         let syntax = fileSyntax.1
 
         if let name = syntax.name {
-            if let kind = syntax.kind {
-                switch syntax.kind {
-                case .class:
-                    classes[name] = fileSyntax
-                case .extension:
-                    extensions.append(fileSyntax)
-                case .exprCall:
-                    calls.append(fileSyntax)
-                default:
-                    //print("ASTBuilder: unhandled kind \(kind)...")
-                    break
-                }
+            switch syntax.kind {
+            case .class:
+                classes[name] = fileSyntax
+            case .extension:
+                extensions.append(fileSyntax)
+            case .exprCall:
+                calls.append(fileSyntax)
+            default:
+                //print("ASTBuilder: unhandled kind \(kind)...")
+                break
             }
         }
 

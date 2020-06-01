@@ -67,33 +67,32 @@ extension Rule {
         return (line, character)
     }
 
-    func error(_ offset: Int?, _ fileSyntax: FileSyntax) -> String {
+    func error(_ offset: Int64?, _ fileSyntax: FileSyntax) -> String {
         let path = fileSyntax.0.path ?? "<nopath>"
         if let offset = offset {
-            let (line, character) = lineAndCharacter(fileSyntax.0, offset)
+            let (line, character) = lineAndCharacter(fileSyntax.0, Int(offset))
             return "\(path):\(line):\(character): error: \(description.consoleDescription)"
         }
         return "\(path): error: \(description.consoleDescription)"
     }
 
-    func warning(_ offset: Int?, _ fileSyntax: FileSyntax) -> String {
+    func warning(_ offset: Int64?, _ fileSyntax: FileSyntax) -> String {
         let path = fileSyntax.0.path ?? "<nopath>"
         if let offset = offset {
-            let (line, character) = lineAndCharacter(fileSyntax.0, offset)
+            let (line, character) = lineAndCharacter(fileSyntax.0, Int(offset))
             return "\(path):\(line):\(character): warning: \(description.consoleDescription)"
         }
         return "\(path): warning: \(description.consoleDescription)"
     }
 
     func test(_ code: String) -> Bool {
-        //let printError = PrintError()
+        //let printError: PrintError? = PrintError()
+        let printError: PrintError? = nil
 
         do {
             let file = File(contents: code)
             let structure = try Structure(file: file)
-            let jsonData = structure.description.data(using: .utf8)!
-            let syntax = try JSONDecoder().decode(SyntaxStructure.self, from: jsonData)
-            let fileSyntax = FileSyntax(file, syntax)
+            let fileSyntax = FileSyntax(file, structure.dictionary)
 
             let astBuilder = ASTBuilder()
             astBuilder.add(fileSyntax)
@@ -102,7 +101,7 @@ extension Rule {
 
             for syntax in astBuilder {
                 if description.syntaxTriggers.contains(syntax.1.kind!) {
-                    if !check(ast, syntax, nil) {
+                    if !check(ast, syntax, printError) {
                         return false
                     }
                 }

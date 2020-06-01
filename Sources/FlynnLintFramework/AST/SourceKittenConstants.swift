@@ -6,48 +6,32 @@
 //  Copyright © 2020 Rocco Bowling. All rights reserved.
 //
 
+// swiftlint:disable force_cast
+
 import Foundation
 import SourceKittenFramework
 import Flynn
 
-struct SyntaxStructure: Codable {
-    let accessibility: AccessControlLevel?
-    let attribute: String?
-    let attributes: [SyntaxStructure]?
-    let bodylength: Int?
-    let bodyoffset: Int?
-    let diagnosticstage: String?
-    let elements: [SyntaxStructure]?
-    let inheritedTypes: [SyntaxStructure]?
-    let kind: SwiftDeclarationKind?
-    let length: Int?
-    let name: String?
-    let namelength: Int?
-    let nameoffset: Int?
-    let offset: Int?
-    let runtimename: String?
-    let substructure: [SyntaxStructure]?
-    let typename: String?
+typealias SyntaxStructure = [String: SourceKitRepresentable]
 
-    enum CodingKeys: String, CodingKey {
-        case accessibility = "key.accessibility"
-        case attribute = "key.attribute"
-        case attributes = "key.attributes"
-        case bodylength = "key.bodylength"
-        case bodyoffset = "key.bodyoffset"
-        case diagnosticstage = "key.diagnostic_stage"
-        case elements = "key.elements"
-        case inheritedTypes = "key.inheritedtypes"
-        case kind = "key.kind"
-        case length = "key.length"
-        case name = "key.name"
-        case namelength = "key.namelength"
-        case nameoffset = "key.nameoffset"
-        case offset = "key.offset"
-        case runtimename = "key.runtime_name"
-        case substructure = "key.substructure"
-        case typename = "key.typename"
-    }
+extension SyntaxStructure {
+    var accessibility: AccessControlLevel? { return AccessControlLevel(rawValue: self["key.accessibility"] as! String) }
+    var attribute: String? { return self["key.attribute"] as? String }
+    var attributes: [SyntaxStructure]? { return self["key.attributes"] as? [SyntaxStructure] }
+    var bodylength: Int64? { return self["key.bodylength"] as? Int64 }
+    var bodyoffset: Int64? { return self["key.bodyoffset"] as? Int64 }
+    var diagnosticstage: String? { return self["key.diagnostic_stage"] as? String }
+    var elements: [SyntaxStructure]? { return self["key.elements"] as? [SyntaxStructure] }
+    var inheritedTypes: [SyntaxStructure]? { return self["key.inheritedtypes"] as? [SyntaxStructure] }
+    var kind: SwiftDeclarationKind? { return SwiftDeclarationKind(rawValue: self["key.kind"] as! String) }
+    var length: Int64? { return self["key.length"] as? Int64 }
+    var name: String? { return self["key.name"] as? String }
+    var namelength: Int64? { return self["key.namelength"] as? Int64 }
+    var nameoffset: Int64? { return self["key.nameoffset"] as? Int64 }
+    var offset: Int64? { return self["key.offset"] as? Int64 }
+    var runtimename: String? { return self["key.runtime_name"] as? String }
+    var substructure: [SyntaxStructure]? { return self["key.substructure"] as? [SyntaxStructure] }
+    var typename: String? { return self["key.typename"] as? String }
 }
 
 // MARK: - Default to the last item in enum if codable fails

@@ -11,15 +11,6 @@
         }
       },
       {
-        "package": "DictionaryDecoder",
-        "repositoryURL": "https://github.com/KittyMac/DictionaryDecoder.git",
-        "state": {
-          "branch": null,
-          "revision": "b4e25609ab4b577a28b988d6cfcda1e009caa7b9",
-          "version": "0.18.0"
-        }
-      },
-      {
         "package": "Flynn",
         "repositoryURL": "https://github.com/KittyMac/Flynn.git",
         "state": {
