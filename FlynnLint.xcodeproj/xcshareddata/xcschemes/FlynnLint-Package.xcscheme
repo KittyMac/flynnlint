@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1140"
+   LastUpgradeVersion = "9999"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,10 +14,24 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "46AB458824840D5A0032B99E"
+               BlueprintIdentifier = "FlynnLint::FlynnLintFramework"
                BuildableName = "FlynnLintFramework.framework"
                BlueprintName = "FlynnLintFramework"
-               ReferencedContainer = "container:FlynnLintFramework.xcodeproj">
+               ReferencedContainer = "container:FlynnLint.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FlynnLint::flynnlint"
+               BuildableName = "flynnlint"
+               BlueprintName = "flynnlint"
+               ReferencedContainer = "container:FlynnLint.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +46,10 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "46AB459124840D5A0032B99E"
+               BlueprintIdentifier = "FlynnLint::FlynnLintFrameworkTests"
                BuildableName = "FlynnLintFrameworkTests.xctest"
                BlueprintName = "FlynnLintFrameworkTests"
-               ReferencedContainer = "container:FlynnLintFramework.xcodeproj">
+               ReferencedContainer = "container:FlynnLint.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -57,15 +71,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "46AB458824840D5A0032B99E"
-            BuildableName = "FlynnLintFramework.framework"
-            BlueprintName = "FlynnLintFramework"
-            ReferencedContainer = "container:FlynnLintFramework.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

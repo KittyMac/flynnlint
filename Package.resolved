@@ -11,6 +11,15 @@
         }
       },
       {
+        "package": "Flynn",
+        "repositoryURL": "https://github.com/KittyMac/Flynn.git",
+        "state": {
+          "branch": null,
+          "revision": "55badf2f158eb691137cd94c86e8dad35a4f9cc1",
+          "version": "0.0.1"
+        }
+      },
+      {
         "package": "Nimble",
         "repositoryURL": "https://github.com/Quick/Nimble.git",
         "state": {

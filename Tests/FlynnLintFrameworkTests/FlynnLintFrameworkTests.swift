@@ -20,12 +20,12 @@ class FlynnLintTests: XCTestCase {
     }
 
     func testSampleSet() throws {
-        FlynnLintFramework.Process("/Volumes/Development/Development/chimerasw2/flynnlint/test")
+        FlynnLintFramework.Process("/Volumes/Development/Development/chimerasw2/flynnlint/Tests/sample")
     }
 
     func testPerformanceSet() throws {
         measure {
-            FlynnLintFramework.Process("/Volumes/Development/Development/chimerasw2/flynnlint/benchmark")
+            FlynnLintFramework.Process("/Volumes/Development/Development/chimerasw2/flynnlint/Tests/benchmark")
         }
     }
     
@@ -33,7 +33,7 @@ class FlynnLintTests: XCTestCase {
         measure {
             let task = Process()
             task.launchPath = "/usr/local/bin/swiftlint"
-            task.arguments = ["--path","/Volumes/Development/Development/chimerasw2/flynnlint/benchmark"]
+            task.arguments = ["--path","/Volumes/Development/Development/chimerasw2/flynnlint/Tests/benchmark"]
             task.launch()
             task.waitUntilExit()
         }

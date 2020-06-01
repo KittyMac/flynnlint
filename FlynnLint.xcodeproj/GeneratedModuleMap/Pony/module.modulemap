@@ -1,0 +1,4 @@
+module Pony {
+    umbrella header "/Volumes/Development/Development/chimerasw2/flynnlint/.build/checkouts/Flynn/Sources/Pony/include/Pony.h"
+    export *
+}
