@@ -79,11 +79,18 @@ class BuildCombinedAST: Actor {
     // output: an immutable AST and pass all syntax
     var astBuilder = ASTBuilder()
 
+    override init() {
+        super.init()
+        priority = 1
+    }
+
     override func protected_flowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
         if args.isEmpty == false {
             astBuilder.add(FileSyntax(args[x:0], args[x:1]))
             return (false, [])
         }
+
+        priority = -1
 
         // Once we have all of the relevant structures from all of the files captured, we turn that
         // into an immutable struct which will allow us to share that safely with many actors. Then

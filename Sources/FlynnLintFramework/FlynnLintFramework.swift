@@ -17,12 +17,12 @@ public class FlynnLint {
 
     public init() {
         let ruleset = Ruleset()
+        let poolSize = max(1, (Flynn.cores / Flynn.cpus) - 2 )
 
-        // TODO: Replace 28 with a Flynn.numCores() or equivalent
         pipeline = FindFiles(["swift"]) |>
-            Array(count: 28) { ParseFile() } |>
+            Array(count: poolSize) { ParseFile() } |>
             BuildCombinedAST() |>
-            Array(count: 28) { CheckRules(ruleset) } |>
+            Array(count: poolSize) { CheckRules(ruleset) } |>
             PrintError { (numErrors: Int) in
                 self.numErrors += numErrors
             }
