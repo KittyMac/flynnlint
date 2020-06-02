@@ -17,7 +17,8 @@ struct Ruleset {
     init() {
         let allRules: [Rule.Type] = [
             PrivateFunctionInActorRule.self,
-            ProtectedFunctionRule.self
+            ProtectedFunctionRule.self,
+            PrivateVariablesInActorRule.self
         ]
 
         for ruleClass in allRules {

@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		460DCB1D248600E300AC0664 /* PrivateVariablesInActorRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460DCB1C248600E300AC0664 /* PrivateVariablesInActorRule.swift */; };
 		OBJ_193 /* api.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_106 /* api.c */; };
 		OBJ_194 /* emitter.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_107 /* emitter.c */; };
 		OBJ_195 /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_108 /* parser.c */; };
@@ -446,6 +447,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		460DCB1C248600E300AC0664 /* PrivateVariablesInActorRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivateVariablesInActorRule.swift; sourceTree = "<group>"; };
 		"Commandant::Commandant::Product" /* Commandant.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Commandant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Flynn::Flynn::Product" /* Flynn.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Flynn.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Flynn::Pony::Product" /* Pony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Pony.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -926,6 +928,7 @@
 		OBJ_19 /* Rules */ = {
 			isa = PBXGroup;
 			children = (
+				460DCB1C248600E300AC0664 /* PrivateVariablesInActorRule.swift */,
 				OBJ_20 /* PrivateFunctionInActorRule.swift */,
 				OBJ_21 /* ProtectedFunctionRule.swift */,
 				OBJ_22 /* Shared */,
@@ -1675,6 +1678,7 @@
 				OBJ_263 /* FindFiles.swift in Sources */,
 				OBJ_264 /* ParseFile.swift in Sources */,
 				OBJ_265 /* PrintError.swift in Sources */,
+				460DCB1D248600E300AC0664 /* PrivateVariablesInActorRule.swift in Sources */,
 				OBJ_266 /* FlynnLintFramework.swift in Sources */,
 				OBJ_267 /* PrivateFunctionInActorRule.swift in Sources */,
 				OBJ_268 /* ProtectedFunctionRule.swift in Sources */,
