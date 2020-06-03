@@ -10,7 +10,7 @@ import Foundation
 import SourceKittenFramework
 import Flynn
 
-typealias FileSyntax = (File, SyntaxStructure)
+typealias FileSyntax = (File, SyntaxStructure, [SyntaxToken])
 
 typealias ASTBuilderResult = ((AST) -> Void)
 
@@ -23,6 +23,7 @@ struct ASTBuilderIterator: IteratorProtocol {
         combinedArray.append(contentsOf: Array(astBuilder.classes.values))
         combinedArray.append(contentsOf: astBuilder.extensions)
         combinedArray.append(contentsOf: astBuilder.calls)
+        combinedArray.append(contentsOf: astBuilder.functions)
     }
 
     mutating func next() -> FileSyntax? {
@@ -38,19 +39,27 @@ class ASTBuilder: Sequence {
     var classes: [String: FileSyntax] = [:]
     var extensions: [FileSyntax] = []
     var calls: [FileSyntax] = []
+    var functions: [FileSyntax] = []
 
     func add(_ fileSyntax: FileSyntax) {
         let file = fileSyntax.0
         let syntax = fileSyntax.1
+        let syntaxMap = fileSyntax.2
 
         if let name = syntax.name {
             switch syntax.kind {
             case .class:
                 classes[name] = fileSyntax
-            case .extension:
+            case .extension, .extensionEnum, .extensionStruct:
                 extensions.append(fileSyntax)
             case .exprCall:
                 calls.append(fileSyntax)
+            case .functionAccessorAddress, .functionAccessorDidset, .functionAccessorGetter, .functionAccessorModify,
+                 .functionAccessorMutableaddress, .functionAccessorRead, .functionAccessorSetter,
+                 .functionAccessorWillset, .functionConstructor, .functionDestructor, .functionFree,
+                 .functionMethodClass, .functionMethodInstance, .functionMethodStatic, .functionOperator,
+                 .functionOperatorInfix, .functionOperatorPostfix, .functionOperatorPrefix, .functionSubscript:
+                functions.append(fileSyntax)
             default:
                 //print("ASTBuilder: unhandled kind \(kind)...")
                 break
@@ -59,7 +68,7 @@ class ASTBuilder: Sequence {
 
         if let substructures = syntax.substructure {
             for substructure in substructures {
-                add((file, substructure))
+                add((file, substructure, syntaxMap))
             }
         }
     }
@@ -86,7 +95,7 @@ class BuildCombinedAST: Actor {
 
     override func protected_flowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
         if args.isEmpty == false {
-            astBuilder.add(FileSyntax(args[x:0], args[x:1]))
+            astBuilder.add(args[x:0])
             return (false, [])
         }
 

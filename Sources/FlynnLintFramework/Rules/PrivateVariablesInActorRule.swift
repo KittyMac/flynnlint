@@ -29,11 +29,21 @@ struct PrivateVariablesInActorRule: Rule {
                         print("foo")
                     }
                 }
+            """),
+            Example("""
+                class WhoseCallWasThisAnyway: Actor {
+                    public lazy var protected_colorable = "hello"
+                }
             """)
         ],
         triggeringExamples: [
             Example("class SomeActor: Actor { var x:Int = 0 }\n"),
-            Example("class SomeActor: Actor { let x:Int = 0 }\n")
+            Example("class SomeActor: Actor { let x:Int = 0 }\n"),
+            Example("""
+                class WhoseCallWasThisAnyway: Actor {
+                    public lazy var _colorable = "hello"
+                }
+            """)
         ]
     )
 
@@ -53,6 +63,13 @@ struct PrivateVariablesInActorRule: Rule {
                                 let sibling = variables[idx+1]
                                 if (sibling.name == "ChainableBehavior" || sibling.name == "Behavior") &&
                                 sibling.kind == .exprCall {
+                                    continue
+                                }
+                            }
+
+                            // allow variables to be "protected"
+                            if let name = variable.name {
+                                if name.hasPrefix("protected_") {
                                     continue
                                 }
                             }

@@ -18,7 +18,8 @@ struct Ruleset {
         let allRules: [Rule.Type] = [
             PrivateFunctionInActorRule.self,
             ProtectedFunctionRule.self,
-            PrivateVariablesInActorRule.self
+            PrivateVariablesInActorRule.self,
+            ProtectedVariableRule.self
         ]
 
         for ruleClass in allRules {
@@ -48,31 +49,13 @@ protocol Rule {
 
 extension Rule {
 
-    func lineAndCharacter(_ file: File, _ offset: Int) -> (Int, Int) {
-        let contents = file.contents.utf8
-        var line: Int = 1
-        var character: Int = 1
-        var count: Int = offset
-        for ccc in contents {
-            if ccc == 10 {
-                line += 1
-                character = 1
-            } else {
-                character += 1
-            }
-            count -= 1
-            if count <= 0 {
-                break
-            }
-        }
-        return (line, character)
-    }
-
     func error(_ offset: Int64?, _ fileSyntax: FileSyntax) -> String {
         let path = fileSyntax.0.path ?? "<nopath>"
         if let offset = offset {
-            let (line, character) = lineAndCharacter(fileSyntax.0, Int(offset))
-            return "\(path):\(line):\(character): error: \(description.consoleDescription)"
+            let stringView = StringView.init(fileSyntax.0.contents)
+            if let (line, character) = stringView.lineAndCharacter(forByteOffset: ByteCount(offset)) {
+                return "\(path):\(line):\(character): error: \(description.consoleDescription)"
+            }
         }
         return "\(path): error: \(description.consoleDescription)"
     }
@@ -80,20 +63,23 @@ extension Rule {
     func warning(_ offset: Int64?, _ fileSyntax: FileSyntax) -> String {
         let path = fileSyntax.0.path ?? "<nopath>"
         if let offset = offset {
-            let (line, character) = lineAndCharacter(fileSyntax.0, Int(offset))
-            return "\(path):\(line):\(character): warning: \(description.consoleDescription)"
+            let stringView = StringView.init(fileSyntax.0.contents)
+            if let (line, character) = stringView.lineAndCharacter(forByteOffset: ByteCount(offset)) {
+                return "\(path):\(line):\(character): warning: \(description.consoleDescription)"
+            }
         }
         return "\(path): warning: \(description.consoleDescription)"
     }
 
     func test(_ code: String) -> Bool {
-        //let printError: PrintError? = PrintError()
-        let printError: PrintError? = nil
+        let printError: PrintError? = PrintError()
+        //let printError: PrintError? = nil
 
         do {
             let file = File(contents: code)
             let structure = try Structure(file: file)
-            let fileSyntax = FileSyntax(file, structure.dictionary)
+            let syntaxMap = try SyntaxMap(file: file)
+            let fileSyntax = FileSyntax(file, structure.dictionary, syntaxMap.tokens)
 
             let astBuilder = ASTBuilder()
             astBuilder.add(fileSyntax)
@@ -128,5 +114,49 @@ extension Rule {
             }
         }
         return true
+    }
+
+    func match(_ syntax: FileSyntax, _ regex: String) -> Int64? {
+        var firstOffendingMatchOffset: Int64?
+
+        do {
+            let pattern = #"\w+(?<!self)\.protected_"#
+            let body = syntax.0.contents
+            let regex = try NSRegularExpression(pattern: pattern, options: [])
+            let structure = syntax.1
+            let map = syntax.2
+
+            if let bodyoffset = structure.bodyoffset, let bodylength = structure.bodylength {
+                let nsrange = NSRange(location: Int(bodyoffset), length: Int(bodylength))
+                regex.enumerateMatches(in: body, options: [], range: nsrange) { (match, _, stop) in
+                    guard let match = match else { return }
+
+                    let fullBodyOffset = Int64(match.range.location)
+
+                    // check this offset against all of the offsets in the syntax map.  If it is
+                    // inside of a comment, then we want to ignore this offset
+                    for commentSection in map {
+                        if let type = SyntaxKind(rawValue: commentSection.type) {
+                            let offset = commentSection.offset.value
+                            let length = commentSection.length.value
+                            if fullBodyOffset >= offset && fullBodyOffset <= (offset + length) {
+                                switch type {
+                                case .comment, .commentURL, .commentMark, .docComment, .docCommentField:
+                                    return
+                                default:
+                                    break
+                                }
+                            }
+                        }
+                    }
+
+                    firstOffendingMatchOffset = fullBodyOffset
+                    stop.pointee = true
+                }
+            }
+        } catch {
+            return nil
+        }
+        return firstOffendingMatchOffset
     }
 }

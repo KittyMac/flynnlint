@@ -20,7 +20,9 @@ class ParseFile: Actor {
         if let file = File(path: path) {
             do {
                 let syntax = try Structure(file: file)
-                return (true, [file, syntax.dictionary])
+                let syntaxMap = try SyntaxMap(file: file)
+                let fileSyntax = FileSyntax(file, syntax.dictionary, syntaxMap.tokens)
+                return (true, [fileSyntax])
             } catch {
                 print("Parsing error: \(error)")
             }
