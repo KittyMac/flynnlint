@@ -15,26 +15,7 @@ struct ProtectedVariableRule: Rule {
         identifier: "actors_protected_var",
         name: "Protected Access Violation",
         description: "Protected variables may not be called outside of the Actor.",
-        syntaxTriggers: [.class, .extension, .struct, .extensionStruct, .enum, .extensionEnum,
-                         .functionAccessorAddress,
-                         .functionAccessorDidset,
-                         .functionAccessorGetter,
-                         .functionAccessorModify,
-                         .functionAccessorMutableaddress,
-                         .functionAccessorRead,
-                         .functionAccessorSetter,
-                         .functionAccessorWillset,
-                         .functionConstructor,
-                         .functionDestructor,
-                         .functionFree,
-                         .functionMethodClass,
-                         .functionMethodInstance,
-                         .functionMethodStatic,
-                         .functionOperator,
-                         .functionOperatorInfix,
-                         .functionOperatorPostfix,
-                         .functionOperatorPrefix,
-                         .functionSubscript],
+        syntaxTriggers: [.class, .extension, .struct, .extensionStruct, .enum, .extensionEnum, .functionFree],
         nonTriggeringExamples: [
             Example("""
                 class SomeActor: Actor {
@@ -102,11 +83,13 @@ struct ProtectedVariableRule: Rule {
         // or any instances of .protected_ which are not self.protected_. This is
         // FAR from perfect, but until sourcekit provides the full, unadultered
         // AST what can we do?
-        if let innerOffset = match(syntax, #"\w+(?<!self)\.protected_"#) {
-            if let output = output {
-                output.flow(error(innerOffset, syntax))
+        if syntax.0.contents.contains(".protected_") {
+            if let innerOffset = match(syntax, #"\w+(?<!self)\.protected_"#) {
+                if let output = output {
+                    output.flow(error(innerOffset, syntax))
+                }
+                return false
             }
-            return false
         }
 
         return true

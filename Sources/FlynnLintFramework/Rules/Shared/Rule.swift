@@ -78,6 +78,7 @@ extension Rule {
         do {
             let file = File(contents: code)
             let structure = try Structure(file: file)
+            print(structure)
             let syntaxMap = try SyntaxMap(file: file)
             let fileSyntax = FileSyntax(file, structure.dictionary, syntaxMap.tokens)
 
@@ -116,42 +117,43 @@ extension Rule {
         return true
     }
 
-    func match(_ syntax: FileSyntax, _ regex: String) -> Int64? {
+    func match(_ syntax: FileSyntax, _ pattern: String) -> Int64? {
         var firstOffendingMatchOffset: Int64?
 
         do {
-            let pattern = #"\w+(?<!self)\.protected_"#
             let body = syntax.0.contents
-            let regex = try NSRegularExpression(pattern: pattern, options: [])
             let structure = syntax.1
             let map = syntax.2
 
             if let bodyoffset = structure.bodyoffset, let bodylength = structure.bodylength {
-                let nsrange = NSRange(location: Int(bodyoffset), length: Int(bodylength))
-                regex.enumerateMatches(in: body, options: [], range: nsrange) { (match, _, stop) in
-                    guard let match = match else { return }
+                if bodyoffset + bodylength < body.count {
+                    let regex = try NSRegularExpression(pattern: pattern, options: [])
+                    let nsrange = NSRange(location: Int(bodyoffset), length: Int(bodylength))
+                    regex.enumerateMatches(in: body, options: [], range: nsrange) { (match, _, stop) in
+                        guard let match = match else { return }
 
-                    let fullBodyOffset = Int64(match.range.location)
+                        let fullBodyOffset = Int64(match.range.location)
 
-                    // check this offset against all of the offsets in the syntax map.  If it is
-                    // inside of a comment, then we want to ignore this offset
-                    for commentSection in map {
-                        if let type = SyntaxKind(rawValue: commentSection.type) {
-                            let offset = commentSection.offset.value
-                            let length = commentSection.length.value
-                            if fullBodyOffset >= offset && fullBodyOffset <= (offset + length) {
-                                switch type {
-                                case .comment, .commentURL, .commentMark, .docComment, .docCommentField:
-                                    return
-                                default:
-                                    break
+                        // check this offset against all of the offsets in the syntax map.  If it is
+                        // inside of a comment, then we want to ignore this offset
+                        for commentSection in map {
+                            if let type = SyntaxKind(rawValue: commentSection.type) {
+                                let offset = commentSection.offset.value
+                                let length = commentSection.length.value
+                                if fullBodyOffset >= offset && fullBodyOffset <= (offset + length) {
+                                    switch type {
+                                    case .comment, .commentURL, .commentMark, .docComment, .docCommentField:
+                                        return
+                                    default:
+                                        break
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    firstOffendingMatchOffset = fullBodyOffset
-                    stop.pointee = true
+                        firstOffendingMatchOffset = fullBodyOffset
+                        stop.pointee = true
+                    }
                 }
             }
         } catch {
