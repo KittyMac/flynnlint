@@ -1142,9 +1142,9 @@
 		OBJ_8 /* FlynnLintFramework */ = {
 			isa = PBXGroup;
 			children = (
+				OBJ_18 /* FlynnLintFramework.swift */,
 				OBJ_9 /* AST */,
 				OBJ_12 /* Actors */,
-				OBJ_18 /* FlynnLintFramework.swift */,
 				OBJ_19 /* Rules */,
 			);
 			name = FlynnLintFramework;

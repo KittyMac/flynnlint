@@ -10,7 +10,7 @@ import Foundation
 import SourceKittenFramework
 import Flynn
 
-typealias FileSyntax = (File, SyntaxStructure, [SyntaxToken])
+typealias FileSyntax = (File, SyntaxStructure, [SyntaxToken], [String])
 
 typealias ASTBuilderResult = ((AST) -> Void)
 
@@ -45,6 +45,7 @@ class ASTBuilder: Sequence {
         let file = fileSyntax.0
         let syntax = fileSyntax.1
         let syntaxMap = fileSyntax.2
+        let ruleBlacklist = fileSyntax.3
 
         if let name = syntax.name {
             switch syntax.kind {
@@ -68,7 +69,7 @@ class ASTBuilder: Sequence {
 
         if let substructures = syntax.substructure {
             for substructure in substructures {
-                add((file, substructure, syntaxMap))
+                add((file, substructure, syntaxMap, ruleBlacklist))
             }
         }
     }

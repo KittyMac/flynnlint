@@ -77,19 +77,21 @@ struct ProtectedVariableRule: Rule {
         ]
     )
 
+    func precheck(_ file: File) -> Bool {
+        return file.contents.contains(".protected_")
+    }
+
     func check(_ ast: AST, _ syntax: FileSyntax, _ output: Actor?) -> Bool {
         // sourcekit doesn't give us structures for variable accesses. So the
         // best we can do is grep the body contents. Doing this, we are looking
         // or any instances of .protected_ which are not self.protected_. This is
         // FAR from perfect, but until sourcekit provides the full, unadultered
         // AST what can we do?
-        if syntax.0.contents.contains(".protected_") {
-            if let innerOffset = match(syntax, #"\w+(?<!self)\.protected_"#) {
-                if let output = output {
-                    output.flow(error(innerOffset, syntax))
-                }
-                return false
+        if let innerOffset = match(syntax, #"\w+(?<!self)\.protected_"#) {
+            if let output = output {
+                output.flow(error(innerOffset, syntax))
             }
+            return false
         }
 
         return true

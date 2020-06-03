@@ -43,11 +43,17 @@ protocol Rule {
 
     var description: RuleDescription { get }
 
+    func precheck(_ file: File) -> Bool
+
     @discardableResult
     func check(_ ast: AST, _ syntax: FileSyntax, _ output: Actor?) -> Bool
 }
 
 extension Rule {
+
+    func precheck(_ file: File) -> Bool {
+        return true
+    }
 
     func error(_ offset: Int64?, _ fileSyntax: FileSyntax) -> String {
         let path = fileSyntax.0.path ?? "<nopath>"
@@ -77,10 +83,8 @@ extension Rule {
 
         do {
             let file = File(contents: code)
-            let structure = try Structure(file: file)
-            print(structure)
-            let syntaxMap = try SyntaxMap(file: file)
-            let fileSyntax = FileSyntax(file, structure.dictionary, syntaxMap.tokens)
+            let syntax = try StructureAndSyntax(file: file)
+            let fileSyntax = FileSyntax(file, syntax.structure, syntax.syntax, [])
 
             let astBuilder = ASTBuilder()
             astBuilder.add(fileSyntax)

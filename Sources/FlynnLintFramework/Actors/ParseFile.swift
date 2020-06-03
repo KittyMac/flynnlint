@@ -19,9 +19,17 @@ class ParseFile: Actor {
         let path: String = args[x:0]
         if let file = File(path: path) {
             do {
-                let syntax = try Structure(file: file)
-                let syntaxMap = try SyntaxMap(file: file)
-                let fileSyntax = FileSyntax(file, syntax.dictionary, syntaxMap.tokens)
+                let syntax = try StructureAndSyntax(file: file)
+
+                var blacklist: [String] = []
+                for rule in Ruleset().all {
+                    if !rule.precheck(file) {
+                        blacklist.append(rule.description.identifier)
+                    }
+                }
+
+                let fileSyntax = FileSyntax(file, syntax.structure, syntax.syntax, blacklist)
+
                 return (true, [fileSyntax])
             } catch {
                 print("Parsing error: \(error)")

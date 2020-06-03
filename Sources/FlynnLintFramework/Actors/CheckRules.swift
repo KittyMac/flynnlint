@@ -25,9 +25,11 @@ class CheckRules: Actor {
             let syntax: FileSyntax = args[x:1]
             let target = protected_nextTarget()
 
+            let blacklist = syntax.3
+
             if let kind = syntax.1.kind {
                 if let rules = rules.byKind[kind] {
-                    for rule in rules {
+                    for rule in rules where !blacklist.contains(rule.description.identifier) {
                         rule.check(ast, syntax, target)
                     }
                 }

@@ -34,6 +34,28 @@ extension SyntaxStructure {
     var typename: String? { return self["key.typename"] as? String }
 }
 
+public struct StructureAndSyntax {
+    public let structure: [String: SourceKitRepresentable]
+    public let syntax: [SyntaxToken]
+
+    public init(sourceKitResponse: [String: SourceKitRepresentable]) {
+        structure = sourceKitResponse
+        if let data = sourceKitResponse["key.syntaxmap"] as? [SourceKitRepresentable] {
+            syntax = data.map { item in
+                let dict = item as! [String: SourceKitRepresentable]
+                return SyntaxToken(type: dict["key.kind"] as! String, offset: ByteCount(dict["key.offset"] as! Int64),
+                                   length: ByteCount(dict["key.length"] as! Int64))
+            }
+        } else {
+            syntax = []
+        }
+    }
+
+    public init(file: File) throws {
+        self.init(sourceKitResponse: try Request.editorOpen(file: file).send())
+    }
+}
+
 // MARK: - Default to the last item in enum if codable fails
 
 enum CaseIterableDefaultsLastError: Error {
