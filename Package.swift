@@ -10,8 +10,8 @@ let package = Package(
     dependencies: [
 		.package(url: "https://github.com/KittyMac/Flynn.git", from: "0.0.0"),
         .package(url: "https://github.com/Carthage/Commandant.git", .upToNextMinor(from: "0.17.0")),
-        .package(url: "https://github.com/jpsim/SourceKitten.git", .upToNextMinor(from: "0.29.0")),
-        .package(url: "https://github.com/jpsim/Yams.git", from: "2.0.0"),
+        .package(url: "https://github.com/KittyMac/SourceKitten.git", .branch("roc_master")),
+        .package(url: "https://github.com/jpsim/Yams.git", from: "3.0.0"),
         .package(url: "https://github.com/scottrhoyt/SwiftyTextTable.git", from: "0.9.0"),
     ],
     targets: [

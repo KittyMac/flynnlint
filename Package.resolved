@@ -15,7 +15,7 @@
         "repositoryURL": "https://github.com/KittyMac/Flynn.git",
         "state": {
           "branch": null,
-          "revision": "c1cc670e555e61aca4f56bae31d7caf50e22cdf8",
+          "revision": "1652f525f1edde563ec1e3130514e53f0d0c8066",
           "version": "0.0.1"
         }
       },
@@ -39,11 +39,11 @@
       },
       {
         "package": "SourceKitten",
-        "repositoryURL": "https://github.com/jpsim/SourceKitten.git",
+        "repositoryURL": "https://github.com/KittyMac/SourceKitten.git",
         "state": {
-          "branch": null,
-          "revision": "77a4dbbb477a8110eb8765e3c44c70fb4929098f",
-          "version": "0.29.0"
+          "branch": "roc_master",
+          "revision": "efd4db4f6f155a44feaa66f7ca021b65cb5ad21b",
+          "version": null
         }
       },
       {
@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/jpsim/Yams.git",
         "state": {
           "branch": null,
-          "revision": "c947a306d2e80ecb2c0859047b35c73b8e1ca27f",
-          "version": "2.0.0"
+          "revision": "81a65c4069c28011ee432f2858ba0de49b086677",
+          "version": "3.0.1"
         }
       }
     ]
