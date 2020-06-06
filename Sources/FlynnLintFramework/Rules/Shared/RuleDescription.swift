@@ -30,6 +30,9 @@ struct RuleDescription: Equatable {
     /// The console-printable string for this description.
     public var consoleDescription: String { return "\(name): \(description)" }
 
+    /// Custom console error message
+    public func console(_ msg: String) -> String { return "\(name): \(msg)" }
+
     // MARK: Equatable
 
     public static func == (lhs: RuleDescription, rhs: RuleDescription) -> Bool {

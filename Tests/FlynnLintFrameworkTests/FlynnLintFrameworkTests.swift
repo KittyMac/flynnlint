@@ -23,7 +23,7 @@ class FlynnLintTests: XCTestCase {
     }
     
     func testOneRule() throws {
-        let rule = ProtectedVariableRule()
+        let rule = BehaviorParamsDefined()
         XCTAssert(rule.test())
     }
 

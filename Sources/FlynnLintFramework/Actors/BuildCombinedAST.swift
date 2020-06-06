@@ -10,7 +10,155 @@ import Foundation
 import SourceKittenFramework
 import Flynn
 
-typealias FileSyntax = (File, SyntaxStructure, [SyntaxToken], [String])
+// swiftlint:disable line_length
+
+extension String {
+    func substring(with nsrange: NSRange) -> Substring? {
+        guard let range = Range(nsrange, in: self) else { return nil }
+        return self[range]
+    }
+}
+
+struct FileSyntax {
+    let file: File
+    let structure: SyntaxStructure
+    let tokens: [SyntaxToken]
+    let blacklist: [String]
+
+    init(_ file: File, _ structure: SyntaxStructure, _ tokens: [SyntaxToken], _ blacklist: [String]) {
+        self.file = file
+        self.structure = structure
+        self.tokens = tokens
+        self.blacklist = blacklist
+    }
+
+    func clone(_ substructure: SyntaxStructure) -> FileSyntax {
+        return FileSyntax(file, substructure, tokens, blacklist)
+    }
+
+    func match(_ pattern: String) -> Int64? {
+        var firstOffendingMatchOffset: Int64?
+
+        do {
+            let body = self.file.contents
+            let structure = self.structure
+            let map = self.tokens
+
+            if let bodyoffset = structure.offset, let bodylength = structure.length {
+                if bodyoffset + bodylength < body.count {
+                    let regex = try NSRegularExpression(pattern: pattern, options: [])
+                    let nsrange = NSRange(location: Int(bodyoffset), length: Int(bodylength))
+                    regex.enumerateMatches(in: body, options: [], range: nsrange) { (match, _, stop) in
+                        guard let match = match else { return }
+
+                        let fullBodyOffset = Int64(match.range.location)
+
+                        // check this offset against all of the offsets in the syntax map.  If it is
+                        // inside of a comment, then we want to ignore this offset
+                        for commentSection in map {
+                            if let type = SyntaxKind(rawValue: commentSection.type) {
+                                let offset = commentSection.offset.value
+                                let length = commentSection.length.value
+                                if fullBodyOffset >= offset && fullBodyOffset <= (offset + length) {
+                                    switch type {
+                                    case .comment, .commentURL, .commentMark, .docComment, .docCommentField:
+                                        return
+                                    default:
+                                        break
+                                    }
+                                }
+                            }
+                        }
+
+                        firstOffendingMatchOffset = fullBodyOffset
+                        stop.pointee = true
+                    }
+                }
+            }
+        } catch {
+            return nil
+        }
+        return firstOffendingMatchOffset
+    }
+
+    func matches(_ pattern: String, _ callback: ((NSTextCheckingResult, [String]) -> Void)) {
+        do {
+            let body = self.file.contents
+            let structure = self.structure
+            let map = self.tokens
+
+            if let bodyoffset = structure.offset, let bodylength = structure.length {
+                if bodyoffset + bodylength < body.count {
+                    let regex = try NSRegularExpression(pattern: pattern, options: [])
+                    let nsrange = NSRange(location: Int(bodyoffset), length: Int(bodylength))
+                    regex.enumerateMatches(in: body, options: [], range: nsrange) { (match, _, _) in
+                        guard let match = match else { return }
+
+                        let fullBodyOffset = Int64(match.range.location)
+
+                        // check this offset against all of the offsets in the syntax map.  If it is
+                        // inside of a comment, then we want to ignore this offset
+                        for commentSection in map {
+                            if let type = SyntaxKind(rawValue: commentSection.type) {
+                                let offset = commentSection.offset.value
+                                let length = commentSection.length.value
+                                if fullBodyOffset >= offset && fullBodyOffset <= (offset + length) {
+                                    switch type {
+                                    case .comment, .commentURL, .commentMark, .docComment, .docCommentField:
+                                        return
+                                    default:
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                        var groups: [String] = []
+                        for iii in 0..<match.numberOfRanges {
+                            if let groupString = body.substring(with: match.range(at: iii)) {
+                                groups.append(String(groupString))
+                            }
+                        }
+                        callback(match, groups)
+                    }
+                }
+            }
+        } catch { }
+    }
+
+    func markup(_ label: String) -> [(ByteCount, String)] {
+        let body = self.file.contents
+        let structure = self.structure
+        let map = self.tokens
+        var markup: [(ByteCount, String)] = []
+
+        if let bodyoffset = structure.offset, let bodylength = structure.length {
+            if bodyoffset + bodylength < body.count {
+                let targetString = "flynnlint:\(label)"
+                // Check all comments inside the body to see if they are flynnlint commands
+                // flynnlint:<name> <args>
+                for commentSection in map {
+                    if let type = SyntaxKind(rawValue: commentSection.type) {
+                        let offset = commentSection.offset.value
+                        if offset >= bodyoffset && offset <= (bodyoffset + bodylength) {
+                            switch type {
+                            case .comment, .commentURL, .commentMark, .docComment, .docCommentField:
+                                let stringView = StringView.init(body)
+                                if let commentString = stringView.substringWithByteRange(commentSection.range) {
+                                    if let range = commentString.range(of: targetString) {
+                                        markup.append( (commentSection.offset, String(commentString[range.upperBound...])) )
+                                    }
+                                }
+                            default:
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return markup
+    }
+}
 
 typealias ASTBuilderResult = ((AST) -> Void)
 
@@ -42,10 +190,7 @@ class ASTBuilder: Sequence {
     var functions: [FileSyntax] = []
 
     func add(_ fileSyntax: FileSyntax) {
-        let file = fileSyntax.0
-        let syntax = fileSyntax.1
-        let syntaxMap = fileSyntax.2
-        let ruleBlacklist = fileSyntax.3
+        let syntax = fileSyntax.structure
 
         if let name = syntax.name {
             switch syntax.kind {
@@ -69,7 +214,7 @@ class ASTBuilder: Sequence {
 
         if let substructures = syntax.substructure {
             for substructure in substructures {
-                add((file, substructure, syntaxMap, ruleBlacklist))
+                add(fileSyntax.clone(substructure))
             }
         }
     }

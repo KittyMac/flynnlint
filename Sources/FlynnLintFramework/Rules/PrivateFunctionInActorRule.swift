@@ -43,9 +43,9 @@ struct PrivateFunctionInActorRule: Rule {
         //    but a subclass of this Actor calling protected methods
         // 3. if it is an init function
 
-        if let resolvedClass = ast.getClass(syntax.1.name) {
+        if let resolvedClass = ast.getClass(syntax.structure.name) {
             if ast.isActor(resolvedClass) {
-                if let functions = syntax.1.substructure {
+                if let functions = syntax.structure.substructure {
                     for function in functions where
                         !(function.name ?? "").hasPrefix("protected_") &&
                         !(function.name ?? "").hasPrefix("init(") &&

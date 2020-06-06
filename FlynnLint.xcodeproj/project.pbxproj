@@ -23,6 +23,7 @@
 /* Begin PBXBuildFile section */
 		460DCB1D248600E300AC0664 /* PrivateVariablesInActorRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460DCB1C248600E300AC0664 /* PrivateVariablesInActorRule.swift */; };
 		46627BE42486E3A500A2A610 /* ProtectedVariableRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46627BE32486E3A500A2A610 /* ProtectedVariableRule.swift */; };
+		46776428248ABAB200228D82 /* BehaviorParamsDefined.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46776427248ABAB200228D82 /* BehaviorParamsDefined.swift */; };
 		OBJ_193 /* api.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_106 /* api.c */; };
 		OBJ_194 /* emitter.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_107 /* emitter.c */; };
 		OBJ_195 /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_108 /* parser.c */; };
@@ -450,6 +451,7 @@
 /* Begin PBXFileReference section */
 		460DCB1C248600E300AC0664 /* PrivateVariablesInActorRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivateVariablesInActorRule.swift; sourceTree = "<group>"; };
 		46627BE32486E3A500A2A610 /* ProtectedVariableRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProtectedVariableRule.swift; sourceTree = "<group>"; };
+		46776427248ABAB200228D82 /* BehaviorParamsDefined.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BehaviorParamsDefined.swift; sourceTree = "<group>"; };
 		"Commandant::Commandant::Product" /* Commandant.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Commandant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Flynn::Flynn::Product" /* Flynn.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Flynn.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Flynn::Pony::Product" /* Pony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Pony.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -934,6 +936,7 @@
 				OBJ_20 /* PrivateFunctionInActorRule.swift */,
 				OBJ_21 /* ProtectedFunctionRule.swift */,
 				46627BE32486E3A500A2A610 /* ProtectedVariableRule.swift */,
+				46776427248ABAB200228D82 /* BehaviorParamsDefined.swift */,
 				OBJ_22 /* Shared */,
 			);
 			path = Rules;
@@ -1675,6 +1678,7 @@
 			files = (
 				OBJ_259 /* AST.swift in Sources */,
 				OBJ_260 /* SourceKittenConstants.swift in Sources */,
+				46776428248ABAB200228D82 /* BehaviorParamsDefined.swift in Sources */,
 				OBJ_261 /* BuildCombinedAST.swift in Sources */,
 				OBJ_262 /* CheckRules.swift in Sources */,
 				OBJ_263 /* FindFiles.swift in Sources */,

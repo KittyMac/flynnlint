@@ -87,7 +87,7 @@ struct ProtectedVariableRule: Rule {
         // or any instances of .protected_ which are not self.protected_. This is
         // FAR from perfect, but until sourcekit provides the full, unadultered
         // AST what can we do?
-        if let innerOffset = match(syntax, #"\w+(?<!self)\.protected_"#) {
+        if let innerOffset = syntax.match(#"\w+(?<!self)\.protected_"#) {
             if let output = output {
                 output.flow(error(innerOffset, syntax))
             }
