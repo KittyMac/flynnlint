@@ -11,6 +11,8 @@ import Flynn
 import SourceKittenFramework
 
 struct SafeFunctionRule: Rule {
+    
+    let unsafeCallString = ".\(FlynnLint.safePrefix)"
 
     let description = RuleDescription(
         identifier: "actors_safe_func",
@@ -121,8 +123,7 @@ struct SafeFunctionRule: Rule {
     func check(_ ast: AST, _ syntax: FileSyntax, _ output: Actor?) -> Bool {
         // Only functions of the class may call safe methods on a class
         if let functionCall = syntax.structure.name {
-            if  functionCall.range(of: FlynnLint.safePrefix) != nil &&
-                functionCall.hasPrefix(FlynnLint.safePrefix) == false &&
+            if  functionCall.range(of: unsafeCallString) != nil &&
                 functionCall.hasPrefix("self.") == false {
                 if let output = output {
                     output.flow(error(syntax.structure.offset, syntax))
