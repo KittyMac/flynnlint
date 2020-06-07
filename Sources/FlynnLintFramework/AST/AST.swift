@@ -15,6 +15,16 @@ struct AST {
         let syntax: FileSyntax
         let parameters: [Parameter]
         let argsName: String
+
+        init(_ syntax: FileSyntax, _ parameters: [Parameter], _ argsName: String) {
+            self.syntax = syntax
+            self.argsName = argsName
+            if argsName == "_" && parameters.isEmpty {
+                self.parameters = [Parameter("None")]
+            } else {
+                self.parameters = parameters
+            }
+        }
     }
     struct Parameter {
         let type: String
@@ -102,10 +112,10 @@ struct AST {
 
                             // Extract the name of the "args" closure parameter
                             let argsStructure = findSubstructureOfType(sibling, "BehaviorArgs")
-                            let argsName = argsStructure?.name ?? "args"
-                            behaviors[name]?.append(Behavior(syntax: variableSyntax,
-                                                             parameters: params,
-                                                             argsName: argsName))
+                            let argsName = argsStructure?.name ?? "_"
+                            behaviors[name]?.append(Behavior(variableSyntax,
+                                                             params,
+                                                             argsName))
                         }
                     }
                 }

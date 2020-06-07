@@ -29,6 +29,9 @@ struct BehaviorParamsDefined: Rule {
                         // flynnlint:parameter None
                         self.string.append(" ")
                     }
+                    lazy var space = ChainableBehavior(self) { (_: BehaviorArgs) in
+                        self.string.append(" ")
+                    }
                     lazy var result = ChainableBehavior(self) { (args: BehaviorArgs) in
                         // flynnlint:parameter String - closure to call when the string is completed
                         let callback: ((String) -> Void) = args[x:0]
