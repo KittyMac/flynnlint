@@ -24,7 +24,7 @@ struct RuleDescription: Equatable {
     /// Examples where the rule is used properly
     public let nonTriggeringExamples: [Example]
 
-    /// Examples which violate the rule (Violations should occur where `↓` markers are located)
+    /// Examples which violate the rule
     public let triggeringExamples: [Example]
 
     /// The console-printable string for this description.

@@ -30,7 +30,9 @@ class PrintError: Actor {
         if args.isEmpty == false {
             let error: String = args[x:0]
             print(error)
-            numErrors += 1
+            if error.contains("error") {
+                numErrors += 1
+            }
             return (false, [])
         }
 

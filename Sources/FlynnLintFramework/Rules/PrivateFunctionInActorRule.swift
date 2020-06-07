@@ -25,14 +25,20 @@ struct PrivateFunctionInActorRule: Rule {
             Example("class SomeActor: Actor { private func foo() { } }\n"),
             Example("class SomeActor: Actor { init(_ data: OffToTheRacesData) { self.data = data } }\n"),
             Example("class SomeActor: Actor { override func safeFlowProcess() { } }\n"),
-            Example("class SomeClass { public func foo() { } }\n")
+            Example("class SomeClass { public func foo() { } }\n"),
+
+            Example("class SomeActor: Actor { public func unsafeFoo() { } }\n"),
+            Example("class SomeActor: Actor { fileprivate func unsafeFoo() { } }\n"),
+            Example("class SomeActor: Actor { internal func unsafeFoo() { } }\n"),
+            Example("class SomeActor: Actor { func unsafeFoo() { } }\n"),
+            Example("class SomeActor: Actor { override func unsafeFlowProcess() { } }\n")
         ],
         triggeringExamples: [
-            Example("class SomeActor: Actor { public ↓func foo() { } }\n"),
-            Example("class SomeActor: Actor { fileprivate ↓func foo() { } }\n"),
-            Example("class SomeActor: Actor { internal ↓func foo() { } }\n"),
-            Example("class SomeActor: Actor { ↓func foo() { } }\n"),
-            Example("class SomeActor: Actor { override ↓func flowProcess() { } }\n")
+            Example("class SomeActor: Actor { public func foo() { } }\n"),
+            Example("class SomeActor: Actor { fileprivate func foo() { } }\n"),
+            Example("class SomeActor: Actor { internal func foo() { } }\n"),
+            Example("class SomeActor: Actor { func foo() { } }\n"),
+            Example("class SomeActor: Actor { override func flowProcess() { } }\n")
         ]
     )
 
@@ -47,14 +53,23 @@ struct PrivateFunctionInActorRule: Rule {
             if ast.isActor(resolvedClass) {
                 if let functions = syntax.structure.substructure {
                     for function in functions where
+                        !(function.name ?? "").hasPrefix(FlynnLint.unsafePrefix) &&
                         !(function.name ?? "").hasPrefix(FlynnLint.safePrefix) &&
                         !(function.name ?? "").hasPrefix("init(") &&
                         function.kind == .functionMethodInstance &&
                         function.accessibility != .private {
-                            if let output = output {
-                                output.flow(error(function.offset, syntax))
-                            }
+                        if let output = output {
+                            output.flow(error(function.offset, syntax))
+                        }
                         return false
+                    }
+                    for function in functions where
+                        (function.name ?? "").hasPrefix(FlynnLint.unsafePrefix) &&
+                        function.kind == .functionMethodInstance &&
+                        function.accessibility != .private {
+                        if let output = output {
+                            output.flow(warning(function.offset, syntax, description.console("Unsafe functions should not be used")))
+                        }
                     }
                 }
             }

@@ -7,6 +7,7 @@
 //
 
 // swiftlint:disable line_length
+// swiftlint:disable cyclomatic_complexity
 
 import Foundation
 import Flynn
@@ -33,6 +34,14 @@ struct PrivateVariablesInActorRule: Rule {
             Example("""
                 class WhoseCallWasThisAnyway: Actor {
                     public lazy var safeColorable = "hello"
+                }
+            """),
+
+            Example("class SomeActor: Actor { var unsafeX:Int = 0 }\n"),
+            Example("class SomeActor: Actor { let unsafeX:Int = 0 }\n"),
+            Example("""
+                class WhoseCallWasThisAnyway: Actor {
+                    public lazy var unsafeColorable = "hello"
                 }
             """)
         ],
@@ -67,9 +76,16 @@ struct PrivateVariablesInActorRule: Rule {
                                 }
                             }
 
-                            // allow variables to be "safe"
                             if let name = variable.name {
+                                // allow variables to be "safe"
                                 if name.hasPrefix(FlynnLint.safePrefix) {
+                                    continue
+                                }
+                                // allow variables to be "unsafe"
+                                if name.hasPrefix(FlynnLint.unsafePrefix) {
+                                    if let output = output {
+                                        output.flow(warning(variable.offset, syntax, description.console("Unsafe variables should not be used")))
+                                    }
                                     continue
                                 }
                             }
