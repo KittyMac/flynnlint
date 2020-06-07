@@ -24,6 +24,7 @@
 		460DCB1D248600E300AC0664 /* PrivateVariablesInActorRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460DCB1C248600E300AC0664 /* PrivateVariablesInActorRule.swift */; };
 		46627BE42486E3A500A2A610 /* SafeVariableRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46627BE32486E3A500A2A610 /* SafeVariableRule.swift */; };
 		46776428248ABAB200228D82 /* BehaviorParamsDefined.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46776427248ABAB200228D82 /* BehaviorParamsDefined.swift */; };
+		46B8A330248DB2D50076973B /* BehaviorNamingConvention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B8A32F248DB2D50076973B /* BehaviorNamingConvention.swift */; };
 		OBJ_193 /* api.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_106 /* api.c */; };
 		OBJ_194 /* emitter.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_107 /* emitter.c */; };
 		OBJ_195 /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_108 /* parser.c */; };
@@ -452,6 +453,7 @@
 		460DCB1C248600E300AC0664 /* PrivateVariablesInActorRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivateVariablesInActorRule.swift; sourceTree = "<group>"; };
 		46627BE32486E3A500A2A610 /* SafeVariableRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafeVariableRule.swift; sourceTree = "<group>"; };
 		46776427248ABAB200228D82 /* BehaviorParamsDefined.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BehaviorParamsDefined.swift; sourceTree = "<group>"; };
+		46B8A32F248DB2D50076973B /* BehaviorNamingConvention.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BehaviorNamingConvention.swift; sourceTree = "<group>"; };
 		"Commandant::Commandant::Product" /* Commandant.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Commandant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Flynn::Flynn::Product" /* Flynn.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Flynn.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Flynn::Pony::Product" /* Pony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Pony.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -937,6 +939,7 @@
 				OBJ_21 /* SafeFunctionRule.swift */,
 				46627BE32486E3A500A2A610 /* SafeVariableRule.swift */,
 				46776427248ABAB200228D82 /* BehaviorParamsDefined.swift */,
+				46B8A32F248DB2D50076973B /* BehaviorNamingConvention.swift */,
 				OBJ_22 /* Shared */,
 			);
 			path = Rules;
@@ -1682,6 +1685,7 @@
 				OBJ_261 /* BuildCombinedAST.swift in Sources */,
 				OBJ_262 /* CheckRules.swift in Sources */,
 				OBJ_263 /* FindFiles.swift in Sources */,
+				46B8A330248DB2D50076973B /* BehaviorNamingConvention.swift in Sources */,
 				OBJ_264 /* ParseFile.swift in Sources */,
 				46627BE42486E3A500A2A610 /* SafeVariableRule.swift in Sources */,
 				OBJ_265 /* PrintError.swift in Sources */,

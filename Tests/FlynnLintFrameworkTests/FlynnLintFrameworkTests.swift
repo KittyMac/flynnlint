@@ -44,7 +44,7 @@ class FlynnLintTests: XCTestCase {
     }
     
     func testOneRule() throws {
-        let rule = BehaviorParamsDefined()
+        let rule = BehaviorNamingConvention()
         XCTAssert(rule.test())
     }
 

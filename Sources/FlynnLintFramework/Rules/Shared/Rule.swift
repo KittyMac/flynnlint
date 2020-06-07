@@ -20,7 +20,8 @@ struct Ruleset {
             SafeFunctionRule.self,
             PrivateVariablesInActorRule.self,
             SafeVariableRule.self,
-            BehaviorParamsDefined.self
+            BehaviorParamsDefined.self,
+            BehaviorNamingConvention.self
         ]
 
         for ruleClass in allRules {
