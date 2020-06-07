@@ -13,7 +13,7 @@ import Flynn
 class ParseFile: Actor {
     // input: path to swift file
     // output: SourceKitten File, SourceKitten Structure
-    override func protected_flowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
+    override func safeFlowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
         if args.isEmpty { return (true, args) }
 
         let path: String = args[x:0]

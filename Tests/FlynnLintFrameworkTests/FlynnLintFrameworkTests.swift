@@ -22,6 +22,27 @@ class FlynnLintTests: XCTestCase {
         flynnlint.finish()
     }
     
+    func testOneRuleOneCode() throws {
+        let rule = BehaviorParamsDefined()
+        XCTAssert(!rule.test("""
+            class StringBuilder: Actor {
+                private var string: String = ""
+                lazy var append = ChainableBehavior(self) { (args: BehaviorArgs) in
+                    // flynnlint:parameter String this is an improperly formatted parameter (missing - )
+                    let value: String = args[x: 0]
+                    self.string.append(value)
+                }
+                lazy var space = ChainableBehavior(self) { (_: BehaviorArgs) in
+                    self.string.append(" ")
+                }
+                lazy var result = ChainableBehavior(self) { (args: BehaviorArgs) in
+                    let callback: ((String) -> Void) = args[x:0]
+                    callback(self.string)
+                }
+            }
+        """))
+    }
+    
     func testOneRule() throws {
         let rule = BehaviorParamsDefined()
         XCTAssert(rule.test())

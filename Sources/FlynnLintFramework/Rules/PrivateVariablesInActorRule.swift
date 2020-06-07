@@ -32,7 +32,7 @@ struct PrivateVariablesInActorRule: Rule {
             """),
             Example("""
                 class WhoseCallWasThisAnyway: Actor {
-                    public lazy var protected_colorable = "hello"
+                    public lazy var safeColorable = "hello"
                 }
             """)
         ],
@@ -67,9 +67,9 @@ struct PrivateVariablesInActorRule: Rule {
                                 }
                             }
 
-                            // allow variables to be "protected"
+                            // allow variables to be "safe"
                             if let name = variable.name {
-                                if name.hasPrefix("protected_") {
+                                if name.hasPrefix(FlynnLint.safePrefix) {
                                     continue
                                 }
                             }

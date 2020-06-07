@@ -13,5 +13,8 @@ flynn: build
 clean:
 	rm -rf .build
 
+update:
+	swift package update
+
 xcode:
 	swift package generate-xcodeproj

@@ -22,7 +22,7 @@
 
 /* Begin PBXBuildFile section */
 		460DCB1D248600E300AC0664 /* PrivateVariablesInActorRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460DCB1C248600E300AC0664 /* PrivateVariablesInActorRule.swift */; };
-		46627BE42486E3A500A2A610 /* ProtectedVariableRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46627BE32486E3A500A2A610 /* ProtectedVariableRule.swift */; };
+		46627BE42486E3A500A2A610 /* SafeVariableRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46627BE32486E3A500A2A610 /* SafeVariableRule.swift */; };
 		46776428248ABAB200228D82 /* BehaviorParamsDefined.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46776427248ABAB200228D82 /* BehaviorParamsDefined.swift */; };
 		OBJ_193 /* api.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_106 /* api.c */; };
 		OBJ_194 /* emitter.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_107 /* emitter.c */; };
@@ -66,7 +66,7 @@
 		OBJ_265 /* PrintError.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_17 /* PrintError.swift */; };
 		OBJ_266 /* FlynnLintFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* FlynnLintFramework.swift */; };
 		OBJ_267 /* PrivateFunctionInActorRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_20 /* PrivateFunctionInActorRule.swift */; };
-		OBJ_268 /* ProtectedFunctionRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* ProtectedFunctionRule.swift */; };
+		OBJ_268 /* SafeFunctionRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* SafeFunctionRule.swift */; };
 		OBJ_269 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_23 /* Rule.swift */; };
 		OBJ_270 /* RuleDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_24 /* RuleDescription.swift */; };
 		OBJ_272 /* Flynn.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Flynn::Flynn::Product" /* Flynn.framework */; };
@@ -450,7 +450,7 @@
 
 /* Begin PBXFileReference section */
 		460DCB1C248600E300AC0664 /* PrivateVariablesInActorRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivateVariablesInActorRule.swift; sourceTree = "<group>"; };
-		46627BE32486E3A500A2A610 /* ProtectedVariableRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProtectedVariableRule.swift; sourceTree = "<group>"; };
+		46627BE32486E3A500A2A610 /* SafeVariableRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafeVariableRule.swift; sourceTree = "<group>"; };
 		46776427248ABAB200228D82 /* BehaviorParamsDefined.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BehaviorParamsDefined.swift; sourceTree = "<group>"; };
 		"Commandant::Commandant::Product" /* Commandant.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Commandant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Flynn::Flynn::Product" /* Flynn.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Flynn.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -528,7 +528,7 @@
 		OBJ_186 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		OBJ_187 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		OBJ_20 /* PrivateFunctionInActorRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateFunctionInActorRule.swift; sourceTree = "<group>"; };
-		OBJ_21 /* ProtectedFunctionRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedFunctionRule.swift; sourceTree = "<group>"; };
+		OBJ_21 /* SafeFunctionRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeFunctionRule.swift; sourceTree = "<group>"; };
 		OBJ_23 /* Rule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rule.swift; sourceTree = "<group>"; };
 		OBJ_24 /* RuleDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleDescription.swift; sourceTree = "<group>"; };
 		OBJ_26 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
@@ -934,8 +934,8 @@
 			children = (
 				460DCB1C248600E300AC0664 /* PrivateVariablesInActorRule.swift */,
 				OBJ_20 /* PrivateFunctionInActorRule.swift */,
-				OBJ_21 /* ProtectedFunctionRule.swift */,
-				46627BE32486E3A500A2A610 /* ProtectedVariableRule.swift */,
+				OBJ_21 /* SafeFunctionRule.swift */,
+				46627BE32486E3A500A2A610 /* SafeVariableRule.swift */,
 				46776427248ABAB200228D82 /* BehaviorParamsDefined.swift */,
 				OBJ_22 /* Shared */,
 			);
@@ -1683,12 +1683,12 @@
 				OBJ_262 /* CheckRules.swift in Sources */,
 				OBJ_263 /* FindFiles.swift in Sources */,
 				OBJ_264 /* ParseFile.swift in Sources */,
-				46627BE42486E3A500A2A610 /* ProtectedVariableRule.swift in Sources */,
+				46627BE42486E3A500A2A610 /* SafeVariableRule.swift in Sources */,
 				OBJ_265 /* PrintError.swift in Sources */,
 				460DCB1D248600E300AC0664 /* PrivateVariablesInActorRule.swift in Sources */,
 				OBJ_266 /* FlynnLintFramework.swift in Sources */,
 				OBJ_267 /* PrivateFunctionInActorRule.swift in Sources */,
-				OBJ_268 /* ProtectedFunctionRule.swift in Sources */,
+				OBJ_268 /* SafeFunctionRule.swift in Sources */,
 				OBJ_269 /* Rule.swift in Sources */,
 				OBJ_270 /* RuleDescription.swift in Sources */,
 			);

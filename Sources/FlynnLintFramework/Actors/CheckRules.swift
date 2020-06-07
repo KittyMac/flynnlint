@@ -19,11 +19,11 @@ class CheckRules: Actor {
         self.rules = rules
     }
 
-    override func protected_flowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
+    override func safeFlowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
         if args.isEmpty == false {
             let ast: AST = args[x:0]
             let syntax: FileSyntax = args[x:1]
-            let target = protected_nextTarget()
+            let target = safeNextTarget()
 
             let blacklist = syntax.blacklist
 

@@ -26,7 +26,7 @@ class PrintError: Actor {
         self.onComplete = onComplete
     }
 
-    override func protected_flowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
+    override func safeFlowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
         if args.isEmpty == false {
             let error: String = args[x:0]
             print(error)

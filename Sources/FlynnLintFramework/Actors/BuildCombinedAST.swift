@@ -45,7 +45,7 @@ struct FileSyntax {
             let map = self.tokens
 
             if let bodyoffset = structure.offset, let bodylength = structure.length {
-                if bodyoffset + bodylength < body.count {
+                if bodyoffset + bodylength <= body.count {
                     let regex = try NSRegularExpression(pattern: pattern, options: [])
                     let nsrange = NSRange(location: Int(bodyoffset), length: Int(bodylength))
                     regex.enumerateMatches(in: body, options: [], range: nsrange) { (match, _, stop) in
@@ -239,7 +239,7 @@ class BuildCombinedAST: Actor {
         priority = 1
     }
 
-    override func protected_flowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
+    override func safeFlowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
         if args.isEmpty == false {
             astBuilder.add(args[x:0])
             return (false, [])
@@ -254,7 +254,7 @@ class BuildCombinedAST: Actor {
 
         // Run through every syntax structure and pass it to the rulesets
         for syntax in astBuilder {
-            if let target = protected_nextTarget() {
+            if let target = safeNextTarget() {
                 target.flow(ast, syntax)
             }
         }

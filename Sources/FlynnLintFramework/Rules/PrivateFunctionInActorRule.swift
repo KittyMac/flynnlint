@@ -24,7 +24,7 @@ struct PrivateFunctionInActorRule: Rule {
             Example("class SomeActor: Actor {}\n"),
             Example("class SomeActor: Actor { private func foo() { } }\n"),
             Example("class SomeActor: Actor { init(_ data: OffToTheRacesData) { self.data = data } }\n"),
-            Example("class SomeActor: Actor { override func protected_flowProcess() { } }\n"),
+            Example("class SomeActor: Actor { override func safeFlowProcess() { } }\n"),
             Example("class SomeClass { public func foo() { } }\n")
         ],
         triggeringExamples: [
@@ -39,15 +39,15 @@ struct PrivateFunctionInActorRule: Rule {
     func check(_ ast: AST, _ syntax: FileSyntax, _ output: Actor?) -> Bool {
         // Every function defined in a class which is a subclass of Actor must follow these rules:
         // 1. its access control level (ACL) must be set to private
-        // 2. if it starts with protected_, its ACL may be anything. Other rules will keep anything
-        //    but a subclass of this Actor calling protected methods
+        // 2. if it starts with safe, its ACL may be anything. Other rules will keep anything
+        //    but a subclass of this Actor calling safe methods
         // 3. if it is an init function
 
         if let resolvedClass = ast.getClass(syntax.structure.name) {
             if ast.isActor(resolvedClass) {
                 if let functions = syntax.structure.substructure {
                     for function in functions where
-                        !(function.name ?? "").hasPrefix("protected_") &&
+                        !(function.name ?? "").hasPrefix(FlynnLint.safePrefix) &&
                         !(function.name ?? "").hasPrefix("init(") &&
                         function.kind == .functionMethodInstance &&
                         function.accessibility != .private {

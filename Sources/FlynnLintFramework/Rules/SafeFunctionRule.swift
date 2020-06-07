@@ -10,12 +10,12 @@ import Foundation
 import Flynn
 import SourceKittenFramework
 
-struct ProtectedFunctionRule: Rule {
+struct SafeFunctionRule: Rule {
 
     let description = RuleDescription(
-        identifier: "actors_protected_func",
-        name: "Protected Access Violation",
-        description: "Protected functions may not be called outside of the Actor.",
+        identifier: "actors_safe_func",
+        name: "Safe Access Violation",
+        description: "Safe functions may not be called outside of the Actor.",
         syntaxTriggers: [.exprCall],
         nonTriggeringExamples: [
             Example("class SomeClass {}\n"),
@@ -24,13 +24,13 @@ struct ProtectedFunctionRule: Rule {
             Example("class SomeActor: Actor { init(_ data: OffToTheRacesData) { self.data = data } }\n"),
             Example("""
                 class SomeActor: Actor {
-                    func protected_foo() {
+                    func safeFoo() {
                         print("hello world")
                     }
 
-                    override func protected_flowProcess() {
-                        protected_foo()
-                        self.protected_foo()
+                    override func safeFlowProcess() {
+                        safeFoo()
+                        self.safeFoo()
                     }
                 }
             """)
@@ -38,16 +38,16 @@ struct ProtectedFunctionRule: Rule {
         triggeringExamples: [
             Example("""
                 class SomeActor: Actor {
-                    func protected_foo() {
+                    func safeFoo() {
                         print("hello world")
                     }
 
-                    override func protected_flowProcess() {
-                        protected_foo()
+                    override func safeFlowProcess() {
+                        safeFoo()
                     }
                 }
                 let a = SomeActor()
-                a.protected_flowProcess()
+                a.safeFlowProcess()
             """),
             Example("""
                 func testCallSiteUncertainty() {
@@ -67,21 +67,21 @@ struct ProtectedFunctionRule: Rule {
                     actor.printFoo()
                     actor.printFoo()
                     // TODO: flynnlint should flag these as errors
-                    actor.protected_printBar()
-                    actor.protected_printBar()
-                    actor.protected_printBar()
-                    actor.protected_printBar()
-                    actor.protected_printBar()
-                    actor.protected_printBar()
-                    actor.protected_printBar()
-                    actor.protected_printBar()
+                    actor.safePrintBar()
+                    actor.safePrintBar()
+                    actor.safePrintBar()
+                    actor.safePrintBar()
+                    actor.safePrintBar()
+                    actor.safePrintBar()
+                    actor.safePrintBar()
+                    actor.safePrintBar()
 
                     actor.wait(0)
                 }
             """),
             Example("""
                 open class Actor {
-                    public func protected_nextTarget() -> Actor? {
+                    public func safeNextTarget() -> Actor? {
                         switch numTargets {
                         case 0:
                             return nil
@@ -110,7 +110,7 @@ struct ProtectedFunctionRule: Rule {
                     actor.printFoo()
                     actor.printFoo()
                     actor.printFoo()
-                    actor.protected_nextTarget()
+                    actor.safeNextTarget()
 
                     actor.wait(0)
                 }
@@ -119,10 +119,10 @@ struct ProtectedFunctionRule: Rule {
     )
 
     func check(_ ast: AST, _ syntax: FileSyntax, _ output: Actor?) -> Bool {
-        // Only functions of the class may call protected methods on a class
+        // Only functions of the class may call safe methods on a class
         if let functionCall = syntax.structure.name {
-            if  functionCall.range(of: "protected_") != nil &&
-                functionCall.hasPrefix("protected_") == false &&
+            if  functionCall.range(of: FlynnLint.safePrefix) != nil &&
+                functionCall.hasPrefix(FlynnLint.safePrefix) == false &&
                 functionCall.hasPrefix("self.") == false {
                 if let output = output {
                     output.flow(error(syntax.structure.offset, syntax))

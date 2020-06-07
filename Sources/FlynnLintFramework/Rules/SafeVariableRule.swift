@@ -10,21 +10,21 @@ import Foundation
 import Flynn
 import SourceKittenFramework
 
-struct ProtectedVariableRule: Rule {
+struct SafeVariableRule: Rule {
     let description = RuleDescription(
-        identifier: "actors_protected_var",
-        name: "Protected Access Violation",
-        description: "Protected variables may not be called outside of the Actor.",
+        identifier: "actors_safe_var",
+        name: "Safe Access Violation",
+        description: "Safe variables may not be called outside of the Actor.",
         syntaxTriggers: [.class, .extension, .struct, .extensionStruct, .enum, .extensionEnum, .functionFree],
         nonTriggeringExamples: [
             Example("""
                 class SomeActor: Actor {
-                    var protected_colorable = 5
+                    var safeColorable = 5
                 }
                 class OtherActor: SomeActor {
                     func foo() {
-                        protected_colorable = 15
-                        self.protected_colorable = 15
+                        safeColorable = 15
+                        self.safeColorable = 15
                     }
                 }
             """),
@@ -33,12 +33,12 @@ struct ProtectedVariableRule: Rule {
                     let expectation = XCTestExpectation(description: "Protocols, extensions etc...")
                     let color = Color()
                     color.render(CGRect.zero)
-                    //print(color.protected_colorable._color)
-                    /* print(color.protected_colorable._color) */
+                    //print(color.safeColorable._color)
+                    /* print(color.safeColorable._color) */
                     /*
-                     * print(color.protected_colorable._color)
+                     * print(color.safeColorable._color)
                      */
-                    ///print(color.protected_colorable._color)
+                    ///print(color.safeColorable._color)
                     expectation.fulfill()
                 }
             """),
@@ -56,12 +56,12 @@ struct ProtectedVariableRule: Rule {
         triggeringExamples: [
             Example("""
                 class SomeActor: Actor {
-                    var protected_colorable = 5
+                    var safeColorable = 5
                 }
                 class OtherActor: SomeActor {
                     func foo() {
                         let a = SomeActor()
-                        a.protected_colorable = 15
+                        a.safeColorable = 15
                     }
                 }
             """),
@@ -70,7 +70,7 @@ struct ProtectedVariableRule: Rule {
                     let expectation = XCTestExpectation(description: "Protocols, extensions etc...")
                     let color = Color()
                     color.render(CGRect.zero)
-                    print(color.protected_colorable._color)
+                    print(color.safeColorable._color)
                     expectation.fulfill()
                 }
             """)
@@ -78,16 +78,16 @@ struct ProtectedVariableRule: Rule {
     )
 
     func precheck(_ file: File) -> Bool {
-        return file.contents.contains(".protected_")
+        return file.contents.contains(".\(FlynnLint.safePrefix)")
     }
 
     func check(_ ast: AST, _ syntax: FileSyntax, _ output: Actor?) -> Bool {
         // sourcekit doesn't give us structures for variable accesses. So the
         // best we can do is grep the body contents. Doing this, we are looking
-        // or any instances of .protected_ which are not self.protected_. This is
+        // or any instances of .safe which are not self.safe This is
         // FAR from perfect, but until sourcekit provides the full, unadultered
         // AST what can we do?
-        if let innerOffset = syntax.match(#"\w+(?<!self)\.protected_"#) {
+        if let innerOffset = syntax.match(#"\w+(?<!self)\."# + FlynnLint.safePrefix + #"\w"#) {
             if let output = output {
                 output.flow(error(innerOffset, syntax))
             }

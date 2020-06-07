@@ -12,6 +12,10 @@ import SourceKittenFramework
 
 public class FlynnLint {
 
+    static let behaviorPrefix = "be"
+    static let safePrefix = "safe"
+    static let unsafePrefix = "unsafe"
+
     private var pipeline: Actor = Actor()
     private var numErrors: Int = 0
 
