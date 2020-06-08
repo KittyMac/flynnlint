@@ -78,7 +78,6 @@ struct AST {
         // To make it easier for rules to access later, we run through all behaviors of all
         // classes here and add then to the SyntaxStructure of the class for easy lookup
         for actor in classes.values {
-            if !isActor(actor) { continue }
             guard let name = actor.structure.name else { continue }
             guard let variables = actor.structure.substructure else { continue }
 

@@ -110,8 +110,6 @@ struct BehaviorParamsDefined: Rule {
         guard let name = resolvedClass.structure.name else { return true }
         guard let behaviors = ast.behaviors[name] else { return true }
 
-        if !ast.isActor(resolvedClass) { return true }
-
         // 1. There must be some parameters defined
         for behavior in behaviors where behavior.parameters.count == 0 {
             if let output = output,

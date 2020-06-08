@@ -23,16 +23,23 @@ class FlynnLintTests: XCTestCase {
     }
     
     func testOneRuleOneCode() throws {
-        let rule = PrivateVariablesInActorRule()
-        XCTAssert(rule.test("""
-            protocol Colorable: Actor {
-                var safeColorable: ColorableState { get set }
-                var beRender: Behavior { get }
-                var beColor: Behavior { get }
-            }
-            extension Colorable {
-                var beColor: Behavior { return safeColorable.beColor! }
-                var beAlpha: Behavior { return safeColorable.beAlpha! }
+        let rule = BehaviorParamsDefined()
+        XCTAssert(!rule.test("""
+            public class ColorableState<T> {
+                private var internalColor: GLKVector4 = GLKVector4Make(1, 1, 1, 1)
+
+                lazy var beColor: ChainableBehavior<T> = ChainableBehavior { (args: BehaviorArgs) in
+                    print("Colorable.color")
+                }
+
+                lazy var beAlpha: ChainableBehavior<T> = ChainableBehavior { (args: BehaviorArgs) in
+                    print("Colorable.alpha")
+                }
+
+                init (_ actor: T) {
+                    beColor.setActor(actor)
+                    beAlpha.setActor(actor)
+                }
             }
         """))
     }

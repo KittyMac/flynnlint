@@ -87,8 +87,6 @@ struct BehaviorNamingConvention: Rule {
         guard let name = resolvedClass.structure.name else { return true }
         guard let behaviors = ast.behaviors[name] else { return true }
 
-        if !ast.isActor(resolvedClass) { return true }
-
         // 1. There must be some parameters defined
         for behavior in behaviors where
             behavior.syntax.structure.name?.starts(with: FlynnLint.behaviorPrefix) == false {
