@@ -44,11 +44,13 @@ struct AST {
     }
 
     let classes: [String: FileSyntax]
+    let protocols: [String: FileSyntax]
     var behaviors: [String: [Behavior]]
     let extensions: [FileSyntax]
 
-    init (_ classes: [String: FileSyntax], _ extensions: [FileSyntax]) {
+    init (_ classes: [String: FileSyntax], _ protocols: [String: FileSyntax], _ extensions: [FileSyntax]) {
         self.classes = classes
+        self.protocols = protocols
         self.extensions = extensions
         self.behaviors = [:]
 
@@ -137,13 +139,26 @@ struct AST {
         return nil
     }
 
+    func getClassOrProtocol(_ name: String?) -> FileSyntax? {
+        guard let name = name else { return nil }
+        if let actualClass = classes[name] {
+            return actualClass
+        }
+        return protocols[name]
+    }
+
     func getClass(_ name: String?) -> FileSyntax? {
         guard let name = name else { return nil }
         return classes[name]
     }
 
+    func getProtocol(_ name: String?) -> FileSyntax? {
+        guard let name = name else { return nil }
+        return protocols[name]
+    }
+
     func isSubclassOf(_ syntax: FileSyntax, _ className: String) -> Bool {
-        if syntax.structure.kind == .class {
+        if syntax.structure.kind == .class || syntax.structure.kind == .protocol {
             if let inheritedTypes = syntax.structure.inheritedTypes {
                 for ancestor in inheritedTypes {
                     if ancestor.name == className {
@@ -165,7 +180,7 @@ struct AST {
     func isActor(_ syntax: FileSyntax) -> Bool {
         let actorName = "Actor"
         if let name = syntax.structure.name {
-            if let actualClass = getClass(name) {
+            if let actualClass = getClassOrProtocol(name) {
                 return isSubclassOf(actualClass, actorName)
             }
         }

@@ -81,7 +81,7 @@ struct BehaviorNamingConvention: Rule {
         // behaviors to adhere to the "\(FlynnLint.behaviorPrefix)" naming convention.
         // So, "actor.\(FlynnLint.behaviorPrefix)Foo()" instead of "actor.foo()"
         var noErrors = true
-        guard let resolvedClass = ast.getClass(syntax.structure.name) else { return true }
+        guard let resolvedClass = ast.getClassOrProtocol(syntax.structure.name) else { return true }
         guard let name = resolvedClass.structure.name else { return true }
         guard let behaviors = ast.behaviors[name] else { return true }
 

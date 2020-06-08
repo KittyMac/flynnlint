@@ -169,6 +169,7 @@ struct ASTBuilderIterator: IteratorProtocol {
     init(_ astBuilder: ASTBuilder) {
         combinedArray = []
         combinedArray.append(contentsOf: Array(astBuilder.classes.values))
+        combinedArray.append(contentsOf: Array(astBuilder.protocols.values))
         combinedArray.append(contentsOf: astBuilder.extensions)
         combinedArray.append(contentsOf: astBuilder.calls)
         combinedArray.append(contentsOf: astBuilder.functions)
@@ -185,6 +186,7 @@ struct ASTBuilderIterator: IteratorProtocol {
 
 class ASTBuilder: Sequence {
     var classes: [String: FileSyntax] = [:]
+    var protocols: [String: FileSyntax] = [:]
     var extensions: [FileSyntax] = []
     var calls: [FileSyntax] = []
     var functions: [FileSyntax] = []
@@ -196,6 +198,8 @@ class ASTBuilder: Sequence {
             switch syntax.kind {
             case .class:
                 classes[name] = fileSyntax
+            case .protocol, .extensionProtocol:
+                protocols[name] = fileSyntax
             case .extension, .extensionEnum, .extensionStruct:
                 extensions.append(fileSyntax)
             case .exprCall:
@@ -220,7 +224,7 @@ class ASTBuilder: Sequence {
     }
 
     func build() -> AST {
-        return AST(classes, extensions)
+        return AST(classes, protocols, extensions)
     }
 
     func makeIterator() -> ASTBuilderIterator {

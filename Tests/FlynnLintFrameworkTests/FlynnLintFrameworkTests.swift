@@ -23,28 +23,38 @@ class FlynnLintTests: XCTestCase {
     }
     
     func testOneRuleOneCode() throws {
-        let rule = BehaviorParamsDefined()
+        let rule = PrivateFunctionInActorRule()
         XCTAssert(!rule.test("""
-            class StringBuilder: Actor {
-                private var string: String = ""
-                lazy var append = ChainableBehavior(self) { (args: BehaviorArgs) in
-                    // flynnlint:parameter String this is an improperly formatted parameter (missing - )
-                    let value: String = args[x: 0]
-                    self.string.append(value)
+            public protocol Viewable: Actor {
+                var beRender: Behavior { get }
+            }
+
+            public extension Viewable {
+
+                func viewableSubmitRenderUnit(_ ctx: RenderFrameContext,
+                                              _ vertices: FloatAlignedArray,
+                                              _ contentSize: GLKVector2,
+                                              _ shaderType: ShaderType = .flat,
+                                              _ textureName: String? = nil,
+                                              _ partNumber: Int64 = 0) {
+                    let unit = RenderUnit(ctx,
+                                          shaderType,
+                                          vertices,
+                                          contentSize,
+                                          partNumber,
+                                          textureName)
+                    ctx.renderer.beSubmitRenderUnit(ctx, unit)
                 }
-                lazy var space = ChainableBehavior(self) { (_: BehaviorArgs) in
-                    self.string.append(" ")
-                }
-                lazy var result = ChainableBehavior(self) { (args: BehaviorArgs) in
-                    let callback: ((String) -> Void) = args[x:0]
-                    callback(self.string)
+
+                func safeViewableSubmitRenderFinished(_ ctx: RenderFrameContext) {
+                    ctx.renderer.beSubmitRenderFinished(ctx)
                 }
             }
         """))
     }
     
     func testOneRule() throws {
-        let rule = BehaviorNamingConvention()
+        let rule = PrivateFunctionInActorRule()
         XCTAssert(rule.test())
     }
 

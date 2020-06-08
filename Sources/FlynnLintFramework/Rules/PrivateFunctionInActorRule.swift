@@ -38,7 +38,34 @@ struct PrivateFunctionInActorRule: Rule {
             Example("class SomeActor: Actor { fileprivate func foo() { } }\n"),
             Example("class SomeActor: Actor { internal func foo() { } }\n"),
             Example("class SomeActor: Actor { func foo() { } }\n"),
-            Example("class SomeActor: Actor { override func flowProcess() { } }\n")
+            Example("class SomeActor: Actor { override func flowProcess() { } }\n"),
+            Example("""
+                public protocol Viewable: Actor {
+                    var beRender: Behavior { get }
+                }
+
+                public extension Viewable {
+
+                    func viewableSubmitRenderUnit(_ ctx: RenderFrameContext,
+                                                  _ vertices: FloatAlignedArray,
+                                                  _ contentSize: GLKVector2,
+                                                  _ shaderType: ShaderType = .flat,
+                                                  _ textureName: String? = nil,
+                                                  _ partNumber: Int64 = 0) {
+                        let unit = RenderUnit(ctx,
+                                              shaderType,
+                                              vertices,
+                                              contentSize,
+                                              partNumber,
+                                              textureName)
+                        ctx.renderer.beSubmitRenderUnit(ctx, unit)
+                    }
+
+                    func safeViewableSubmitRenderFinished(_ ctx: RenderFrameContext) {
+                        ctx.renderer.beSubmitRenderFinished(ctx)
+                    }
+                }
+            """)
         ]
     )
 
@@ -49,7 +76,7 @@ struct PrivateFunctionInActorRule: Rule {
         //    but a subclass of this Actor calling safe methods
         // 3. if it is an init function
 
-        if let resolvedClass = ast.getClass(syntax.structure.name) {
+        if let resolvedClass = ast.getClassOrProtocol(syntax.structure.name) {
             if ast.isActor(resolvedClass) {
                 if let functions = syntax.structure.substructure {
                     for function in functions where

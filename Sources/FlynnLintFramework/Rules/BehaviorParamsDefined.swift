@@ -106,7 +106,7 @@ struct BehaviorParamsDefined: Rule {
         // 2. Restrict access to only parameters which are properly documented
         // 3. At the callsite for a behavior, ensure the number of params specified match the expected
         var noErrors = true
-        guard let resolvedClass = ast.getClass(syntax.structure.name) else { return true }
+        guard let resolvedClass = ast.getClassOrProtocol(syntax.structure.name) else { return true }
         guard let name = resolvedClass.structure.name else { return true }
         guard let behaviors = ast.behaviors[name] else { return true }
 

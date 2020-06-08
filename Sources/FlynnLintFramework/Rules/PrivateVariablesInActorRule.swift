@@ -57,7 +57,7 @@ struct PrivateVariablesInActorRule: Rule {
     )
 
     func check(_ ast: AST, _ syntax: FileSyntax, _ output: Actor?) -> Bool {
-        if let resolvedClass = ast.getClass(syntax.structure.name) {
+        if let resolvedClass = ast.getClassOrProtocol(syntax.structure.name) {
             if ast.isActor(resolvedClass) {
                 if let variables = syntax.structure.substructure {
 
