@@ -68,11 +68,17 @@ struct PrivateVariablesInActorRule: Rule {
 
                             // If we're a Behavior or ChainableBehavior, then this is Ok. To know this, we need the sibling
                             // structure of this structure
+                            if let typename = variable.typename {
+                                if typename.contains("Behavior") {
+                                    continue
+                                }
+                            }
                             if idx+1 < variables.count {
                                 let sibling = variables[idx+1]
-                                if (sibling.name == "ChainableBehavior" || sibling.name == "Behavior") &&
-                                sibling.kind == .exprCall {
-                                    continue
+                                if let name = sibling.name {
+                                    if name.contains("Behavior") && sibling.kind == .exprCall {
+                                        continue
+                                    }
                                 }
                             }
 

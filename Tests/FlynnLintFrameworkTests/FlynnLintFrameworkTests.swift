@@ -23,32 +23,16 @@ class FlynnLintTests: XCTestCase {
     }
     
     func testOneRuleOneCode() throws {
-        let rule = PrivateFunctionInActorRule()
-        XCTAssert(!rule.test("""
-            public protocol Viewable: Actor {
+        let rule = PrivateVariablesInActorRule()
+        XCTAssert(rule.test("""
+            protocol Colorable: Actor {
+                var safeColorable: ColorableState { get set }
                 var beRender: Behavior { get }
+                var beColor: Behavior { get }
             }
-
-            public extension Viewable {
-
-                func viewableSubmitRenderUnit(_ ctx: RenderFrameContext,
-                                              _ vertices: FloatAlignedArray,
-                                              _ contentSize: GLKVector2,
-                                              _ shaderType: ShaderType = .flat,
-                                              _ textureName: String? = nil,
-                                              _ partNumber: Int64 = 0) {
-                    let unit = RenderUnit(ctx,
-                                          shaderType,
-                                          vertices,
-                                          contentSize,
-                                          partNumber,
-                                          textureName)
-                    ctx.renderer.beSubmitRenderUnit(ctx, unit)
-                }
-
-                func safeViewableSubmitRenderFinished(_ ctx: RenderFrameContext) {
-                    ctx.renderer.beSubmitRenderFinished(ctx)
-                }
+            extension Colorable {
+                var beColor: Behavior { return safeColorable.beColor! }
+                var beAlpha: Behavior { return safeColorable.beAlpha! }
             }
         """))
     }

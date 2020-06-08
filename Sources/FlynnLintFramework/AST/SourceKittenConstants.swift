@@ -15,7 +15,11 @@ import Flynn
 typealias SyntaxStructure = [String: SourceKitRepresentable]
 
 extension SyntaxStructure {
-    var accessibility: AccessControlLevel? { return AccessControlLevel(rawValue: self["key.accessibility"] as! String) }
+    var accessibility: AccessControlLevel? {
+        guard let key = self["key.accessibility"] else { return nil }
+        return AccessControlLevel(rawValue: key as! String)
+    }
+
     var attribute: String? { return self["key.attribute"] as? String }
     var attributes: [SyntaxStructure]? { return self["key.attributes"] as? [SyntaxStructure] }
     var bodylength: Int64? { return self["key.bodylength"] as? Int64 }

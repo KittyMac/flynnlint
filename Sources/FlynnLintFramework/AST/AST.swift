@@ -36,6 +36,9 @@ struct AST {
             } else if paramString.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("None") {
                 type = "None"
                 description = "This behavior accepts no parameters"
+            } else if paramString.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("Any") {
+                type = "Any"
+                description = "This behavior accepts any parameters"
             } else {
                 type = ""
                 description = ""
@@ -92,32 +95,31 @@ struct AST {
 
                     if idx+1 < variables.count {
                         let sibling = variables[idx+1]
-                        if (sibling.name == "ChainableBehavior" ||
-                            sibling.name == "Behavior") &&
-                            sibling.kind == .exprCall {
-
-                            // Check for the existance of the flynnlint markup
-                            let variableSyntax = actor.clone(variable)
-                            var params: [Parameter] = []
-                            let flynnlintParameterStrings = variableSyntax.markup("parameter")
-                            for parameterInfo in flynnlintParameterStrings {
-                                let parameter = Parameter(parameterInfo.1)
-                                if !parameter.type.isEmpty && !parameter.description.isEmpty {
-                                    params.append( parameter )
-                                } else {
-                                    let err = error(Int64(parameterInfo.0.value),
-                                                    actor.file,
-                                                    "Malformed Hint: flynnlint:parameter <Type> - <Description>")
-                                    print(err)
+                        if let siblingName = sibling.name {
+                            if siblingName.contains("Behavior") && sibling.kind == .exprCall {
+                                // Check for the existance of the flynnlint markup
+                                let variableSyntax = actor.clone(variable)
+                                var params: [Parameter] = []
+                                let flynnlintParameterStrings = variableSyntax.markup("parameter")
+                                for parameterInfo in flynnlintParameterStrings {
+                                    let parameter = Parameter(parameterInfo.1)
+                                    if !parameter.type.isEmpty && !parameter.description.isEmpty {
+                                        params.append( parameter )
+                                    } else {
+                                        let err = error(Int64(parameterInfo.0.value),
+                                                        actor.file,
+                                                        "Malformed Hint: flynnlint:parameter <Type> - <Description>")
+                                        print(err)
+                                    }
                                 }
-                            }
 
-                            // Extract the name of the "args" closure parameter
-                            let argsStructure = findSubstructureOfType(sibling, "BehaviorArgs")
-                            let argsName = argsStructure?.name ?? "_"
-                            behaviors[name]?.append(Behavior(variableSyntax,
-                                                             params,
-                                                             argsName))
+                                // Extract the name of the "args" closure parameter
+                                let argsStructure = findSubstructureOfType(sibling, "BehaviorArgs")
+                                let argsName = argsStructure?.name ?? "_"
+                                behaviors[name]?.append(Behavior(variableSyntax,
+                                                                 params,
+                                                                 argsName))
+                            }
                         }
                     }
                 }
@@ -180,6 +182,9 @@ struct AST {
     func isActor(_ syntax: FileSyntax) -> Bool {
         let actorName = "Actor"
         if let name = syntax.structure.name {
+            if name == actorName {
+                return true
+            }
             if let actualClass = getClassOrProtocol(name) {
                 return isSubclassOf(actualClass, actorName)
             }
