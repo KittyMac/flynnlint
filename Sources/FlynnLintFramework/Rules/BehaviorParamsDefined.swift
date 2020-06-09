@@ -111,7 +111,10 @@ struct BehaviorParamsDefined: Rule {
         guard let behaviors = ast.behaviors[name] else { return true }
 
         // 1. There must be some parameters defined
-        for behavior in behaviors where behavior.parameters.count == 0 {
+        for behavior in behaviors where
+            behavior.parameters.count == 0 &&
+            behavior.anyParams == false &&
+            behavior.noParams == false {
             if let output = output,
                let bodyoffset = behavior.syntax.structure.offset {
                 let msg = description.console("Behaviors must document their parameters using flynnlint:parameter")

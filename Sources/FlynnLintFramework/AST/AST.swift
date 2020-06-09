@@ -13,16 +13,26 @@ import Flynn
 struct AST {
     struct Behavior {
         let syntax: FileSyntax
+        let anyParams: Bool
+        let noParams: Bool
         let parameters: [Parameter]
         let argsName: String
 
         init(_ syntax: FileSyntax, _ parameters: [Parameter], _ argsName: String) {
             self.syntax = syntax
             self.argsName = argsName
-            if argsName == "_" && parameters.isEmpty {
-                self.parameters = [Parameter("None")]
+            if argsName == "_" || argsName == "None" {
+                self.parameters = []
+                self.anyParams = false
+                self.noParams = true
+            } else if parameters.isEmpty == false && parameters[0].type == "Any" {
+                self.parameters = []
+                self.anyParams = true
+                self.noParams = false
             } else {
                 self.parameters = parameters
+                self.anyParams = false
+                self.noParams = false
             }
         }
     }
@@ -146,6 +156,18 @@ struct AST {
             return actualClass
         }
         return protocols[name]
+    }
+
+    func getBehaviors(_ name: String) -> [Behavior] {
+        var retBehaviors: [Behavior] = []
+        for key in behaviors.keys {
+            if let classBehaviors = behaviors[key] {
+                for behavior in classBehaviors where behavior.syntax.structure.name == name {
+                    retBehaviors.append(behavior)
+                }
+            }
+        }
+        return retBehaviors
     }
 
     func getClass(_ name: String?) -> FileSyntax? {

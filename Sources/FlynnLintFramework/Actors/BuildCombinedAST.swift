@@ -17,6 +17,25 @@ extension String {
         guard let range = Range(nsrange, in: self) else { return nil }
         return self[range]
     }
+
+    func matches(_ pattern: String, _ callback: ((NSTextCheckingResult, [String]) -> Void)) {
+        do {
+            let body = self
+            let regex = try NSRegularExpression(pattern: pattern, options: [])
+            let nsrange = NSRange(location: Int(0), length: Int(count))
+            regex.enumerateMatches(in: body, options: [], range: nsrange) { (match, _, _) in
+                guard let match = match else { return }
+
+                var groups: [String] = []
+                for iii in 0..<match.numberOfRanges {
+                    if let groupString = body.substring(with: match.range(at: iii)) {
+                        groups.append(String(groupString))
+                    }
+                }
+                callback(match, groups)
+            }
+        } catch { }
+    }
 }
 
 struct FileSyntax {
@@ -88,7 +107,7 @@ struct FileSyntax {
             let map = self.tokens
 
             if let bodyoffset = structure.offset, let bodylength = structure.length {
-                if bodyoffset + bodylength < body.count {
+                if bodyoffset + bodylength <= body.count {
                     let regex = try NSRegularExpression(pattern: pattern, options: [])
                     let nsrange = NSRange(location: Int(bodyoffset), length: Int(bodylength))
                     regex.enumerateMatches(in: body, options: [], range: nsrange) { (match, _, _) in
@@ -132,7 +151,7 @@ struct FileSyntax {
         var markup: [(ByteCount, String)] = []
 
         if let bodyoffset = structure.offset, let bodylength = structure.length {
-            if bodyoffset + bodylength < body.count {
+            if bodyoffset + bodylength <= body.count {
                 let targetString = "flynnlint:\(label)"
                 // Check all comments inside the body to see if they are flynnlint commands
                 // flynnlint:<name> <args>

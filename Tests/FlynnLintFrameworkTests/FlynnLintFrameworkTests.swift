@@ -23,29 +23,39 @@ class FlynnLintTests: XCTestCase {
     }
     
     func testOneRuleOneCode() throws {
-        let rule = BehaviorParamsDefined()
+        let rule = BehaviorCallCheck()
         XCTAssert(!rule.test("""
-            public class ColorableState<T> {
-                private var internalColor: GLKVector4 = GLKVector4Make(1, 1, 1, 1)
-
-                lazy var beColor: ChainableBehavior<T> = ChainableBehavior { (args: BehaviorArgs) in
-                    print("Colorable.color")
+            class StringBuilder: Actor {
+                private var string: String = ""
+                lazy var beAppend = ChainableBehavior(self) { (args: BehaviorArgs) in
+                    // flynnlint:parameter String - the string to be appended
+                    let value: String = args[x: 0]
+                    self.string.append(value)
                 }
-
-                lazy var beAlpha: ChainableBehavior<T> = ChainableBehavior { (args: BehaviorArgs) in
-                    print("Colorable.alpha")
+                lazy var beSpace = ChainableBehavior(self) { (_: BehaviorArgs) in
+                    // flynnlint:parameter None
+                    self.string.append(" ")
                 }
-
-                init (_ actor: T) {
-                    beColor.setActor(actor)
-                    beAlpha.setActor(actor)
+                lazy var beSpace = ChainableBehavior(self) { (_: BehaviorArgs) in
+                    self.string.append(" ")
+                }
+                lazy var beResult = ChainableBehavior(self) { (args: BehaviorArgs) in
+                    // flynnlint:parameter String - closure to call when the string is completed
+                    let callback: ((String) -> Void) = args[x:0]
+                    callback(self.string)
+                }
+            }
+            class Foo {
+                init() {
+                    let a = StringBuilder()
+                    a.beAppend("Hello", "World")
                 }
             }
         """))
     }
     
     func testOneRule() throws {
-        let rule = PrivateFunctionInActorRule()
+        let rule = BehaviorCallCheck()
         XCTAssert(rule.test())
     }
 
