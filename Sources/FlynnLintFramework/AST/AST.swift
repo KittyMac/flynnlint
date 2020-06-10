@@ -6,12 +6,73 @@
 //  Copyright © 2020 Rocco Bowling. All rights reserved.
 //
 
+// swiftlint:disable line_length
+
 import Foundation
 import SourceKittenFramework
 import Flynn
 
+struct ASTSimpleType: Equatable, CustomStringConvertible {
+    static func == (lhs: ASTSimpleType, rhs: ASTSimpleType) -> Bool {
+        return  lhs.kind == rhs.kind
+    }
+
+    enum Kind {
+        case unknown
+        case string
+        case int
+        case float
+
+        public var description: String {
+            switch self {
+            case .unknown: return "Unknown"
+            case .string: return "String"
+            case .int: return "Int"
+            case .float: return "Float"
+            }
+        }
+    }
+
+    var kind: Kind = .unknown
+
+    public var description: String {
+        return kind.description
+    }
+
+    init(infer: String) {
+        let trimmed = infer.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if trimmed.contains("\"") {
+            kind = .string
+        } else if trimmed.contains("'") {
+            kind = .string
+        } else if CharacterSet(charactersIn: "0123456789").isSuperset(of: CharacterSet(charactersIn: trimmed)) {
+            kind = .int
+        } else if CharacterSet(charactersIn: "x0123456789").isSuperset(of: CharacterSet(charactersIn: trimmed)) {
+            kind = .int
+        } else if CharacterSet(charactersIn: "0123456789.").isSuperset(of: CharacterSet(charactersIn: trimmed)) {
+            kind = .float
+        } else if trimmed == "String" || trimmed == "NSString" || trimmed == "NSMutableString" {
+            kind = .string
+        } else if trimmed == "Int" || trimmed == "Int8" || trimmed == "Int16" || trimmed == "Int32" || trimmed == "Int64" {
+            kind = .int
+        } else if trimmed == "UInt" || trimmed == "UInt8" || trimmed == "UInt16" || trimmed == "UInt32" || trimmed == "UInt64" {
+            kind = .int
+        } else if trimmed == "Float" || trimmed == "Double" {
+            kind = .float
+        }
+    }
+}
+
 struct AST {
-    struct Behavior {
+
+    struct Behavior: Equatable {
+        static func == (lhs: AST.Behavior, rhs: AST.Behavior) -> Bool {
+            return  lhs.parameters == rhs.parameters &&
+                    lhs.anyParams == rhs.anyParams &&
+                    lhs.noParams == rhs.noParams
+        }
+
         let syntax: FileSyntax
         let anyParams: Bool
         let noParams: Bool
@@ -36,7 +97,11 @@ struct AST {
             }
         }
     }
-    struct Parameter {
+    struct Parameter: Equatable {
+        static func == (lhs: AST.Parameter, rhs: AST.Parameter) -> Bool {
+            return  lhs.type == rhs.type
+        }
+
         let type: String
         let description: String
         init(_ paramString: String) {

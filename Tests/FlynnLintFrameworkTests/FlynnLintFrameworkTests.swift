@@ -24,7 +24,7 @@ class FlynnLintTests: XCTestCase {
     
     func testOneRuleOneCode() throws {
         let rule = BehaviorCallCheck()
-        XCTAssert(!rule.test("""
+        XCTAssert(rule.test("""
             class StringBuilder: Actor {
                 private var string: String = ""
                 lazy var beAppend = ChainableBehavior(self) { (args: BehaviorArgs) in
@@ -48,7 +48,7 @@ class FlynnLintTests: XCTestCase {
             class Foo {
                 init() {
                     let a = StringBuilder()
-                    a.beAppend("Hello", "World")
+                    a.beAppend(5)
                 }
             }
         """))
