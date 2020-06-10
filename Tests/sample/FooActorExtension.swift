@@ -10,7 +10,7 @@ import Foundation
 import Flynn
 
 extension Foo {
-    public func xyz() {
+    private func xyz() {
         
     }
 }

@@ -10,33 +10,35 @@ import Foundation
 import SourceKittenFramework
 import Flynn
 
-class CheckRules: Actor {
+class CheckRules: Actor, Flowable {
     // input: an AST and one syntax structure
     // output: error string if rule failed
-    let rules: Ruleset
+    lazy var safeFlowable = FlowableState(self)
+    private let rules: Ruleset
 
     init(_ rules: Ruleset) {
         self.rules = rules
     }
 
-    override func safeFlowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
+    lazy var beFlow = Behavior(self) { (args: BehaviorArgs) in
+        // flynnlint:parameter Any
         if args.isEmpty == false {
             let ast: AST = args[x:0]
             let syntax: FileSyntax = args[x:1]
-            let target = safeNextTarget()
+            let target = self.safeNextTarget()
 
             let blacklist = syntax.blacklist
 
             if let kind = syntax.structure.kind {
-                if let rules = rules.byKind[kind] {
+                if let rules = self.rules.byKind[kind] {
                     for rule in rules where !blacklist.contains(rule.description.identifier) {
                         rule.check(ast, syntax, target)
                     }
                 }
             }
-            return (false, [])
+            return
         }
 
-        return (true, args)
+        self.safeFlowToNextTarget(args)
     }
 }

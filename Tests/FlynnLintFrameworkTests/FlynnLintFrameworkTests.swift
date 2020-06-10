@@ -22,6 +22,13 @@ class FlynnLintTests: XCTestCase {
         flynnlint.finish()
     }
     
+    func testCutlass() throws {
+        let flynnlint = FlynnLint()
+        flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/cutlass/Cutlass")
+        flynnlint.finish()
+    }
+
+    
     func testOneRuleOneCode() throws {
         let rule = BehaviorCallCheck()
         XCTAssert(rule.test("""

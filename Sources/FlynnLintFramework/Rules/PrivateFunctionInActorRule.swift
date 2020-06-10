@@ -69,7 +69,7 @@ struct PrivateFunctionInActorRule: Rule {
         ]
     )
 
-    func check(_ ast: AST, _ syntax: FileSyntax, _ output: Actor?) -> Bool {
+    func check(_ ast: AST, _ syntax: FileSyntax, _ output: Flowable?) -> Bool {
         // Every function defined in a class which is a subclass of Actor must follow these rules:
         // 1. its access control level (ACL) must be set to private
         // 2. if it starts with safe, its ACL may be anything. Other rules will keep anything
@@ -87,7 +87,7 @@ struct PrivateFunctionInActorRule: Rule {
                         function.kind == .functionMethodInstance &&
                         function.accessibility != .private {
                         if let output = output {
-                            output.flow(error(function.offset, syntax))
+                            output.beFlow(error(function.offset, syntax))
                         }
                         return false
                     }
@@ -96,7 +96,7 @@ struct PrivateFunctionInActorRule: Rule {
                         function.kind == .functionMethodInstance &&
                         function.accessibility != .private {
                         if let output = output {
-                            output.flow(warning(function.offset, syntax, description.console("Unsafe functions should not be used")))
+                            output.beFlow(warning(function.offset, syntax, description.console("Unsafe functions should not be used")))
                         }
                     }
                 }

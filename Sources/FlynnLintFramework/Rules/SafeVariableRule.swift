@@ -81,7 +81,7 @@ struct SafeVariableRule: Rule {
         return file.contents.contains(".\(FlynnLint.safePrefix)")
     }
 
-    func check(_ ast: AST, _ syntax: FileSyntax, _ output: Actor?) -> Bool {
+    func check(_ ast: AST, _ syntax: FileSyntax, _ output: Flowable?) -> Bool {
         // sourcekit doesn't give us structures for variable accesses. So the
         // best we can do is grep the body contents. Doing this, we are looking
         // or any instances of .safe which are not self.safe This is
@@ -89,7 +89,7 @@ struct SafeVariableRule: Rule {
         // AST what can we do?
         if let innerOffset = syntax.match(#"\w+(?<!self)\."# + FlynnLint.safePrefix + #"\w"#) {
             if let output = output {
-                output.flow(error(innerOffset, syntax))
+                output.beFlow(error(innerOffset, syntax))
             }
             return false
         }

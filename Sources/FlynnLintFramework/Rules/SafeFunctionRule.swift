@@ -121,13 +121,13 @@ struct SafeFunctionRule: Rule {
         ]
     )
 
-    func check(_ ast: AST, _ syntax: FileSyntax, _ output: Actor?) -> Bool {
+    func check(_ ast: AST, _ syntax: FileSyntax, _ output: Flowable?) -> Bool {
         // Only functions of the class may call safe methods on a class
         if let functionCall = syntax.structure.name {
             if  functionCall.range(of: safeCallString) != nil &&
                 functionCall.hasPrefix("self.") == false {
                 if let output = output {
-                    output.flow(error(syntax.structure.offset, syntax))
+                    output.beFlow(error(syntax.structure.offset, syntax))
                 }
                 return false
             }

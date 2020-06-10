@@ -12,11 +12,13 @@ import Flynn
 
 typealias PrintErrorResult = ((Int) -> Void)
 
-class PrintError: Actor {
+class PrintError: Actor, Flowable {
     // input: error string
     // output: none
-    var onComplete: PrintErrorResult?
-    var numErrors: Int = 0
+    lazy var safeFlowable = FlowableState(self)
+
+    private var onComplete: PrintErrorResult?
+    private var numErrors: Int = 0
 
     override init() {
         super.init()
@@ -26,20 +28,18 @@ class PrintError: Actor {
         self.onComplete = onComplete
     }
 
-    override func safeFlowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
+    lazy var beFlow = Behavior(self) { (args: BehaviorArgs) in
+        // flynnlint:parameter Any
         if args.isEmpty == false {
             let error: String = args[x:0]
             print(error)
             if error.contains("error") {
-                numErrors += 1
+                self.numErrors += 1
             }
-            return (false, [])
         }
 
-        if let onComplete = onComplete {
-            onComplete(numErrors)
+        if let onComplete = self.onComplete {
+            onComplete(self.numErrors)
         }
-
-        return (false, [])
     }
 }

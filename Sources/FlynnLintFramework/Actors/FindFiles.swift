@@ -9,17 +9,19 @@
 import Foundation
 import Flynn
 
-class FindFiles: Actor {
+class FindFiles: Actor, Flowable {
     // input: path to source directory
     // output: paths to individual swift files
-    let extensions: [String]
+    lazy var safeFlowable = FlowableState(self)
+    private let extensions: [String]
 
     init (_ extensions: [String]) {
         self.extensions = extensions
     }
 
-    override func safeFlowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
-        if args.isEmpty { return (true, args) }
+    lazy var beFlow = Behavior(self) { (args: BehaviorArgs) in
+        // flynnlint:parameter Any
+        if args.isEmpty { return self.safeFlowToNextTarget(args) }
 
         let path: String = args[x:0]
         do {
@@ -35,16 +37,12 @@ class FindFiles: Actor {
             for case let fileURL as URL in enumerator {
                 let resourceValues = try fileURL.resourceValues(forKeys: Set(resourceKeys))
                 let pathExtension = (fileURL.path as NSString).pathExtension
-                if extensions.contains(pathExtension) && resourceValues.isDirectory == false {
-                    if let next = safeNextTarget() {
-                        next.flow(fileURL.path)
-                    }
+                if self.extensions.contains(pathExtension) && resourceValues.isDirectory == false {
+                    self.safeFlowToNextTarget([fileURL.path])
                 }
             }
         } catch {
             print(error)
         }
-
-        return (false, args)
     }
 }

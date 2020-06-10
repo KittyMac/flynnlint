@@ -10,7 +10,7 @@ import Foundation
 import SourceKittenFramework
 
 class Foo: Actor {
-    var value: Int = 0
+    private var value: Int = 0
 
     init() {
         value = 5

@@ -15,7 +15,7 @@
         "repositoryURL": "https://github.com/KittyMac/Flynn.git",
         "state": {
           "branch": null,
-          "revision": "cc5a695c828657168a358ae80004eaacc4a6523e",
+          "revision": "cf24f2f743a8af0a6f63075acadfc23a3c2ab465",
           "version": "0.0.2"
         }
       },
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/Quick/Nimble.git",
         "state": {
           "branch": null,
-          "revision": "4870c1e2afbcc9dd537b02a6d52fc292fee732b2",
-          "version": "8.1.0"
+          "revision": "2b1809051b4a65c1d7f5233331daa24572cd7fca",
+          "version": "8.1.1"
         }
       },
       {

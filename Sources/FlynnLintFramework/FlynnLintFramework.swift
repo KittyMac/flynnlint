@@ -16,10 +16,12 @@ public class FlynnLint {
     static let safePrefix = "safe"
     static let unsafePrefix = "unsafe"
 
-    private var pipeline: Actor = Actor()
+    private var pipeline: Flowable?
     private var numErrors: Int = 0
 
     public init() {
+        Flynn.startup()
+
         let ruleset = Ruleset()
         let poolSize = max(1, (Flynn.cores / Flynn.cpus) - 2 )
 
@@ -33,8 +35,8 @@ public class FlynnLint {
     }
 
     public func process(directory path: String) {
-        pipeline.flow(path)
-        pipeline.flow()
+        pipeline!.beFlow(path)
+        pipeline!.beFlow()
     }
 
     @discardableResult

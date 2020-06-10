@@ -25,6 +25,7 @@
 		46352B3B248F3D3100E5880B /* BehaviorCallCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46352B3A248F3D3100E5880B /* BehaviorCallCheck.swift */; };
 		46627BE42486E3A500A2A610 /* SafeVariableRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46627BE32486E3A500A2A610 /* SafeVariableRule.swift */; };
 		46776428248ABAB200228D82 /* BehaviorParamsDefined.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46776427248ABAB200228D82 /* BehaviorParamsDefined.swift */; };
+		467794E5249133FB00118597 /* Flowable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467794E4249133F200118597 /* Flowable.swift */; };
 		46B8A330248DB2D50076973B /* BehaviorNamingConvention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B8A32F248DB2D50076973B /* BehaviorNamingConvention.swift */; };
 		OBJ_193 /* api.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_106 /* api.c */; };
 		OBJ_194 /* emitter.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_107 /* emitter.c */; };
@@ -455,6 +456,7 @@
 		46352B3A248F3D3100E5880B /* BehaviorCallCheck.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BehaviorCallCheck.swift; sourceTree = "<group>"; };
 		46627BE32486E3A500A2A610 /* SafeVariableRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafeVariableRule.swift; sourceTree = "<group>"; };
 		46776427248ABAB200228D82 /* BehaviorParamsDefined.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BehaviorParamsDefined.swift; sourceTree = "<group>"; };
+		467794E4249133F200118597 /* Flowable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Flowable.swift; sourceTree = "<group>"; };
 		46B8A32F248DB2D50076973B /* BehaviorNamingConvention.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BehaviorNamingConvention.swift; sourceTree = "<group>"; };
 		"Commandant::Commandant::Product" /* Commandant.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Commandant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Flynn::Flynn::Product" /* Flynn.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Flynn.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -879,6 +881,7 @@
 				OBJ_153 /* Actor.swift */,
 				OBJ_154 /* Behavior.swift */,
 				OBJ_155 /* Extensions.swift */,
+				467794E4249133F200118597 /* Flowable.swift */,
 				OBJ_156 /* Flynn.swift */,
 			);
 			name = Flynn;
@@ -1290,6 +1293,7 @@
 			buildConfigurationList = OBJ_255 /* Build configuration list for PBXNativeTarget "FlynnLintFramework" */;
 			buildPhases = (
 				460DCB1B2485EB9700AC0664 /* SwiftLint */,
+				467A6CF324914BF9005052FD /* FlynnLint */,
 				OBJ_258 /* Sources */,
 				OBJ_271 /* Frameworks */,
 			);
@@ -1618,6 +1622,24 @@
 			shellPath = /bin/sh;
 			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint --path ${SRCROOT}/Sources\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
+		467A6CF324914BF9005052FD /* FlynnLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = FlynnLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "${SRCROOT}/.build/checkouts/flynn/meta/FlynnLint ${SRCROOT}/Sources\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1672,6 +1694,7 @@
 			buildActionMask = 0;
 			files = (
 				OBJ_246 /* Actor.swift in Sources */,
+				467794E5249133FB00118597 /* Flowable.swift in Sources */,
 				OBJ_247 /* Behavior.swift in Sources */,
 				OBJ_248 /* Extensions.swift in Sources */,
 				OBJ_249 /* Flynn.swift in Sources */,

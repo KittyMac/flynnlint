@@ -56,7 +56,7 @@ struct PrivateVariablesInActorRule: Rule {
         ]
     )
 
-    func check(_ ast: AST, _ syntax: FileSyntax, _ output: Actor?) -> Bool {
+    func check(_ ast: AST, _ syntax: FileSyntax, _ output: Flowable?) -> Bool {
         if let resolvedClass = ast.getClassOrProtocol(syntax.structure.name) {
             if ast.isActor(resolvedClass) {
                 if let variables = syntax.structure.substructure {
@@ -90,14 +90,14 @@ struct PrivateVariablesInActorRule: Rule {
                                 // allow variables to be "unsafe"
                                 if name.hasPrefix(FlynnLint.unsafePrefix) {
                                     if let output = output {
-                                        output.flow(warning(variable.offset, syntax, description.console("Unsafe variables should not be used")))
+                                        output.beFlow(warning(variable.offset, syntax, description.console("Unsafe variables should not be used")))
                                     }
                                     continue
                                 }
                             }
 
                             if let output = output {
-                                output.flow(error(variable.offset, syntax))
+                                output.beFlow(error(variable.offset, syntax))
                             }
                             return false
                         }

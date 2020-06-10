@@ -10,11 +10,14 @@ import Foundation
 import SourceKittenFramework
 import Flynn
 
-class ParseFile: Actor {
+class ParseFile: Actor, Flowable {
     // input: path to swift file
     // output: SourceKitten File, SourceKitten Structure
-    override func safeFlowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
-        if args.isEmpty { return (true, args) }
+    lazy var safeFlowable = FlowableState(self)
+
+    lazy var beFlow = Behavior(self) { (args: BehaviorArgs) in
+        // flynnlint:parameter Any
+        if args.isEmpty { return self.safeFlowToNextTarget(args) }
 
         let path: String = args[x:0]
         if let file = File(path: path) {
@@ -30,12 +33,10 @@ class ParseFile: Actor {
 
                 let fileSyntax = FileSyntax(file, syntax.structure, syntax.syntax, blacklist)
 
-                return (true, [fileSyntax])
+                self.safeFlowToNextTarget([fileSyntax])
             } catch {
                 print("Parsing error: \(error)")
             }
         }
-
-        return (false, [])
     }
 }

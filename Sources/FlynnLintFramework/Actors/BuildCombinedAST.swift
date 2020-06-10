@@ -262,36 +262,36 @@ class ASTBuilder: Sequence {
 
 }
 
-class BuildCombinedAST: Actor {
+class BuildCombinedAST: Actor, Flowable {
     // input: a File and  a syntax structure
     // output: an immutable AST and pass all syntax
-    var astBuilder = ASTBuilder()
+    lazy var safeFlowable = FlowableState(self)
+    private var astBuilder = ASTBuilder()
 
     override init() {
         super.init()
-        priority = 1
+        safePriority = 1
     }
 
-    override func safeFlowProcess(args: BehaviorArgs) -> (Bool, BehaviorArgs) {
+    lazy var beFlow = Behavior(self) { (args: BehaviorArgs) in
+        // flynnlint:parameter Any
         if args.isEmpty == false {
-            astBuilder.add(args[x:0])
-            return (false, [])
+            self.astBuilder.add(args[x:0])
+            return
         }
 
-        priority = -1
+        self.safePriority = -1
 
         // Once we have all of the relevant structures from all of the files captured, we turn that
         // into an immutable struct which will allow us to share that safely with many actors. Then
         // we process eash structure against the rule set.
-        let ast = astBuilder.build()
+        let ast = self.astBuilder.build()
 
         // Run through every syntax structure and pass it to the rulesets
-        for syntax in astBuilder {
-            if let target = safeNextTarget() {
-                target.flow(ast, syntax)
-            }
+        for syntax in self.astBuilder {
+            self.safeFlowToNextTarget([ast, syntax])
         }
 
-        return (true, [])
+        self.safeFlowToNextTarget([])
     }
 }

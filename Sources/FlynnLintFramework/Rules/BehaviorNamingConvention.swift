@@ -78,7 +78,7 @@ struct BehaviorNamingConvention: Rule {
         return file.contents.contains("Behavior")
     }
 
-    func check(_ ast: AST, _ syntax: FileSyntax, _ output: Actor?) -> Bool {
+    func check(_ ast: AST, _ syntax: FileSyntax, _ output: Flowable?) -> Bool {
         // Since behaviors look just like functions at the call site, we enforce
         // behaviors to adhere to the "\(FlynnLint.behaviorPrefix)" naming convention.
         // So, "actor.\(FlynnLint.behaviorPrefix)Foo()" instead of "actor.foo()"
@@ -92,7 +92,7 @@ struct BehaviorNamingConvention: Rule {
             behavior.syntax.structure.name?.starts(with: FlynnLint.behaviorPrefix) == false {
             if let output = output,
                let bodyoffset = behavior.syntax.structure.offset {
-                output.flow(error(bodyoffset, behavior.syntax))
+                output.beFlow(error(bodyoffset, behavior.syntax))
                 noErrors = false
             }
         }

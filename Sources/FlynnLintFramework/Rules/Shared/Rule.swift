@@ -49,7 +49,7 @@ protocol Rule {
     func precheck(_ file: File) -> Bool
 
     @discardableResult
-    func check(_ ast: AST, _ syntax: FileSyntax, _ output: Actor?) -> Bool
+    func check(_ ast: AST, _ syntax: FileSyntax, _ output: Flowable?) -> Bool
 }
 
 extension Rule {
