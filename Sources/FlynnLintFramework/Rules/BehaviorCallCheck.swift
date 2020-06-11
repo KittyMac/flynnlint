@@ -47,7 +47,7 @@ struct BehaviorCallCheck: Rule {
         identifier: "actors_safe_func",
         name: "Parameter Violation",
         description: "The parameters for this behavior call do not match the expected parameters documentation.",
-        syntaxTriggers: [.class, .extension, .struct, .extensionStruct, .enum, .extensionEnum, .functionFree],
+        syntaxTriggers: [ ],
         nonTriggeringExamples: [
             Example("""
                 \(BehaviorCallCheckConst.stringBuilder)
@@ -60,6 +60,18 @@ struct BehaviorCallCheck: Rule {
                         a.beResult { (value: String) in
                             print(value)
                         }
+                    }
+                }
+            """),
+            Example("""
+                \(BehaviorCallCheckConst.stringBuilder)
+                class Foo: Actor {
+                    init() {
+                        beCount("Hello")
+                    }
+                    lazy var beCount = Behavior(self) { (args: BehaviorArgs) in
+                        // flynnlint:parameter Int - amount
+                        self.count()
                     }
                 }
             """)
@@ -93,7 +105,7 @@ struct BehaviorCallCheck: Rule {
     func check(_ ast: AST, _ syntax: FileSyntax, _ output: Flowable?) -> Bool {
         var noErrors = true
 
-        syntax.matches(#"\.("# + FlynnLint.behaviorPrefix + #"[^\s\(]*)\s*\(\s*([^)]*?)\s*\)"#) { (match, groups) in
+        syntax.matches(#"[\.\s]("# + FlynnLint.behaviorPrefix + #"[^\s\(]*)\s*\(\s*([^)]*?)\s*\)"#) { (match, groups) in
             var behaviorName = groups[1]
             let argumentString = groups[2]
 

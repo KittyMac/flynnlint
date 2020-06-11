@@ -103,7 +103,12 @@ extension Rule {
             let ast = astBuilder.build()
 
             for syntax in astBuilder {
-                if description.syntaxTriggers.contains(syntax.structure.kind!) {
+
+                if description.syntaxTriggers.count == 0 {
+                    if !check(ast, syntax, printError) {
+                        return false
+                    }
+                } else if description.syntaxTriggers.contains(syntax.structure.kind!) {
                     if !check(ast, syntax, printError) {
                         return false
                     }

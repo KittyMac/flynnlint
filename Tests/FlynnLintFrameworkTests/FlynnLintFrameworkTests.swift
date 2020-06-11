@@ -22,6 +22,12 @@ class FlynnLintTests: XCTestCase {
         flynnlint.finish()
     }
     
+    func testBatteryTester() throws {
+        let flynnlint = FlynnLint()
+        flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/flynn/Examples/BatteryTester/BatteryTester")
+        flynnlint.finish()
+    }
+    
     func testCutlass() throws {
         let flynnlint = FlynnLint()
         flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/cutlass/Cutlass")
@@ -31,7 +37,7 @@ class FlynnLintTests: XCTestCase {
     
     func testOneRuleOneCode() throws {
         let rule = BehaviorCallCheck()
-        XCTAssert(rule.test("""
+        XCTAssert(!rule.test("""
             class StringBuilder: Actor {
                 private var string: String = ""
                 lazy var beAppend = ChainableBehavior(self) { (args: BehaviorArgs) in
@@ -55,7 +61,7 @@ class FlynnLintTests: XCTestCase {
             class Foo {
                 init() {
                     let a = StringBuilder()
-                    a.beAppend(5)
+                    a.beAppend("Hello", "World")
                 }
             }
         """))

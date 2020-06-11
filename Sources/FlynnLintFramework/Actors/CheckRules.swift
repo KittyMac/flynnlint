@@ -25,14 +25,21 @@ class CheckRules: Actor, Flowable {
         if args.isEmpty == false {
             let ast: AST = args[x:0]
             let syntax: FileSyntax = args[x:1]
+            let fileOnly: Bool = args[x:2]
             let target = self.safeNextTarget()
 
             let blacklist = syntax.blacklist
 
-            if let kind = syntax.structure.kind {
-                if let rules = self.rules.byKind[kind] {
-                    for rule in rules where !blacklist.contains(rule.description.identifier) {
-                        rule.check(ast, syntax, target)
+            if fileOnly {
+                for rule in self.rules.all where !blacklist.contains(rule.description.identifier) {
+                    rule.check(ast, syntax, target)
+                }
+            } else {
+                if let kind = syntax.structure.kind {
+                    if let rules = self.rules.byKind[kind] {
+                        for rule in rules where !blacklist.contains(rule.description.identifier) {
+                            rule.check(ast, syntax, target)
+                        }
                     }
                 }
             }

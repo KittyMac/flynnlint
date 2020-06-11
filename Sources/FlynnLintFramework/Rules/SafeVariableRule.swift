@@ -15,7 +15,7 @@ struct SafeVariableRule: Rule {
         identifier: "actors_safe_var",
         name: "Safe Access Violation",
         description: "Safe variables may not be called outside of the Actor.",
-        syntaxTriggers: [.class, .extension, .struct, .extensionStruct, .enum, .extensionEnum, .functionFree],
+        syntaxTriggers: [ ],
         nonTriggeringExamples: [
             Example("""
                 class SomeActor: Actor {

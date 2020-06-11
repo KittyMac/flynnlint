@@ -73,7 +73,10 @@ struct FileSyntax {
             let structure = self.structure
             let map = self.tokens
 
-            if let bodyoffset = structure.offset, let bodylength = structure.length {
+            if let bodyoffset = structure.offset, var bodylength = structure.length {
+                if bodyoffset + bodylength > body.count {
+                    bodylength = Int64(body.count) - bodyoffset
+                }
                 if bodyoffset + bodylength <= body.count {
                     let regex = try NSRegularExpression(pattern: pattern, options: [])
                     let nsrange = NSRange(location: Int(bodyoffset), length: Int(bodylength))
@@ -116,7 +119,10 @@ struct FileSyntax {
             let structure = self.structure
             let map = self.tokens
 
-            if let bodyoffset = structure.offset, let bodylength = structure.length {
+            if let bodyoffset = structure.offset, var bodylength = structure.length {
+                if bodyoffset + bodylength > body.count {
+                    bodylength = Int64(body.count) - bodyoffset
+                }
                 if bodyoffset + bodylength <= body.count {
                     let regex = try NSRegularExpression(pattern: pattern, options: [])
                     let nsrange = NSRange(location: Int(bodyoffset), length: Int(bodylength))
@@ -160,7 +166,10 @@ struct FileSyntax {
         let map = self.tokens
         var markup: [(ByteCount, String)] = []
 
-        if let bodyoffset = structure.offset, let bodylength = structure.length {
+        if let bodyoffset = structure.offset, var bodylength = structure.length {
+            if bodyoffset + bodylength > body.count {
+                bodylength = Int64(body.count) - bodyoffset
+            }
             if bodyoffset + bodylength <= body.count {
                 let targetString = "flynnlint:\(label)"
                 // Check all comments inside the body to see if they are flynnlint commands
@@ -219,8 +228,14 @@ class ASTBuilder: Sequence {
     var extensions: [FileSyntax] = []
     var calls: [FileSyntax] = []
     var functions: [FileSyntax] = []
+    var files: [FileSyntax] = []
 
     func add(_ fileSyntax: FileSyntax) {
+        files.append(fileSyntax)
+        recursiveAdd(fileSyntax)
+    }
+
+    func recursiveAdd(_ fileSyntax: FileSyntax) {
         let syntax = fileSyntax.structure
 
         if let name = syntax.name {
@@ -247,7 +262,7 @@ class ASTBuilder: Sequence {
 
         if let substructures = syntax.substructure {
             for substructure in substructures {
-                add(fileSyntax.clone(substructure))
+                recursiveAdd(fileSyntax.clone(substructure))
             }
         }
     }
@@ -287,9 +302,14 @@ class BuildCombinedAST: Actor, Flowable {
         // we process eash structure against the rule set.
         let ast = self.astBuilder.build()
 
+        // Run every individual file pass it to the rulesets
+        for syntax in self.astBuilder.files {
+            self.safeFlowToNextTarget([ast, syntax, true])
+        }
+
         // Run through every syntax structure and pass it to the rulesets
         for syntax in self.astBuilder {
-            self.safeFlowToNextTarget([ast, syntax])
+            self.safeFlowToNextTarget([ast, syntax, false])
         }
 
         self.safeFlowToNextTarget([])
