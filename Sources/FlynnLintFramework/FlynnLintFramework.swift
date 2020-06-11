@@ -20,8 +20,6 @@ public class FlynnLint {
     private var numErrors: Int = 0
 
     public init() {
-        Flynn.startup()
-
         let ruleset = Ruleset()
         let poolSize = max(1, (Flynn.cores / Flynn.cpus) - 2 )
 
