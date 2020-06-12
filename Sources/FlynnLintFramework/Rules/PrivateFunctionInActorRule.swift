@@ -80,19 +80,20 @@ struct PrivateFunctionInActorRule: Rule {
             if ast.isActor(resolvedClass) {
                 if let functions = syntax.structure.substructure {
                     for function in functions where
-                        !(function.name ?? "").hasPrefix(FlynnLint.unsafePrefix) &&
-                        !(function.name ?? "").hasPrefix(FlynnLint.safePrefix) &&
+                        !(function.name ?? "").hasPrefix(FlynnLint.prefixUnsafe) &&
+                        !(function.name ?? "").hasPrefix(FlynnLint.prefixSafe) &&
                         !(function.name ?? "").hasPrefix("init(") &&
                         !(function.name ?? "").hasPrefix("deinit") &&
                         function.kind == .functionMethodInstance &&
                         function.accessibility != .private {
                         if let output = output {
-                            output.beFlow(error(function.offset, syntax))
+                            let msg = error(function.offset, syntax)
+                            output.beFlow(msg)
                         }
                         return false
                     }
                     for function in functions where
-                        (function.name ?? "").hasPrefix(FlynnLint.unsafePrefix) &&
+                        (function.name ?? "").hasPrefix(FlynnLint.prefixUnsafe) &&
                         function.kind == .functionMethodInstance &&
                         function.accessibility != .private {
                         if let output = output {

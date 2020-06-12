@@ -16,25 +16,25 @@ struct BehaviorNamingConvention: Rule {
     let description = RuleDescription(
         identifier: "behavior_name",
         name: "Behavior Name Violation",
-        description: "Behaviour names must start with '\(FlynnLint.behaviorPrefix)', such as 'actor.\(FlynnLint.behaviorPrefix)HelloWorld()'",
+        description: "Behaviour names must start with '\(FlynnLint.prefixBehavior)', such as 'actor.\(FlynnLint.prefixBehavior)HelloWorld()'",
         syntaxTriggers: [.class, .extension],
         nonTriggeringExamples: [
             Example("""
                 class StringBuilder: Actor {
                     private var string: String = ""
-                    lazy var \(FlynnLint.behaviorPrefix)Append = ChainableBehavior(self) { (args: BehaviorArgs) in
+                    lazy var \(FlynnLint.prefixBehavior)Append = ChainableBehavior(self) { (args: BehaviorArgs) in
                         // flynnlint:parameter String - the string to be appended
                         let value: String = args[x: 0]
                         self.string.append(value)
                     }
-                    lazy var \(FlynnLint.behaviorPrefix)Space = ChainableBehavior(self) { (_: BehaviorArgs) in
+                    lazy var \(FlynnLint.prefixBehavior)Space = ChainableBehavior(self) { (_: BehaviorArgs) in
                         // flynnlint:parameter None
                         self.string.append(" ")
                     }
-                    lazy var \(FlynnLint.behaviorPrefix)Space = ChainableBehavior(self) { (_: BehaviorArgs) in
+                    lazy var \(FlynnLint.prefixBehavior)Space = ChainableBehavior(self) { (_: BehaviorArgs) in
                         self.string.append(" ")
                     }
-                    lazy var \(FlynnLint.behaviorPrefix)Result = ChainableBehavior(self) { (args: BehaviorArgs) in
+                    lazy var \(FlynnLint.prefixBehavior)Result = ChainableBehavior(self) { (args: BehaviorArgs) in
                         // flynnlint:parameter String - closure to call when the string is completed
                         let callback: ((String) -> Void) = args[x:0]
                         callback(self.string)
@@ -89,7 +89,7 @@ struct BehaviorNamingConvention: Rule {
 
         // 1. There must be some parameters defined
         for behavior in behaviors where
-            behavior.syntax.structure.name?.starts(with: FlynnLint.behaviorPrefix) == false {
+            behavior.syntax.structure.name?.starts(with: FlynnLint.prefixBehavior) == false {
             if let output = output,
                let bodyoffset = behavior.syntax.structure.offset {
                 output.beFlow(error(bodyoffset, behavior.syntax))

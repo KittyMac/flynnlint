@@ -78,7 +78,7 @@ struct SafeVariableRule: Rule {
     )
 
     func precheck(_ file: File) -> Bool {
-        return file.contents.contains(".\(FlynnLint.safePrefix)")
+        return file.contents.contains(".\(FlynnLint.prefixSafe)")
     }
 
     func check(_ ast: AST, _ syntax: FileSyntax, _ output: Flowable?) -> Bool {
@@ -87,7 +87,7 @@ struct SafeVariableRule: Rule {
         // or any instances of .safe which are not self.safe This is
         // FAR from perfect, but until sourcekit provides the full, unadultered
         // AST what can we do?
-        if let innerOffset = syntax.match(#"\w+(?<!self)\."# + FlynnLint.safePrefix + #"\w"#) {
+        if let innerOffset = syntax.match(#"\w+(?<!self)\."# + FlynnLint.prefixSafe + #"\w"#) {
             if let output = output {
                 output.beFlow(error(innerOffset, syntax))
             }

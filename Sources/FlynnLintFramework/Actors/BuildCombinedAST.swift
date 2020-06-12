@@ -11,6 +11,7 @@ import SourceKittenFramework
 import Flynn
 
 // swiftlint:disable line_length
+// swiftlint:disable cyclomatic_complexity
 
 extension String {
     func substring(with nsrange: NSRange) -> Substring? {
@@ -93,7 +94,7 @@ struct FileSyntax {
                                 let length = commentSection.length.value
                                 if fullBodyOffset >= offset && fullBodyOffset <= (offset + length) {
                                     switch type {
-                                    case .comment, .commentURL, .commentMark, .docComment, .docCommentField:
+                                    case .comment, .commentURL, .commentMark, .docComment, .docCommentField, .string, .stringInterpolationAnchor:
                                         return
                                     default:
                                         break
@@ -139,7 +140,7 @@ struct FileSyntax {
                                 let length = commentSection.length.value
                                 if fullBodyOffset >= offset && fullBodyOffset <= (offset + length) {
                                     switch type {
-                                    case .comment, .commentURL, .commentMark, .docComment, .docCommentField:
+                                    case .comment, .commentURL, .commentMark, .docComment, .docCommentField, .string, .stringInterpolationAnchor:
                                         return
                                     default:
                                         break
@@ -179,7 +180,7 @@ struct FileSyntax {
                         let offset = commentSection.offset.value
                         if offset >= bodyoffset && offset <= (bodyoffset + bodylength) {
                             switch type {
-                            case .comment, .commentURL, .commentMark, .docComment, .docCommentField:
+                            case .comment, .commentURL, .commentMark, .docComment, .docCommentField, .string, .stringInterpolationAnchor:
                                 let stringView = StringView.init(body)
                                 if let commentString = stringView.substringWithByteRange(commentSection.range) {
                                     if let range = commentString.range(of: targetString) {

@@ -18,19 +18,19 @@ private struct BehaviorCallCheckConst {
     static let stringBuilder = """
         class StringBuilder: Actor {
             private var string: String = ""
-            lazy var \(FlynnLint.behaviorPrefix)Append = ChainableBehavior(self) { (args: BehaviorArgs) in
+            lazy var \(FlynnLint.prefixBehavior)Append = ChainableBehavior(self) { (args: BehaviorArgs) in
                 // flynnlint:parameter String - the string to be appended
                 let value: String = args[x: 0]
                 self.string.append(value)
             }
-            lazy var \(FlynnLint.behaviorPrefix)Space = ChainableBehavior(self) { (_: BehaviorArgs) in
+            lazy var \(FlynnLint.prefixBehavior)Space = ChainableBehavior(self) { (_: BehaviorArgs) in
                 // flynnlint:parameter None
                 self.string.append(" ")
             }
-            lazy var \(FlynnLint.behaviorPrefix)Space = ChainableBehavior(self) { (_: BehaviorArgs) in
+            lazy var \(FlynnLint.prefixBehavior)Space = ChainableBehavior(self) { (_: BehaviorArgs) in
                 self.string.append(" ")
             }
-            lazy var \(FlynnLint.behaviorPrefix)Result = ChainableBehavior(self) { (args: BehaviorArgs) in
+            lazy var \(FlynnLint.prefixBehavior)Result = ChainableBehavior(self) { (args: BehaviorArgs) in
                 // flynnlint:parameter String - closure to call when the string is completed
                 let callback: ((String) -> Void) = args[x:0]
                 callback(self.string)
@@ -41,7 +41,7 @@ private struct BehaviorCallCheckConst {
 
 struct BehaviorCallCheck: Rule {
 
-    let behaviorCallString = ".\(FlynnLint.behaviorPrefix)"
+    let behaviorCallString = ".\(FlynnLint.prefixBehavior)"
 
     let description = RuleDescription(
         identifier: "actors_safe_func",
@@ -105,42 +105,44 @@ struct BehaviorCallCheck: Rule {
     func check(_ ast: AST, _ syntax: FileSyntax, _ output: Flowable?) -> Bool {
         var noErrors = true
 
-        syntax.matches(#"[\.\s]("# + FlynnLint.behaviorPrefix + #"[^\s\.\(]*)\s*\(\s*([^)]*?)\s*\)"#) { (match, groups) in
+        syntax.matches(#"[\.\s]("# + FlynnLint.prefixBehavior + #"[^\s\.\(]*)\s*\(\s*([^)]*?)\s*\)"#) { (match, groups) in
             var behaviorName = groups[1]
             let argumentString = groups[2]
 
             behaviorName = behaviorName.deletingSuffix(".dynamicallyCall")
 
-            // If there is a ( in the name, its because our regex can't handle nested
-            // parenthesis. We need to try a different mechanism to handle this case.
-            if behaviorName.contains("(") || argumentString.contains("(") {
-                if let output = output {
-                    let msg = description.console("Unable to check arguments when there are nested parenthesis")
-                    output.beFlow(warning(Int64(match.range.location), syntax, msg))
-                }
-                return
-            }
-
-            var arguments: [String] = []
-            argumentString.matches(#"(".*?"|[^",\s]+)(?=\s*,|\s*$)"#, { (_, argGroups) in
-                arguments.append(argGroups[1])
-            })
+            let behaviors = ast.getBehaviors(behaviorName)
 
             // 1. Check that the number of arguments in the behavior call matches the
             // number of arguments documented in the behavior documentation
-            let behaviors = ast.getBehaviors(behaviorName)
             if behaviors.count == 0 {
                 if let output = output {
                     let msg = description.console("Unable to find behavior declaration for \(behaviorName)")
                     output.beFlow(warning(Int64(match.range.location), syntax, msg))
                 }
-            } else if behaviors.count > 1 && !behaviorsAreTheSame(behaviors) {
+            } else if behaviors.count > 1 && !checkBehaviorsAreTheSame(behaviors) {
                 if let output = output {
                     let msg = description.console("Ambiguous behavior \(behaviorName), unable to check arguments")
                     output.beFlow(warning(Int64(match.range.location), syntax, msg))
                 }
             } else if let behavior = behaviors.first {
                 if !behavior.anyParams {
+
+                    // If there is a ( in the name, its because our regex can't handle nested
+                    // parenthesis. We need to try a different mechanism to handle this case.
+                    if behaviorName.contains("(") || argumentString.contains("(") {
+                        if let output = output {
+                            let msg = description.console("Unable to check arguments when there are nested parenthesis")
+                            output.beFlow(warning(Int64(match.range.location), syntax, msg))
+                        }
+                        return
+                    }
+
+                    var arguments: [String] = []
+                    argumentString.matches(#"(".*?"|[^",\s]+)(?=\s*,|\s*$)"#, { (_, argGroups) in
+                        arguments.append(argGroups[1])
+                    })
+
                     if arguments.count < behavior.parameters.count {
                         if let output = output {
                             let msg = description.console("Not enough arguments for behavior (expected \(behaviors.count) arguments)")
@@ -174,7 +176,7 @@ struct BehaviorCallCheck: Rule {
         return noErrors
     }
 
-    func behaviorsAreTheSame(_ behaviors: [AST.Behavior]) -> Bool {
+    func checkBehaviorsAreTheSame(_ behaviors: [AST.Behavior]) -> Bool {
         guard let first = behaviors.first else { return false }
         for behavior in behaviors where first != behavior {
             return false

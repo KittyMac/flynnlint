@@ -12,9 +12,9 @@ import SourceKittenFramework
 
 public class FlynnLint {
 
-    static let behaviorPrefix = "be"
-    static let safePrefix = "safe"
-    static let unsafePrefix = "unsafe"
+    static let prefixBehavior = "be"
+    static let prefixSafe = "safe"
+    static let prefixUnsafe = "unsafe"
 
     private var pipeline: Flowable?
     private var numErrors: Int = 0

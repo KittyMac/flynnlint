@@ -12,8 +12,8 @@ import SourceKittenFramework
 
 struct SafeFunctionRule: Rule {
 
-    let safeCallString = ".\(FlynnLint.safePrefix)"
-    let unsafeCallString = ".\(FlynnLint.unsafePrefix)"
+    let safeCallString = ".\(FlynnLint.prefixSafe)"
+    let unsafeCallString = ".\(FlynnLint.prefixUnsafe)"
 
     let description = RuleDescription(
         identifier: "actors_safe_func",
