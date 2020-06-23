@@ -105,7 +105,7 @@ struct BehaviorCallCheck: Rule {
     func check(_ ast: AST, _ syntax: FileSyntax, _ output: Flowable?) -> Bool {
         var noErrors = true
 
-        syntax.matches(#"[\.\s]("# + FlynnLint.prefixBehavior + #"[^\s\.\(]*)\s*\(\s*([^)]*?)\s*\)"#) { (match, groups) in
+        syntax.matches(#"[\.\s]("# + FlynnLint.prefixBehavior + #"[A-Z][^\s\.\(]*)\s*\(\s*([^)]*?)\s*\)"#) { (match, groups) in
             var behaviorName = groups[1]
             let argumentString = groups[2]
 
