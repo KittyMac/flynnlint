@@ -57,14 +57,15 @@ struct BehaviorUnownedSelf: Rule {
 
         // 1. There must be some parameters defined
         for behavior in behaviors {
-            if let innerOffset1 = behavior.bodySyntax.match(#"self\."#) {
+            if behavior.bodySyntax.match(#"self\."#) != nil {
                 // if the body of the behavior has references to self (ie self.) then
                 // we should have [unowned self]
 
                 if  behavior.bodySyntax.match(#"\[\s*unowned\s*self\]"#) == nil &&
                     behavior.bodySyntax.match(#"\[\s*weak\s*self\]"#) == nil {
-                    if let output = output {
-                        output.beFlow(error(innerOffset1, behavior.bodySyntax))
+                    if  let output = output,
+                        let bodyoffset = behavior.syntax.structure.offset {
+                        output.beFlow(warning(bodyoffset, behavior.bodySyntax))
                         noErrors = false
                     }
                 }
