@@ -126,7 +126,7 @@ private class ToolWorkspaceDelegate: WorkspaceDelegate {
                 switch requirement {
                 case .versionSet(.exact(let version)):
                     stdoutStream <<< "resolved to '\(version)'"
-                case .versionSet(_):
+                case .versionSet:
                     // Impossible
                     break
                 case .revision(let revision):
@@ -917,7 +917,7 @@ private func sandboxProfile(allowedDirectories: [AbsolutePath]) -> String {
 extension BuildConfiguration: StringEnumArgument {
     public static var completion: ShellCompletion = .values([
         (debug.rawValue, "build with DEBUG configuration"),
-        (release.rawValue, "build with RELEASE configuration"),
+        (release.rawValue, "build with RELEASE configuration")
     ])
 }
 

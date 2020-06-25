@@ -365,7 +365,7 @@ final class TargetDependencyWriter: SyntaxRewriter {
 
         // Insert trailing comma, if needed.
         if node.elements.count > 0 {
-            let lastElement = node.elements.map{$0}.last!
+            let lastElement = node.elements.map {$0}.last!
             let trailingTriviaWriter = ArrayTrailingCommaWriter(lastElement: lastElement)
             let newElements = trailingTriviaWriter.visit(node.elements)
             node = node.withElements((newElements as! ArrayElementListSyntax))
@@ -422,7 +422,7 @@ final class NewTargetWriter: SyntaxRewriter {
             calledExpression: dotPackageExpr,
             leftParen: SyntaxFactory.makeLeftParenToken(),
             argumentList: SyntaxFactory.makeFunctionCallArgumentList([
-                nameArg, depenenciesArg,
+                nameArg, depenenciesArg
                 ]),
             rightParen: SyntaxFactory.makeRightParenToken(),
             trailingClosure: nil

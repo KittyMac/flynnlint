@@ -432,7 +432,7 @@ public final class PartialSolution {
             return
         }
 
-        let newTerm = _negative[pkg].flatMap{ term.intersect(with: $0) } ?? term
+        let newTerm = _negative[pkg].flatMap { term.intersect(with: $0) } ?? term
 
         if newTerm.isPositive {
             _negative[pkg] = nil
@@ -451,7 +451,7 @@ public final class PartialSolution {
             guard assignment.term.package == term.package else {
                 continue
             }
-            assignedTerm = assignedTerm.flatMap{ $0.intersect(with: assignment.term) } ?? assignment.term
+            assignedTerm = assignedTerm.flatMap { $0.intersect(with: assignment.term) } ?? assignment.term
 
             if assignedTerm!.satisfies(term) {
                 return assignment
@@ -508,7 +508,7 @@ public final class PartialSolution {
 /// combination. E.g. we don't want both a^1.0.0 and a^1.5.0 to be terms in the
 /// same incompatibility, but have these combined by intersecting their version
 /// requirements to a^1.5.0.
-fileprivate func normalize(
+private func normalize(
     terms: [Term]) -> [Term] {
 
     let dict = terms.reduce(into: OrderedDictionary<PackageReference, (req: VersionSetSpecifier, polarity: Bool)>()) {
@@ -568,7 +568,7 @@ public final class PubgrubDependencyResolver {
     }()
 
     /// The resolver's delegate.
-    let delegate: DependencyResolverDelegate?
+    weak var delegate: DependencyResolverDelegate?
 
     /// Skip updating containers while fetching them.
     private let skipUpdate: Bool
@@ -921,8 +921,8 @@ public final class PubgrubDependencyResolver {
             // otherwise we'll end up creating a repository container
             // for them.
             let pins = pinsMap.values
-                .map{ $0.packageRef }
-                .filter{ !overriddenPackages.keys.contains($0) }
+                .map { $0.packageRef }
+                .filter { !overriddenPackages.keys.contains($0) }
             self.provider.prefetch(containers: pins)
         }
 
@@ -1110,7 +1110,7 @@ public final class PubgrubDependencyResolver {
 
             let priorCause = _mostRecentSatisfier.cause!
 
-            var newTerms = incompatibility.terms.filter{ $0 != mostRecentTerm }
+            var newTerms = incompatibility.terms.filter { $0 != mostRecentTerm }
             newTerms += priorCause.terms.filter({ $0.package != _mostRecentSatisfier.term.package })
 
             if let _difference = difference {
@@ -1227,15 +1227,14 @@ private final class DiagnosticReportBuilder {
                 isNumbered: false)
         }
 
-
         let stream = BufferedOutputByteStream()
-        let padding = lineNumbers.isEmpty ? 0 : "\(lineNumbers.values.map{$0}.last!) ".count
+        let padding = lineNumbers.isEmpty ? 0 : "\(lineNumbers.values.map {$0}.last!) ".count
 
         for (idx, line) in lines.enumerated() {
             let message = line.0
             let number = line.1
             stream <<< Format.asRepeating(string: " ", count: padding)
-            if (number != -1) {
+            if number != -1 {
                 stream <<< Format.asRepeating(string: " ", count: padding)
                 stream <<< " (\(number)) "
             }
@@ -1397,21 +1396,21 @@ private final class DiagnosticReportBuilder {
             let term2 = terms.last!
             if term1.isPositive == term2.isPositive {
                 if term1.isPositive {
-                    return "\(term1.package.lastPathComponent) is incompatible with \(term2.package.lastPathComponent)";
+                    return "\(term1.package.lastPathComponent) is incompatible with \(term2.package.lastPathComponent)"
                 } else {
                     return "either \(term1.package.lastPathComponent) or \(term2)"
                 }
             }
         }
 
-        let positive = terms.filter{ $0.isPositive }.map{ description(for: $0) }
-        let negative = terms.filter{ !$0.isPositive }.map{ description(for: $0) }
+        let positive = terms.filter { $0.isPositive }.map { description(for: $0) }
+        let negative = terms.filter { !$0.isPositive }.map { description(for: $0) }
         if !positive.isEmpty && !negative.isEmpty {
             if positive.count == 1 {
-                let positiveTerm = terms.first{ $0.isPositive }!
-                return "\(description(for: positiveTerm, normalizeRange: true)) requires \(negative.joined(separator: " or "))";
+                let positiveTerm = terms.first { $0.isPositive }!
+                return "\(description(for: positiveTerm, normalizeRange: true)) requires \(negative.joined(separator: " or "))"
             } else {
-                return "if \(positive.joined(separator: " and ")) then \(negative.joined(separator: " or "))";
+                return "if \(positive.joined(separator: " and ")) then \(negative.joined(separator: " or "))"
             }
         } else if !positive.isEmpty {
             return "one of \(positive.joined(separator: " or ")) must be true"
@@ -1492,7 +1491,7 @@ private final class DiagnosticReportBuilder {
                 return "\(name) <\(range.upperBound)"
             }
         case .ranges(let ranges):
-            let ranges = "{" + ranges.map{
+            let ranges = "{" + ranges.map {
                 if $0.lowerBound == $0.upperBound {
                     return $0.lowerBound.description
                 }
@@ -1520,7 +1519,7 @@ private final class DiagnosticReportBuilder {
     }
 }
 
-// MARK:- Container Management
+// MARK: - Container Management
 
 /// A container for an individual package. This enhances PackageContainer to add PubGrub specific
 /// logic which is mostly related to computing incompatibilities at a particular version.
@@ -1588,7 +1587,7 @@ private final class PubGrubPackageContainer {
         }
 
         // Return the highest version that is allowed by the input requirement.
-        return packageContainer.reversedVersions.first{ versionSet.contains($0) }
+        return packageContainer.reversedVersions.first { versionSet.contains($0) }
     }
 
     /// Compute the bounds of incompatible tools version starting from the given version.
@@ -1869,7 +1868,7 @@ private final class ContainerProvider {
     }
 }
 
-// MARK:- Misc Extensions
+// MARK: - Misc Extensions
 
 extension VersionSetSpecifier {
     fileprivate var isExact: Bool {

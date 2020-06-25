@@ -37,4 +37,3 @@ public enum LocationsOrLocationLinksResponse: ResponseType, Hashable {
     }
   }
 }
-

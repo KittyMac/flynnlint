@@ -25,15 +25,14 @@ public final class FallbackBuildSystem: BuildSystem {
     if case .darwin? = Platform.currentPlatform,
        let str = try? Process.checkNonZeroExit(
          args: "/usr/bin/xcrun", "--show-sdk-path", "--sdk", "macosx"),
-       let path = try? AbsolutePath(validating: str.spm_chomp())
-    {
+       let path = try? AbsolutePath(validating: str.spm_chomp()) {
       return path
     }
     return nil
   }()
 
   /// Delegate to handle any build system events.
-  public weak var delegate: BuildSystemDelegate? = nil
+  public weak var delegate: BuildSystemDelegate?
 
   public var indexStorePath: AbsolutePath? { return nil }
 
@@ -73,7 +72,7 @@ public final class FallbackBuildSystem: BuildSystem {
     if let sdkpath = sdkpath {
       args += [
         "-sdk",
-        sdkpath.pathString,
+        sdkpath.pathString
       ]
     }
     args.append(file)
@@ -85,7 +84,7 @@ public final class FallbackBuildSystem: BuildSystem {
     if let sdkpath = sdkpath {
       args += [
         "-isysroot",
-        sdkpath.pathString,
+        sdkpath.pathString
       ]
     }
     args.append(file)

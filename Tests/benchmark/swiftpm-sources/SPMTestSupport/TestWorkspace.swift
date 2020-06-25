@@ -29,7 +29,7 @@ public final class TestWorkspace {
     public let config: SwiftPMConfig
     public var manifestLoader: MockManifestLoader
     public var repoProvider: InMemoryGitRepositoryProvider
-    public let delegate = TestWorkspaceDelegate()
+    public weak var delegate = TestWorkspaceDelegate()
     let toolsVersion: ToolsVersion
     let skipUpdate: Bool
     let enablePubGrub: Bool
@@ -177,7 +177,7 @@ public final class TestWorkspace {
         )
         return _workspace!
     }
-    private var _workspace: Workspace? = nil
+    private var _workspace: Workspace?
 
     public func closeWorkspace() {
         _workspace = nil
@@ -212,7 +212,7 @@ public final class TestWorkspace {
         path: AbsolutePath? = nil,
         revision: Revision? = nil,
         checkoutBranch: String? = nil,
-        _ result: (DiagnosticsEngine) -> ()
+        _ result: (DiagnosticsEngine) -> Void
     ) {
         let ws = createWorkspace()
         let diagnostics = DiagnosticsEngine()
@@ -230,7 +230,7 @@ public final class TestWorkspace {
         packageName: String,
         roots: [String],
         forceRemove: Bool = false,
-        _ result: (DiagnosticsEngine) -> ()
+        _ result: (DiagnosticsEngine) -> Void
     ) {
         let ws = createWorkspace()
         let diagnostics = DiagnosticsEngine()
@@ -241,7 +241,7 @@ public final class TestWorkspace {
         result(diagnostics)
     }
 
-    public func checkResolve(pkg: String, roots: [String], version: TSCUtility.Version, _ result: (DiagnosticsEngine) -> ()) {
+    public func checkResolve(pkg: String, roots: [String], version: TSCUtility.Version, _ result: (DiagnosticsEngine) -> Void) {
         let diagnostics = DiagnosticsEngine()
         let workspace = createWorkspace()
         let rootInput = PackageGraphRootInput(packages: rootPaths(for: roots))
@@ -249,14 +249,14 @@ public final class TestWorkspace {
         result(diagnostics)
     }
 
-    public func checkClean(_ result: (DiagnosticsEngine) -> ()) {
+    public func checkClean(_ result: (DiagnosticsEngine) -> Void) {
         let diagnostics = DiagnosticsEngine()
         let workspace = createWorkspace()
         workspace.clean(with: diagnostics)
         result(diagnostics)
     }
 
-    public func checkReset(_ result: (DiagnosticsEngine) -> ()) {
+    public func checkReset(_ result: (DiagnosticsEngine) -> Void) {
         let diagnostics = DiagnosticsEngine()
         let workspace = createWorkspace()
         workspace.reset(with: diagnostics)
@@ -267,7 +267,7 @@ public final class TestWorkspace {
         roots: [String] = [],
         deps: [TestWorkspace.PackageDependency] = [],
         packages: [String] = [],
-        _ result: (DiagnosticsEngine) -> ()
+        _ result: (DiagnosticsEngine) -> Void
     ) {
         let dependencies = deps.map({ $0.convert(packagesDir, url: urlForPackage(withName: $0.name)) })
         let diagnostics = DiagnosticsEngine()
@@ -277,11 +277,11 @@ public final class TestWorkspace {
         workspace.updateDependencies(root: rootInput, packages: packages, diagnostics: diagnostics)
         result(diagnostics)
     }
-    
+
     public func checkUpdateDryRun(
         roots: [String] = [],
         deps: [TestWorkspace.PackageDependency] = [],
-        _ result: ([(PackageReference, Workspace.PackageStateChange)]?, DiagnosticsEngine) -> ()
+        _ result: ([(PackageReference, Workspace.PackageStateChange)]?, DiagnosticsEngine) -> Void
     ) {
         let dependencies = deps.map({ $0.convert(packagesDir, url: urlForPackage(withName: $0.name)) })
         let diagnostics = DiagnosticsEngine()
@@ -295,7 +295,7 @@ public final class TestWorkspace {
     public func checkPackageGraph(
         roots: [String] = [],
         deps: [TestWorkspace.PackageDependency],
-        _ result: (PackageGraph, DiagnosticsEngine) -> ()
+        _ result: (PackageGraph, DiagnosticsEngine) -> Void
     ) {
         let dependencies = deps.map({ $0.convert(packagesDir, url: urlForPackage(withName: $0.name)) })
         checkPackageGraph(roots: roots, dependencies: dependencies, result)
@@ -305,7 +305,7 @@ public final class TestWorkspace {
         roots: [String] = [],
         dependencies: [PackageGraphRootInput.PackageDependency] = [],
         forceResolvedVersions: Bool = false,
-        _ result: (PackageGraph, DiagnosticsEngine) -> ()
+        _ result: (PackageGraph, DiagnosticsEngine) -> Void
     ) {
         let diagnostics = DiagnosticsEngine()
         let workspace = createWorkspace()
@@ -321,7 +321,7 @@ public final class TestWorkspace {
         public let diagnostics: DiagnosticsEngine
     }
 
-    public func checkPrecomputeResolution(_ check: (ResolutionPrecomputationResult) -> ()) throws {
+    public func checkPrecomputeResolution(_ check: (ResolutionPrecomputationResult) -> Void) throws {
         let diagnostics = DiagnosticsEngine()
         let workspace = createWorkspace()
         let pinsStore = try workspace.pinsStore.load()
@@ -474,7 +474,7 @@ public final class TestWorkspace {
     public func loadDependencyManifests(
         roots: [String] = [],
         deps: [TestWorkspace.PackageDependency] = [],
-        _ result: (Workspace.DependencyManifests, DiagnosticsEngine) -> ()
+        _ result: (Workspace.DependencyManifests, DiagnosticsEngine) -> Void
     ) {
         let dependencies = deps.map({ $0.convert(packagesDir, url: urlForPackage(withName: $0.name)) })
         let diagnostics = DiagnosticsEngine()
@@ -487,7 +487,7 @@ public final class TestWorkspace {
         result(manifests, diagnostics)
     }
 
-    public func checkManagedDependencies(file: StaticString = #file, line: UInt = #line, _ result: (ManagedDependencyResult) throws -> ()) {
+    public func checkManagedDependencies(file: StaticString = #file, line: UInt = #line, _ result: (ManagedDependencyResult) throws -> Void) {
         do {
             let workspace = createWorkspace()
             try result(ManagedDependencyResult(workspace.state.dependencies))
@@ -496,7 +496,7 @@ public final class TestWorkspace {
         }
     }
 
-    public func checkManagedArtifacts(file: StaticString = #file, line: UInt = #line, _ result: (ManagedArtifactResult) throws -> ()) {
+    public func checkManagedArtifacts(file: StaticString = #file, line: UInt = #line, _ result: (ManagedArtifactResult) throws -> Void) {
         do {
             let workspace = createWorkspace()
             try result(ManagedArtifactResult(workspace.state.artifacts))
@@ -546,7 +546,7 @@ public final class TestWorkspace {
         }
     }
 
-    public func checkResolved(file: StaticString = #file, line: UInt = #line, _ result: (ResolvedResult) throws -> ()) {
+    public func checkResolved(file: StaticString = #file, line: UInt = #line, _ result: (ResolvedResult) throws -> Void) {
         do {
             let workspace = createWorkspace()
             try result(ResolvedResult(workspace.pinsStore.load()))
@@ -700,10 +700,10 @@ public struct TestPackage {
         return TestPackage(
             name: name,
             targets: [
-                TestTarget(name: name),
+                TestTarget(name: name)
             ],
             products: [
-                TestProduct(name: name, targets: [name]),
+                TestProduct(name: name, targets: [name])
             ],
             versions: ["1.0.0"]
         )

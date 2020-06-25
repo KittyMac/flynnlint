@@ -132,7 +132,7 @@ public class SwiftPackageTool: SwiftTool<PackageToolOptions> {
                     }
 
                     let args = [swiftFormat.pathString] + formatOptions + [file.pathString]
-                    print("Running:", args.map{ $0.spm_shellEscaped() }.joined(separator: " "))
+                    print("Running:", args.map { $0.spm_shellEscaped() }.joined(separator: " "))
 
                     let result = try Process.popen(arguments: args)
                     let output = try (result.utf8Output() + result.utf8stderrOutput())
@@ -211,14 +211,14 @@ public class SwiftPackageTool: SwiftTool<PackageToolOptions> {
 
         case .update:
             let workspace = try getActiveWorkspace()
-            
+
             let changes = try workspace.updateDependencies(
                 root: getWorkspaceRoot(),
                 packages: options.updateOptions.packages,
                 diagnostics: diagnostics,
                 dryRun: options.updateOptions.dryRun
             )
-            
+
             if let pinsStore = diagnostics.wrap({ try workspace.pinsStore.load() }),
                 let changes = changes,
                 options.updateOptions.dryRun {
@@ -468,7 +468,7 @@ public class SwiftPackageTool: SwiftTool<PackageToolOptions> {
         parser.add(subparser: PackageMode.clean.rawValue, overview: "Delete build artifacts")
         parser.add(subparser: PackageMode.fetch.rawValue, overview: "")
         parser.add(subparser: PackageMode.reset.rawValue, overview: "Reset the complete cache/build directory")
-        
+
         let updateParser = parser.add(subparser: PackageMode.update.rawValue, overview: "Update package dependencies")
         binder.bind(
             positional: updateParser.add(
@@ -823,7 +823,7 @@ public class PackageToolOptions: ToolOptions {
     var configOptions = ConfigOptions()
 
     /// Custom flags for swift-format tool.
-    var swiftFormatFlags: [String]? = nil
+    var swiftFormatFlags: [String]?
 }
 
 public enum PackageMode: String, StringEnumArgument {
@@ -861,7 +861,7 @@ extension InitPackage.PackageType: StringEnumArgument {
             (empty.description, "generates an empty project"),
             (library.description, "generates project for a dynamic library"),
             (executable.description, "generates a project for a cli executable"),
-            (systemModule.description, "generates a project for a system module"),
+            (systemModule.description, "generates a project for a system module")
         ])
     }
 }
@@ -871,7 +871,7 @@ extension ShowDependenciesMode: StringEnumArgument {
         return .values([
             (text.description, "list dependencies using text format"),
             (dot.description, "list dependencies using dot format"),
-            (json.description, "list dependencies using JSON format"),
+            (json.description, "list dependencies using JSON format")
         ])
     }
 }
@@ -880,7 +880,7 @@ extension DescribeMode: StringEnumArgument {
     public static var completion: ShellCompletion {
         return .values([
             (text.rawValue, "describe using text format"),
-            (json.rawValue, "describe using JSON format"),
+            (json.rawValue, "describe using JSON format")
         ])
     }
 }
@@ -891,7 +891,7 @@ extension PackageToolOptions.CompletionToolMode: StringEnumArgument {
             (generateBashScript.rawValue, "generate Bash completion script"),
             (generateZshScript.rawValue, "generate Bash completion script"),
             (listDependencies.rawValue, "list all dependencies' names"),
-            (listExecutables.rawValue, "list all executables' names"),
+            (listExecutables.rawValue, "list all executables' names")
         ])
     }
 }
@@ -925,11 +925,11 @@ fileprivate extension SwiftPackageTool {
     /// - Parameter stream: Stream used for logging
     func logPackageChanges(changes: [(PackageReference, Workspace.PackageStateChange)], pins: PinsStore, on stream: OutputByteStream = TSCBasic.stdoutStream) {
         let changes = changes.filter { $0.1 != .unchanged }
-        
+
         stream <<< "\n"
         stream <<< "\(changes.count) dependenc\(changes.count == 1 ? "y has" : "ies have") changed\(changes.count > 0 ? ":" : ".")"
         stream <<< "\n"
-        
+
         for (package, change) in changes {
             let currentVersion = pins.pinsMap[package.identity]?.state.description ?? ""
             switch change {

@@ -107,8 +107,7 @@ public final class SourceKitServer: LanguageServer {
   }
 
   func registerWorkspaceRequest<R>(
-    _ requestHandler: @escaping (SourceKitServer) -> (Request<R>, Workspace) -> Void)
-  {
+    _ requestHandler: @escaping (SourceKitServer) -> (Request<R>, Workspace) -> Void) {
     _register { [unowned self] (req: Request<R>) in
       guard let workspace = self.workspace else {
         return req.reply(.failure(.serverNotInitialized))
@@ -119,8 +118,7 @@ public final class SourceKitServer: LanguageServer {
   }
 
   func registerWorkspaceNotfication<N>(
-    _ noteHandler: @escaping (SourceKitServer) -> (Notification<N>, Workspace) -> Void)
-  {
+    _ noteHandler: @escaping (SourceKitServer) -> (Notification<N>, Workspace) -> Void) {
     _register { [unowned self] (note: Notification<N>) in
       guard let workspace = self.workspace else {
         log("received notification before \"initialize\", ignoring...", level: .error)
@@ -402,7 +400,6 @@ extension SourceKitServer {
     // Close the index, which will flush to disk.
     self.workspace?.index = nil
   }
-
 
   func shutdown(_ request: Request<ShutdownRequest>) {
     _prepareForExit()
@@ -771,8 +768,7 @@ public func languageService(
   for toolchain: Toolchain,
   _ language: Language,
   options: SourceKitServer.Options,
-  client: MessageHandler) throws -> ToolchainLanguageServer?
-{
+  client: MessageHandler) throws -> ToolchainLanguageServer? {
   switch language {
 
   case .c, .cpp, .objective_c, .objective_cpp:
@@ -794,25 +790,25 @@ public typealias Diagnostic = LanguageServerProtocol.Diagnostic
 extension IndexSymbolKind {
   func asLspSymbolKind() -> SymbolKind {
     switch self {
-    case .class: 
+    case .class:
       return .class
-    case .classMethod, .instanceMethod, .staticMethod: 
+    case .classMethod, .instanceMethod, .staticMethod:
       return .method
-    case .instanceProperty, .staticProperty, .classProperty: 
+    case .instanceProperty, .staticProperty, .classProperty:
       return .property
-    case .enum: 
+    case .enum:
       return .enum
-    case .enumConstant: 
+    case .enumConstant:
       return .enumMember
-    case .protocol: 
+    case .protocol:
       return .interface
-    case .function, .conversionFunction: 
+    case .function, .conversionFunction:
       return .function
-    case .variable: 
+    case .variable:
       return .variable
-    case .struct: 
+    case .struct:
       return .struct
-    case .parameter: 
+    case .parameter:
       return .typeParameter
 
     default:

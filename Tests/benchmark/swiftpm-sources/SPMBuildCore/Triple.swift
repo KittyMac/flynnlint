@@ -179,7 +179,7 @@ extension Triple {
         return ".exe"
       }
     }
-    
+
     /// The file extension for static libraries.
     public var staticLibraryExtension: String {
         return ".a"

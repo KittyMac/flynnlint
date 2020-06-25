@@ -18,7 +18,7 @@ public final class DLHandle {
   #else
     typealias Handle = UnsafeMutableRawPointer
   #endif
-  var rawValue: Handle? = nil
+  var rawValue: Handle?
 
   init(rawValue: Handle) {
     self.rawValue = rawValue

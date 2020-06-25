@@ -77,7 +77,6 @@ func zsh_template(on stream: OutputByteStream) {
 
         """
 
-
     SwiftBuildTool(args: []).parser.generateCompletionScript(for: .zsh, on: stream)
     SwiftRunTool(args: []).parser.generateCompletionScript(for: .zsh, on: stream)
     SwiftPackageTool(args: []).parser.generateCompletionScript(for: .zsh, on: stream)

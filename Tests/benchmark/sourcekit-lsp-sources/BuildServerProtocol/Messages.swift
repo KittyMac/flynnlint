@@ -11,21 +11,21 @@
 //===----------------------------------------------------------------------===//
 import LanguageServerProtocol
 
-fileprivate let requestTypes: [_RequestType.Type] = [
+private let requestTypes: [_RequestType.Type] = [
   BuildTargets.self,
   BuildTargetOutputPaths.self,
   BuildTargetSources.self,
   InitializeBuild.self,
   RegisterForChanges.self,
   ShutdownBuild.self,
-  SourceKitOptions.self,
+  SourceKitOptions.self
 ]
 
-fileprivate let notificationTypes: [NotificationType.Type] = [
+private let notificationTypes: [NotificationType.Type] = [
   BuildTargetsChangedNotification.self,
   ExitBuildNotification.self,
   FileOptionsChangedNotification.self,
-  InitializedBuildNotification.self,
+  InitializedBuildNotification.self
 ]
 
 public let bspRegistry = MessageRegistry(requests: requestTypes, notifications: notificationTypes)

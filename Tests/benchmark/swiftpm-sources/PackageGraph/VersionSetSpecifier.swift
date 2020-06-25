@@ -305,7 +305,7 @@ extension VersionSetSpecifier {
             }
             return .union(from: result + [lhs])
 
-        case (.ranges(_), .range(let r)):
+        case (.ranges, .range(let r)):
             return self.difference(.ranges([r]))
 
         case (.ranges(let lhs), .ranges(let rhs)):
@@ -416,7 +416,7 @@ extension VersionSetSpecifier: CustomStringConvertible {
         case .empty:
             return "empty"
         case .ranges(let ranges):
-            return "{" + ranges.map{
+            return "{" + ranges.map {
                 if $0.lowerBound == $0.upperBound {
                     return $0.lowerBound.description
                 }

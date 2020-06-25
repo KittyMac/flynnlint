@@ -27,10 +27,9 @@ public struct TextEdit: ResponseType, Hashable {
 }
 
 extension TextEdit: LSPAnyCodable {
-  public init?(fromLSPDictionary dictionary: [String : LSPAny]) {
+  public init?(fromLSPDictionary dictionary: [String: LSPAny]) {
     guard case .dictionary(let rangeDict) = dictionary[CodingKeys.range.stringValue],
-          case .string(let newText) = dictionary[CodingKeys.newText.stringValue] else
-    {
+          case .string(let newText) = dictionary[CodingKeys.newText.stringValue] else {
       return nil
     }
     guard let range = Range<Position>(fromLSPDictionary: rangeDict) else {

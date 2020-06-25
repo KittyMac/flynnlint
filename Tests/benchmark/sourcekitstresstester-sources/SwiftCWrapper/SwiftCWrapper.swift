@@ -99,7 +99,7 @@ public struct SwiftCWrapper {
     }
 
     // Write out response data once it's received and all preceding operations are complete
-    var orderingHandler: OrderingBuffer<[SourceKitResponseData]>? = nil
+    var orderingHandler: OrderingBuffer<[SourceKitResponseData]>?
     var seenResponses = Set<UInt64>()
     if let dumpResponsesPath = dumpResponsesPath {
       orderingHandler = OrderingBuffer(itemCount: operations.count) { responses in
@@ -129,7 +129,7 @@ public struct SwiftCWrapper {
 
     // Determine the set of processed files and the first failure (if any)
     var processedFiles = Set<String>()
-    var detectedIssue: StressTesterIssue? = nil
+    var detectedIssue: StressTesterIssue?
     for operation in operations where detectedIssue == nil {
       switch operation.status {
       case .cancelled:
@@ -211,10 +211,10 @@ public struct SwiftCWrapper {
 private struct OrderingBuffer<T> {
   private var items: [T?]
   private var nextItemIndex: Int
-  private var endIndex: Int? = nil
-  private let completionHandler: (T) -> ()
+  private var endIndex: Int?
+  private let completionHandler: (T) -> Void
 
-  init(itemCount: Int, completionHandler: @escaping (T) -> ()) {
+  init(itemCount: Int, completionHandler: @escaping (T) -> Void) {
     items = Array.init(repeating: nil, count: itemCount)
     nextItemIndex = items.startIndex
     self.completionHandler = completionHandler

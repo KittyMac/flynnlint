@@ -68,7 +68,7 @@ public struct SwiftCWrapperTool {
     let maxJobs = try maxJobsEnv.get(from: environment)
     let dumpResponsesPath = try dumpResponsesPathEnv.get(from: environment)
 
-    var issueManager: IssueManager? = nil
+    var issueManager: IssueManager?
     if let expectedFailuresPath = try expectedFailuresPathEnv.get(from: environment),
       let outputPath = try outputPathEnv.get(from: environment),
       let activeConfig = try activeConfigEnv.get(from: environment) {
@@ -151,7 +151,7 @@ public enum EnvOptionError: Swift.Error, CustomStringConvertible {
     case .noFallback(let key, let target):
       return "couldn't locate \(target); please set environment variable \(key) to its path"
     case .unknownValue(let key, let value, let validValues):
-      return "unknown value \(value) provided via environment variable \(key); should be one of: '\(validValues.map{ String(describing: $0)}.joined(separator: "', '"))'"
+      return "unknown value \(value) provided via environment variable \(key); should be one of: '\(validValues.map { String(describing: $0)}.joined(separator: "', '"))'"
     }
   }
 }

@@ -34,7 +34,7 @@ struct CursorInfo {
   var documentationXML: String?
 
   /// The refactor actions available at this position.
-  var refactorActions: [SemanticRefactorCommand]? = nil
+  var refactorActions: [SemanticRefactorCommand]?
 
   init(_ symbolInfo: SymbolDetails, annotatedDeclaration: String?, documentationXML: String?, refactorActions: [SemanticRefactorCommand]? = nil) {
     self.symbolInfo = symbolInfo
@@ -77,8 +77,7 @@ extension SwiftLanguageServer {
     _ uri: DocumentURI,
     _ range: Range<Position>,
     additionalParameters appendAdditionalParameters: ((SKRequestDictionary) -> Void)? = nil,
-    _ completion: @escaping (Swift.Result<CursorInfo?, CursorInfoError>) -> Void)
-  {
+    _ completion: @escaping (Swift.Result<CursorInfo?, CursorInfoError>) -> Void) {
     guard let snapshot = documentManager.latestSnapshot(uri) else {
        return completion(.failure(.unknownDocument(uri)))
      }
@@ -115,11 +114,10 @@ extension SwiftLanguageServer {
         return completion(.success(nil))
       }
 
-      var location: Location? = nil
+      var location: Location?
       if let filepath: String = dict[keys.filepath],
          let offset: Int = dict[keys.offset],
-         let pos = snapshot.positionOf(utf8Offset: offset)
-      {
+         let pos = snapshot.positionOf(utf8Offset: offset) {
         location = Location(uri: DocumentURI(URL(fileURLWithPath: filepath)), range: Range(pos))
       }
 
@@ -161,8 +159,7 @@ extension SwiftLanguageServer {
     _ uri: DocumentURI,
     _ range: Range<Position>,
     additionalParameters appendAdditionalParameters: ((SKRequestDictionary) -> Void)? = nil,
-    _ completion: @escaping (Swift.Result<CursorInfo?, CursorInfoError>) -> Void)
-  {
+    _ completion: @escaping (Swift.Result<CursorInfo?, CursorInfoError>) -> Void) {
     self.queue.async {
       self._cursorInfo(uri, range,
                        additionalParameters: appendAdditionalParameters, completion)

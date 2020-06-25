@@ -29,8 +29,7 @@ open class PerfTestCase: XCTestCase {
     open override func measureMetrics(
       _: [XCTPerformanceMetric],
       automaticallyStartMeasuring: Bool,
-      for block: () -> Void)
-    {
+      for block: () -> Void) {
       block()
     }
   #else
@@ -41,8 +40,7 @@ open class PerfTestCase: XCTestCase {
     public func measureMetrics(
       _: [XCTPerformanceMetric],
       automaticallyStartMeasuring: Bool,
-      for block: () -> Void)
-    {
+      for block: () -> Void) {
       block()
     }
     public func measure(block: () -> Void) {

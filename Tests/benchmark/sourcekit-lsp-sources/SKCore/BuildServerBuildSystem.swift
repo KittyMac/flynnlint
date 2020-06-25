@@ -54,8 +54,7 @@ public final class BuildServerBuildSystem {
   /// Creates a build system using the Build Server Protocol config.
   ///
   /// - Returns: nil if `projectRoot` has no config or there is an error parsing it.
-  public convenience init?(projectRoot: AbsolutePath?, buildSetup: BuildSetup)
-  {
+  public convenience init?(projectRoot: AbsolutePath?, buildSetup: BuildSetup) {
     if projectRoot == nil { return nil }
 
     do {
@@ -89,7 +88,7 @@ public final class BuildServerBuildSystem {
       Language.cpp,
       Language.objective_c,
       Language.objective_cpp,
-      Language.swift,
+      Language.swift
     ]
 
     let initializeRequest = InitializeBuild(
@@ -128,7 +127,7 @@ private func readReponseDataKey(data: LSPAny?, key: String) -> String? {
 
 final class BuildServerHandler: LanguageServerEndpoint {
 
-  public weak var delegate: BuildSystemDelegate? = nil
+  public weak var delegate: BuildSystemDelegate?
 
   override func _registerBuiltinHandlers() {
     _register(BuildServerHandler.handleBuildTargetsChanged)

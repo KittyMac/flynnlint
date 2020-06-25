@@ -137,7 +137,7 @@ extension PinsStore: SimplePersistanceProtocol {
     /// Saves the current state of pins.
     public func toJSON() -> JSON {
         return JSON([
-            "pins": pins.sorted(by: { $0.packageRef.identity < $1.packageRef.identity }).toJSON(),
+            "pins": pins.sorted(by: { $0.packageRef.identity < $1.packageRef.identity }).toJSON()
         ])
     }
 }
@@ -159,7 +159,7 @@ extension PinsStore.Pin: JSONMappable, JSONSerializable, Equatable {
         return .init([
             "package": packageRef.name.toJSON(),
             "repositoryURL": packageRef.path,
-            "state": state,
+            "state": state
         ])
     }
 }

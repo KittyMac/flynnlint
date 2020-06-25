@@ -869,7 +869,7 @@ final class AggregatePIFProjectBuilder: PIFProjectBuilder {
         for case let project as PackagePIFProjectBuilder in projects where project.isRootPackage {
             for case let target as PIFTargetBuilder in project.targets {
                 if target.productType != .unitTest {
-                    allExcludingTestsTarget.addDependency(toTargetWithGUID: target.guid,  platformFilters: [], linkProduct: false)
+                    allExcludingTestsTarget.addDependency(toTargetWithGUID: target.guid, platformFilters: [], linkProduct: false)
                 }
 
                 allIncludingTestsTarget.addDependency(toTargetWithGUID: target.guid, platformFilters: [], linkProduct: false)
@@ -1111,7 +1111,7 @@ final class PIFAggregateTargetBuilder: PIFBaseTargetBuilder {
 final class PIFTargetBuilder: PIFBaseTargetBuilder {
     let productType: PIF.Target.ProductType
     let productName: String
-    var productReference: PIF.FileReference? = nil
+    var productReference: PIF.FileReference?
 
     public init(guid: PIF.GUID, name: String, productType: PIF.Target.ProductType, productName: String) {
         self.productType = productType
@@ -1407,7 +1407,7 @@ private extension BuildSettings.Assignment {
 
 @propertyWrapper
 public struct DelayedImmutable<Value> {
-    private var _value: Value? = nil
+    private var _value: Value?
 
     public init() {
     }
@@ -1431,7 +1431,7 @@ public struct DelayedImmutable<Value> {
 extension Array where Element == PackageConditionProtocol {
     func toPlatformFilters() -> [PIF.PlatformFilter] {
         var result: [PIF.PlatformFilter] = []
-        let platformConditions = self.compactMap{ $0 as? PlatformsCondition }.flatMap{ $0.platforms }
+        let platformConditions = self.compactMap { $0 as? PlatformsCondition }.flatMap { $0.platforms }
 
         for condition in platformConditions {
             switch condition {
@@ -1491,13 +1491,13 @@ extension PIF.PlatformFilter {
     /// Windows platform filters.
     public static let windowsFilters: [PIF.PlatformFilter] = [
         .init(platform: "windows", environment: "msvc"),
-        .init(platform: "windows", environment: "gnu"),
+        .init(platform: "windows", environment: "gnu")
     ]
 
     /// Andriod platform filters.
     public static let androidFilters: [PIF.PlatformFilter] = [
         .init(platform: "linux", environment: "android"),
-        .init(platform: "linux", environment: "androideabi"),
+        .init(platform: "linux", environment: "androideabi")
     ]
 
     /// Common Linux platform filters.

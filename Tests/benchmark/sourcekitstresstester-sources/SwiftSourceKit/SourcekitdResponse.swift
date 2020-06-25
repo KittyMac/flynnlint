@@ -23,7 +23,6 @@ public class SourceKitdResponse: CustomStringConvertible {
     private let dict: sourcekitd_variant_t
     private let context: SourceKitdResponse
 
-
     public init(dict: sourcekitd_variant_t, context: SourceKitdResponse) {
       assert(sourcekitd_variant_get_type(dict).rawValue ==
         SOURCEKITD_VARIANT_TYPE_DICTIONARY.rawValue)
@@ -187,7 +186,7 @@ public class SourceKitdResponse: CustomStringConvertible {
 
     public func getUID() -> SourceKitdUID {
       let value = sourcekitd_variant_uid_get_value(val)!
-      return SourceKitdUID(uid:value)
+      return SourceKitdUID(uid: value)
     }
 
     public func getArray() -> Array {

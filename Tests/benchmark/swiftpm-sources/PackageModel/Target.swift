@@ -16,7 +16,7 @@ public class Target: ObjectIdentifierProtocol, PolymorphicCodableProtocol {
         SwiftTarget.self,
         ClangTarget.self,
         SystemLibraryTarget.self,
-        BinaryTarget.self,
+        BinaryTarget.self
     ]
 
     /// The target kind.

@@ -140,7 +140,7 @@ public struct SwiftName: Codable, Equatable {
   public var name: String {
     argLabels.isEmpty
         ? base
-        : "\(base)(\(argLabels.map{ "\($0.isEmpty ? "_" : $0):" }.joined()))"
+        : "\(base)(\(argLabels.map { "\($0.isEmpty ? "_" : $0):" }.joined()))"
   }
 
   public init?(_ name: String) {
@@ -150,7 +150,7 @@ public struct SwiftName: Codable, Equatable {
       argLabels = name[name.index(after: argStart)..<argEnd]
         .split(separator: ":", omittingEmptySubsequences: false)
         .dropLast()
-        .map{ $0 == "_" ? "" : String($0)}
+        .map { $0 == "_" ? "" : String($0)}
     } else {
       base = name
       argLabels = []
@@ -159,6 +159,6 @@ public struct SwiftName: Codable, Equatable {
 
   init(base: String, labels: [String]) {
     self.base = base
-    self.argLabels = labels.map{ $0 == "_" ? "" : $0 }
+    self.argLabels = labels.map { $0 == "_" ? "" : $0 }
   }
 }

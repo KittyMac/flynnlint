@@ -78,7 +78,7 @@ private struct XMLToMarkdown {
       out += "```\n"
       toMarkdown(node.children)
       out += "\n```\n\n---\n"
-      
+
     case "Name", "USR", "Direction":
       break
 

@@ -57,8 +57,7 @@ struct SemanticRefactoring {
            let endColumn: Int = value[keys.endcolumn],
            let endPosition = snapshot.positionOf(zeroBasedLine: endLine - 1,
                                                  utf8Column: endColumn - 1),
-           let text: String = value[keys.text]
-        {
+           let text: String = value[keys.text] {
           let edit = TextEdit(range: startPosition..<endPosition, newText: text)
           textEdits.append(edit)
         }
@@ -124,8 +123,7 @@ extension SwiftLanguageServer {
   ///   - completion: Completion block to asynchronously receive the SemanticRefactoring data, or error.
   func semanticRefactoring(
     _ refactorCommand: SemanticRefactorCommand,
-    _ completion: @escaping (Result<SemanticRefactoring, SemanticRefactoringError>) -> Void)
-  {
+    _ completion: @escaping (Result<SemanticRefactoring, SemanticRefactoringError>) -> Void) {
     let keys = self.keys
 
     queue.async {

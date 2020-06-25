@@ -94,8 +94,7 @@ extension LineTable {
     utf16Offset fromOff: Int,
     toLine: Int,
     utf16Offset toOff: Int,
-    with replacement: String)
-  {
+    with replacement: String) {
     let start = content.utf16.index(impl[fromLine], offsetBy: fromOff)
     let end = content.utf16.index(impl[toLine], offsetBy: toOff)
 
@@ -115,8 +114,7 @@ extension LineTable {
     fromLine: Int,
     utf16Offset fromOff: Int,
     utf16Length: Int,
-    with replacement: String)
-  {
+    with replacement: String) {
     let start = content.utf16.index(impl[fromLine], offsetBy: fromOff)
     let end = content.utf16.index(start, offsetBy: utf16Length)
     let (toLine, toOff) = lineAndUTF16ColumnOf(end, fromLine: fromLine)

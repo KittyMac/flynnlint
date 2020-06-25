@@ -22,12 +22,12 @@ struct SourceKitDocument {
   let connection: SourceKitdService
 
   private let diagEngine = DiagnosticEngine()
-  private var tree: SourceFileSyntax? = nil
-  private var converter: SourceLocationConverter? = nil
-  private var sourceState: SourceState? = nil
+  private var tree: SourceFileSyntax?
+  private var converter: SourceLocationConverter?
+  private var sourceState: SourceState?
 
   private var documentInfo: DocumentInfo {
-    var modification: DocumentModification? = nil
+    var modification: DocumentModification?
     if let state = sourceState, state.wasModified {
       modification = DocumentModification(mode: state.mode, content: state.source)
     }
@@ -334,14 +334,14 @@ struct SourceKitDocument {
       // but it's name won't have any argument labels.
       // If the expected result is a call that only has empty argument labels
       // (if any), it *may* be in this category, so match on the base name only.
-      return expected.kind == .call && expected.name.argLabels.allSatisfy{ $0.isEmpty }
+      return expected.kind == .call && expected.name.argLabels.allSatisfy { $0.isEmpty }
     default:
       return false
     }
   }
 
   private func sendWithTimeout(_ request: SourceKitdRequest, info: RequestInfo) throws -> SourceKitdResponse {
-    var response: SourceKitdResponse? = nil
+    var response: SourceKitdResponse?
     let completed = DispatchSemaphore(value: 0)
     connection.send(request: request) {
       response = $0
@@ -504,7 +504,7 @@ public struct CompletionMatcher {
       // corresponding result arg labels or be "" since they don't have to be
       // specified when pattern matching.
       var unmatched = resultName.argLabels[...]
-      return expected.name.argLabels.allSatisfy{ label in
+      return expected.name.argLabels.allSatisfy { label in
         if label.isEmpty { return true }
         if let labelIndex = unmatched.firstIndex(of: label) {
           unmatched = unmatched.dropFirst(labelIndex - unmatched.startIndex + 1)
@@ -534,7 +534,7 @@ public struct CompletionMatcher {
         if remainingArgLabels.count < expected.name.argLabels.count {
           // A previous param was matched, so assume it was variadic and consume
           // any leading unlabelled args so the next arg is labelled
-          remainingArgLabels = remainingArgLabels.drop{ $0.isEmpty }
+          remainingArgLabels = remainingArgLabels.drop { $0.isEmpty }
         }
         guard let nextArgLabel = remainingArgLabels.first else {
           // Assume any unprocessed parameters are defaulted

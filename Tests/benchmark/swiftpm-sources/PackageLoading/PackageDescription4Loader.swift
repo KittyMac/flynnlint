@@ -39,7 +39,7 @@ extension ManifestBuilder {
         self.errors = try json.get("errors")
     }
 
-    func parseSwiftLanguageVersion(_ package: JSON) throws -> [SwiftLanguageVersion]?  {
+    func parseSwiftLanguageVersion(_ package: JSON) throws -> [SwiftLanguageVersion]? {
         guard let versionJSON = try? package.getArray("swiftLanguageVersions") else {
             return nil
         }
@@ -97,7 +97,7 @@ extension ManifestBuilder {
             let description = PlatformDescription(
                 name: platformName,
                 version: version.joined(separator: "."),
-                options: options.map{ String($0) }
+                options: options.map { String($0) }
             )
 
             // Check for duplicates.
@@ -122,10 +122,10 @@ extension ManifestBuilder {
             .map(TargetDescription.Dependency.init(v4:))
 
         let sources: [String]? = try? json.get("sources")
-        try sources?.forEach{ _ = try RelativePath(validating: $0) }
+        try sources?.forEach { _ = try RelativePath(validating: $0) }
 
         let exclude: [String] = try json.get("exclude")
-        try exclude.forEach{ _ = try RelativePath(validating: $0) }
+        try exclude.forEach { _ = try RelativePath(validating: $0) }
 
         return TargetDescription(
             name: try json.get("name"),
@@ -192,7 +192,7 @@ extension ManifestBuilder {
 
         // Diagnose invalid values.
         for item in value {
-            let groups = Self.invalidValueRegex.matchGroups(in: item).flatMap{ $0 }
+            let groups = Self.invalidValueRegex.matchGroups(in: item).flatMap { $0 }
             if !groups.isEmpty {
                 let error = "the build setting '\(name)' contains invalid component(s): \(groups.joined(separator: " "))"
                 throw ManifestParseError.runtimeManifestErrors([error])

@@ -97,7 +97,7 @@ public enum XCBuildMessage {
         let result: Result
         let signalled: Bool
     }
-    
+
     public struct TargetDiagnosticInfo {
         let targetID: Int
         let message: String
@@ -140,7 +140,7 @@ public final class XCBuildOutputParser {
     private var hasFailed: Bool
 
     /// Delegate to notify of parsing events.
-    public weak var delegate: XCBuildOutputParserDelegate? = nil
+    public weak var delegate: XCBuildOutputParserDelegate?
 
     /// Initializes the parser with a delegate to notify of parsing events.
     /// - Parameters:

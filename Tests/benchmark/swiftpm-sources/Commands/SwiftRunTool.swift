@@ -238,8 +238,8 @@ public class SwiftRunTool: SwiftTool<RunToolOptions> {
     }
 }
 
-fileprivate let buildTestsOptionName = "--build-tests"
-fileprivate let skipBuildOptionName = "--skip-build"
+private let buildTestsOptionName = "--build-tests"
+private let skipBuildOptionName = "--skip-build"
 
 extension SwiftRunTool: ToolName {
     static var toolName: String {

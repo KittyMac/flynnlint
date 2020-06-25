@@ -165,7 +165,7 @@ public struct SupportedPlatform: Encodable {
 
 /// An extension to the SupportedPlatform struct that defines major platform versions.
 extension SupportedPlatform {
-    
+
     /// The supported macOS version.
     public struct MacOSVersion: Encodable, AppleOSVersion {
         fileprivate static let name = "macOS"
@@ -333,7 +333,7 @@ extension SupportedPlatform {
     }
 }
 
-fileprivate protocol AppleOSVersion {
+private protocol AppleOSVersion {
     static var name: String { get }
     static var minimumMajorVersion: Int { get }
     init(uncheckedVersion: String)

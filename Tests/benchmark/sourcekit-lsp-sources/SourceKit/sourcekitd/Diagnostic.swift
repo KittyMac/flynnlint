@@ -65,7 +65,7 @@ extension CodeAction {
       title: title,
       kind: .quickFix,
       diagnostics: nil,
-      edit: WorkspaceEdit(changes: [snapshot.document.uri:edits]))
+      edit: WorkspaceEdit(changes: [snapshot.document.uri: edits]))
   }
 
   /// Describe a fixit's edit briefly.
@@ -95,8 +95,7 @@ extension TextEdit {
        let replacement: String = fixit[keys.sourcetext],
        let position = snapshot.positionOf(utf8Offset: utf8Offset),
        let endPosition = snapshot.positionOf(utf8Offset: utf8Offset + length),
-       length > 0 || !replacement.isEmpty
-    {
+       length > 0 || !replacement.isEmpty {
       self.init(range: position..<endPosition, newText: replacement)
     } else {
       return nil
@@ -115,11 +114,10 @@ extension Diagnostic {
 
     guard let message: String = diag[keys.description] else { return nil }
 
-    var position: Position? = nil
+    var position: Position?
     if let line: Int = diag[keys.line],
        let utf8Column: Int = diag[keys.column],
-       line > 0, utf8Column > 0
-    {
+       line > 0, utf8Column > 0 {
       position = snapshot.positionOf(zeroBasedLine: line - 1, utf8Column: utf8Column - 1)
     } else if let utf8Offset: Int = diag[keys.offset] {
       position = snapshot.positionOf(utf8Offset: utf8Offset)
@@ -129,7 +127,7 @@ extension Diagnostic {
       return nil
     }
 
-    var severity: DiagnosticSeverity? = nil
+    var severity: DiagnosticSeverity?
     if let uid: sourcekitd_uid_t = diag[keys.severity] {
       switch uid {
       case values.diag_error:
@@ -141,13 +139,13 @@ extension Diagnostic {
       }
     }
 
-    var actions: [CodeAction]? = nil
+    var actions: [CodeAction]?
     if let skfixits: SKResponseArray = diag[keys.fixits],
        let action = CodeAction(fixits: skfixits, in: snapshot, fromNote: nil) {
       actions = [action]
     }
 
-    var notes: [DiagnosticRelatedInformation]? = nil
+    var notes: [DiagnosticRelatedInformation]?
     if let sknotes: SKResponseArray = diag[keys.diagnostics] {
       notes = []
       sknotes.forEach { (_, sknote) -> Bool in
@@ -174,11 +172,10 @@ extension DiagnosticRelatedInformation {
   init?(_ diag: SKResponseDictionary, in snapshot: DocumentSnapshot) {
     let keys = diag.sourcekitd.keys
 
-    var position: Position? = nil
+    var position: Position?
     if let line: Int = diag[keys.line],
        let utf8Column: Int = diag[keys.column],
-       line > 0, utf8Column > 0
-    {
+       line > 0, utf8Column > 0 {
       position = snapshot.positionOf(zeroBasedLine: line - 1, utf8Column: utf8Column - 1)
     } else if let utf8Offset: Int = diag[keys.offset] {
       position = snapshot.positionOf(utf8Offset: utf8Offset)
@@ -190,7 +187,7 @@ extension DiagnosticRelatedInformation {
 
     guard let message: String = diag[keys.description] else { return nil }
 
-    var actions: [CodeAction]? = nil
+    var actions: [CodeAction]?
     if let skfixits: SKResponseArray = diag[keys.fixits],
        let action = CodeAction(fixits: skfixits, in: snapshot, fromNote: message) {
       actions = [action]

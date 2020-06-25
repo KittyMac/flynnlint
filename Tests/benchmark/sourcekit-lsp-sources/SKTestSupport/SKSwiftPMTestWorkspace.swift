@@ -118,7 +118,7 @@ extension SKSwiftPMTestWorkspace {
       "--package-path", sources.rootDirectory.path,
       "--build-path", buildDir.path,
       "-Xswiftc", "-index-ignore-system-modules",
-      "-Xcc", "-index-ignore-system-symbols",
+      "-Xcc", "-index-ignore-system-symbols"
     ])
   }
 }

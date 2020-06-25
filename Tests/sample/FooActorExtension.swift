@@ -11,6 +11,6 @@ import Flynn
 
 extension Foo {
     private func xyz() {
-        
+
     }
 }

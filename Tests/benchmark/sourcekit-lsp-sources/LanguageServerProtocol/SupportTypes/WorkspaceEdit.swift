@@ -255,7 +255,7 @@ public struct DeleteFile: Codable, Hashable {
 }
 
 extension WorkspaceEdit: LSPAnyCodable {
-  public init?(fromLSPDictionary dictionary: [String : LSPAny]) {
+  public init?(fromLSPDictionary dictionary: [String: LSPAny]) {
     guard case .dictionary(let lspDict) = dictionary[CodingKeys.changes.stringValue] else {
       return nil
     }
@@ -299,7 +299,7 @@ extension Array: LSPAnyCodable where Element: LSPAnyCodable {
     self = result
   }
 
-  public init?(fromLSPDictionary dictionary: [String : LSPAny]) {
+  public init?(fromLSPDictionary dictionary: [String: LSPAny]) {
     return nil
   }
 

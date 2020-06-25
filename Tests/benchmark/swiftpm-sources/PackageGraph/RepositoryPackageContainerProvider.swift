@@ -184,12 +184,12 @@ public class BasePackageContainer: PackageContainer {
 /// There is no need to perform any git operations on such packages and they
 /// should be used as-is. Infact, they might not even have a git repository.
 /// Examples: Root packages, local dependencies, edited packages.
-public class LocalPackageContainer: BasePackageContainer, CustomStringConvertible  {
+public class LocalPackageContainer: BasePackageContainer, CustomStringConvertible {
 
     /// The file system that shoud be used to load this package.
     let fs: FileSystem
 
-    private var _manifest: Manifest? = nil
+    private var _manifest: Manifest?
     private func loadManifest() throws -> Manifest {
         if let manifest = _manifest {
             return manifest

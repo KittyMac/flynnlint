@@ -39,7 +39,7 @@ public let builtinRequests: [_RequestType.Type] = [
   // MARK: LSP Extension Requests
 
   SymbolInfoRequest.self,
-  PollIndexRequest.self,
+  PollIndexRequest.self
 ]
 
 /// The set of known notifications.
@@ -59,7 +59,7 @@ public let builtinNotifications: [NotificationType.Type] = [
   DidChangeTextDocumentNotification.self,
   DidSaveTextDocumentNotification.self,
   WillSaveTextDocumentNotification.self,
-  PublishDiagnosticsNotification.self,
+  PublishDiagnosticsNotification.self
 ]
 
 // MARK: Miscellaneous Message Types

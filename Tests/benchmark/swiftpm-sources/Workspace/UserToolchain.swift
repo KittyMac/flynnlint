@@ -224,7 +224,7 @@ public final class UserToolchain: Toolchain {
 
         let swiftCompilers = try UserToolchain.determineSwiftCompilers(binDir: binDir, lookup: { UserToolchain.lookup(variable: $0, searchPaths: searchPaths) }, envSearchPaths: searchPaths)
         self.swiftCompiler = swiftCompilers.compile
-     
+
         // Use the triple from destination or compute the host triple using swiftc.
         let triple = destination.target ?? Triple.getHostTriple(usingSwiftCompiler: swiftCompilers.compile)
         self.triple = triple

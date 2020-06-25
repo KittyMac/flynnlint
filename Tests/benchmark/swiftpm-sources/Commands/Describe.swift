@@ -47,7 +47,7 @@ extension Package: JSONSerializable {
         return .init([
             "name": name,
             "path": path,
-            "targets": targets.sorted(by: { $0.name > $1.name }),
+            "targets": targets.sorted(by: { $0.name > $1.name })
         ])
     }
 }

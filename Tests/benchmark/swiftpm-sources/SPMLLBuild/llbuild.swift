@@ -49,7 +49,7 @@ public final class LLBuildEngine {
     }
 
     private final class Delegate: BuildEngineDelegate {
-        let delegate: LLBuildEngineDelegate
+        weak var delegate: LLBuildEngineDelegate
         var errors: [String] = []
 
         init(_ delegate: LLBuildEngineDelegate) {
@@ -68,7 +68,7 @@ public final class LLBuildEngine {
     }
 
     private let engine: BuildEngine
-    private let delegate: Delegate
+    private weak var delegate: Delegate
 
     public init(delegate: LLBuildEngineDelegate) {
         self.delegate = Delegate(delegate)
@@ -153,7 +153,7 @@ open class LLBuildRule: Rule, Task {
         self.inputsAvailable(LLTaskBuildEngine(engine))
     }
 
-    // MARK:-
+    // MARK: -
 
     open func isResultValid(_ priorValue: Value) -> Bool {
         return true
@@ -169,7 +169,7 @@ open class LLBuildRule: Rule, Task {
     }
 }
 
-// MARK:- Helpers
+// MARK: - Helpers
 
 private struct RuleKey: Codable {
 

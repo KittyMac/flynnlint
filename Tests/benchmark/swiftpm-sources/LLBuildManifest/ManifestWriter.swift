@@ -32,7 +32,7 @@ public struct ManifestWriter {
 
         for (_, target) in manifest.targets.sorted(by: { $0.key < $1.key }) {
             stream <<< "  " <<< Format.asJSON(target.name)
-            stream <<< ": " <<< Format.asJSON(target.nodes.map{ $0.name }.sorted()) <<< "\n"
+            stream <<< ": " <<< Format.asJSON(target.nodes.map { $0.name }.sorted()) <<< "\n"
         }
 
         stream <<< "default: " <<< Format.asJSON(manifest.defaultTarget) <<< "\n"
@@ -40,8 +40,8 @@ public struct ManifestWriter {
         // We need to explicitly configure  the directory structure nodes.
         let directoryStructureNodes = Set(manifest.commands
             .values
-            .flatMap{ $0.tool.inputs }
-            .filter{ $0.kind == .directoryStructure }
+            .flatMap { $0.tool.inputs }
+            .filter { $0.kind == .directoryStructure }
         )
 
         if !directoryStructureNodes.isEmpty {
@@ -53,7 +53,7 @@ public struct ManifestWriter {
         }
 
         stream <<< "commands:\n"
-        for (_,  command) in manifest.commands.sorted(by: { $0.key < $1.key }) {
+        for (_, command) in manifest.commands.sorted(by: { $0.key < $1.key }) {
             stream <<< "  " <<< Format.asJSON(command.name) <<< ":\n"
 
             let tool = command.tool
@@ -110,7 +110,7 @@ public final class ManifestToolStream {
     public subscript(key: String) -> [AbsolutePath] {
          get { fatalError() }
          set {
-            stream <<< "    \(key): " <<< Format.asJSON(newValue.map{$0.pathString}) <<< "\n"
+            stream <<< "    \(key): " <<< Format.asJSON(newValue.map {$0.pathString}) <<< "\n"
          }
      }
 

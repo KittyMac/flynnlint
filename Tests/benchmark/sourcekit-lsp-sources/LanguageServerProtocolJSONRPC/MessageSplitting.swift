@@ -18,7 +18,7 @@ public struct JSONRPCMessageHeader: Hashable {
   static let colon: UInt8 = ":".utf8.first!
   static let invalidKeyBytes: [UInt8] = [colon] + separator
 
-  public var contentLength: Int? = nil
+  public var contentLength: Int?
 
   public init(contentLength: Int? = nil) {
     self.contentLength = contentLength
@@ -29,8 +29,7 @@ extension RandomAccessCollection where Element == UInt8 {
 
   /// Returns the first message range and header in `self`, or nil.
   public func jsonrpcSplitMessage()
-    throws -> ((SubSequence, header: JSONRPCMessageHeader), SubSequence)?
-  {
+    throws -> ((SubSequence, header: JSONRPCMessageHeader), SubSequence)? {
     guard let (header, rest) = try jsonrcpParseHeader() else { return nil }
     guard let contentLength = header.contentLength else {
       throw MessageDecodingError.parseError("missing Content-Length header")
@@ -73,7 +72,7 @@ extension RandomAccessCollection where Element == UInt8 {
     if self[keyEnd] != JSONRPCMessageHeader.colon {
       throw MessageDecodingError.parseError("expected ':' in message header")
     }
-    let valueStart = index(after:keyEnd)
+    let valueStart = index(after: keyEnd)
     guard let valueEnd = self[valueStart...].firstIndex(of: JSONRPCMessageHeader.separator) else {
       return nil
     }

@@ -45,7 +45,7 @@ public struct IssueManager {
     let failureSpecs = try getIssueSpecifications(applicableTo: files)
     var state = try getCurrentState()
 
-    var matchingSpec: ExpectedIssue? = nil
+    var matchingSpec: ExpectedIssue?
     let added = files.subtracting(state.processedFiles)
     state.unmatchedExpectedIssues.append(contentsOf: failureSpecs.filter { spec in
       added.contains {spec.isApplicable(toPath: $0)}
@@ -95,9 +95,9 @@ public struct IssueManager {
 
 /// Holds the state of the IssueManager that will be serialized across
 /// invocations
-fileprivate struct IssueManagerState: Codable {
-  var expectedIssues = Dictionary<String, [StressTesterIssue]>()
-  var expectedIssueMessages = Dictionary<String, [String]>()
+private struct IssueManagerState: Codable {
+  var expectedIssues = [String: [StressTesterIssue]]()
+  var expectedIssueMessages = [String: [String]]()
   var issues = [StressTesterIssue]()
   var issueMessages = [String]()
 

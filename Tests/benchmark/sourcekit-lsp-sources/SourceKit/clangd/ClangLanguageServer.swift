@@ -26,7 +26,7 @@ final class ClangLanguageServerShim: ToolchainLanguageServer {
 
   let clangd: Connection
 
-  var capabilities: ServerCapabilities? = nil
+  var capabilities: ServerCapabilities?
 
   let buildSystem: BuildSystem
 
@@ -56,8 +56,7 @@ final class ClangLanguageServerShim: ToolchainLanguageServer {
   func forwardRequest<R>(
     _ request: Request<R>,
     to: Connection,
-    _ handler: ((LSPResult<R.Response>) -> Void)? = nil)
-  {
+    _ handler: ((LSPResult<R.Response>) -> Void)? = nil) {
     let id = to.send(request.params, queue: queue) { result in
       handler?(result)
       request.reply(result)
@@ -140,7 +139,6 @@ extension ClangLanguageServerShim {
   }
 
   // MARK: - Text Document
-
 
   /// Returns true if the `ToolchainLanguageServer` will take ownership of the request.
   public func definition(_ req: Request<DefinitionRequest>) -> Bool {
@@ -238,7 +236,7 @@ func makeJSONRPCClangServer(
   process.arguments = [
     "-compile_args_from=lsp",   // Provide compiler args programmatically.
     "-background-index=false",  // Disable clangd indexing, we use the build
-    "-index=false",             // system index store instead.
+    "-index=false"             // system index store instead.
   ] + clangdOptions
 
   process.standardOutput = serverToClient

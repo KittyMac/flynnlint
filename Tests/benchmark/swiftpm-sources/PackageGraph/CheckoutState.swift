@@ -84,8 +84,7 @@ extension CheckoutState: JSONMappable, JSONSerializable {
        return .init([
            "revision": revision.identifier,
            "version": version.toJSON(),
-           "branch": branch.toJSON(),
+           "branch": branch.toJSON()
        ])
     }
 }
-

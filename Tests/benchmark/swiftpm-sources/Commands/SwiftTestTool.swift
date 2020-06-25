@@ -935,7 +935,6 @@ struct TestSuite {
     }
 }
 
-
 fileprivate extension Dictionary where Key == AbsolutePath, Value == [TestSuite] {
     /// Returns all the unit tests of the test suites.
     var allTests: [UnitTest] {
@@ -963,11 +962,11 @@ fileprivate extension Dictionary where Key == AbsolutePath, Value == [TestSuite]
                                      options: .regularExpression) != nil
             })
         case .specific(let name):
-            return allTests.filter{ $0.specifier == name }
+            return allTests.filter { $0.specifier == name }
         case .skip(let skippedTests):
             var result = allTests
             for skippedTest in skippedTests {
-                result = result.filter{
+                result = result.filter {
                     $0.specifier.range(of: skippedTest, options: .regularExpression) == nil
                 }
             }
@@ -983,7 +982,7 @@ extension SwiftTestTool: ToolName {
 }
 
 /// Creates the environment needed to test related tools.
-fileprivate func constructTestEnvironment(
+private func constructTestEnvironment(
     toolchain: UserToolchain,
     options: ToolOptions,
     buildParameters: BuildParameters

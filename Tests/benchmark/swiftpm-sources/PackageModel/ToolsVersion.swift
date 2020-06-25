@@ -149,7 +149,7 @@ public struct SwiftLanguageVersion: CustomStringConvertible, Comparable {
 
     /// The list of known Swift language versions.
     public static let knownSwiftLanguageVersions = [
-        v3, v4, v4_2, v5,
+        v3, v4, v4_2, v5
     ]
 
     /// The raw value of the language version.
@@ -229,7 +229,7 @@ extension SwiftLanguageVersion: Codable {
     }
 }
 
-// MARK:- Diagnostics
+// MARK: - Diagnostics
 
 /// The diagnostic triggered when the package has a newer tools version than the installed tools.
 public struct RequireNewerTools: DiagnosticData, Swift.Error {

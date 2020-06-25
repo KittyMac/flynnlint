@@ -46,12 +46,11 @@ public struct PositionRange: CustomCodableWrapper {
 }
 
 extension Range: LSPAnyCodable where Bound == Position {
-  public init?(fromLSPDictionary dictionary: [String : LSPAny]) {
+  public init?(fromLSPDictionary dictionary: [String: LSPAny]) {
     guard case .dictionary(let start)? = dictionary[PositionRange.CodingKeys.lowerBound.stringValue],
           let startPosition = Position(fromLSPDictionary: start),
           case .dictionary(let end)? = dictionary[PositionRange.CodingKeys.upperBound.stringValue],
-          let endPosition = Position(fromLSPDictionary: end) else
-    {
+          let endPosition = Position(fromLSPDictionary: end) else {
       return nil
     }
     self = startPosition..<endPosition

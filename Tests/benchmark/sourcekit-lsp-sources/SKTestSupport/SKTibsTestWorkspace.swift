@@ -40,8 +40,7 @@ public final class SKTibsTestWorkspace {
     tmpDir: URL,
     removeTmpDir: Bool,
     toolchain: Toolchain,
-    clientCapabilities: ClientCapabilities) throws
-  {
+    clientCapabilities: ClientCapabilities) throws {
     self.tibsWorkspace = try TibsTestWorkspace(
       immutableProjectDir: immutableProjectDir,
       persistentBuildDir: persistentBuildDir,
@@ -91,8 +90,7 @@ extension SKTibsTestWorkspace {
   /// Perform a group of edits to the project sources and optionally rebuild.
   public func edit(
     rebuild: Bool = false,
-    _ block: (inout TestSources.ChangeBuilder, _ current: SourceFileCache) throws -> ()) throws
-  {
+    _ block: (inout TestSources.ChangeBuilder, _ current: SourceFileCache) throws -> Void) throws {
     try tibsWorkspace.edit(rebuild: rebuild, block)
   }
 }

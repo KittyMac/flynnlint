@@ -273,7 +273,7 @@ public final class WorkspaceState: SimplePersistanceProtocol {
     public func toJSON() -> JSON {
         return JSON([
             "dependencies": dependencies.toJSON(),
-            "artifacts": artifacts.toJSON(),
+            "artifacts": artifacts.toJSON()
         ])
     }
 }
@@ -358,7 +358,7 @@ extension ManagedDependency: JSONMappable, JSONSerializable, CustomStringConvert
             "packageRef": packageRef.toJSON(),
             "subpath": subpath,
             "basedOn": basedOn.toJSON(),
-            "state": state,
+            "state": state
         ])
     }
 
@@ -367,23 +367,22 @@ extension ManagedDependency: JSONMappable, JSONSerializable, CustomStringConvert
     }
 }
 
-
 extension ManagedDependency.State: JSONMappable, JSONSerializable {
     public func toJSON() -> JSON {
         switch self {
         case .checkout(let checkoutState):
             return .init([
                 "name": "checkout",
-                "checkoutState": checkoutState,
+                "checkoutState": checkoutState
             ])
         case .edited(let path):
             return .init([
                 "name": "edited",
-                "path": path.toJSON(),
+                "path": path.toJSON()
             ])
         case .local:
             return .init([
-                "name": "local",
+                "name": "local"
             ])
         }
     }
@@ -428,7 +427,7 @@ extension ManagedArtifact: JSONMappable, JSONSerializable, CustomStringConvertib
         return .init([
             "packageRef": packageRef,
             "targetName": targetName,
-            "source": source,
+            "source": source
         ])
     }
 
@@ -458,14 +457,14 @@ extension ManagedArtifact.Source: JSONMappable, JSONSerializable, CustomStringCo
         case .local(let path):
             return .init([
                 "type": "local",
-                "path": path,
+                "path": path
             ])
         case .remote(let url, let checksum, let subpath):
             return .init([
                 "type": "remote",
                 "url": url,
                 "checksum": checksum,
-                "subpath": subpath.toJSON(),
+                "subpath": subpath.toJSON()
             ])
         }
     }
@@ -503,7 +502,7 @@ extension ManagedDependencies: Collection {
 
 extension ManagedDependencies: JSONMappable, JSONSerializable {
     public convenience init(json: JSON) throws {
-        let dependencies = try Array<ManagedDependency>(json: json)
+        let dependencies = try [ManagedDependency](json: json)
         let dependencyMap = Dictionary(uniqueKeysWithValues: dependencies.lazy.map({ ($0.packageRef.path, $0) }))
         self.init(dependencyMap: dependencyMap)
     }
@@ -539,7 +538,7 @@ extension ManagedArtifacts: Collection {
 
 extension ManagedArtifacts: JSONMappable, JSONSerializable {
     public convenience init(json: JSON) throws {
-        let artifacts = try Array<ManagedArtifact>(json: json)
+        let artifacts = try [ManagedArtifact](json: json)
         let artifactsByPackagePath = Dictionary(grouping: artifacts, by: { $0.packageRef.path })
         let artifactMap = artifactsByPackagePath.mapValues({ artifacts in
             Dictionary(uniqueKeysWithValues: artifacts.lazy.map({ ($0.targetName, $0) }))

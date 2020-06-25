@@ -26,7 +26,7 @@ extension Collection {
     var result = [SubSequence]()
     while let first = working.first {
       let firstValue = comparison(first)
-      let partition = working.prefix{ comparison($0) == firstValue }
+      let partition = working.prefix { comparison($0) == firstValue }
       result.append(partition)
       working = working.dropFirst(partition.count)
     }

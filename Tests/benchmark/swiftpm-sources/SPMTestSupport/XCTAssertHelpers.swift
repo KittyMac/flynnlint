@@ -44,9 +44,9 @@ public func XCTAssertBuilds(
         } catch {
             XCTFail("""
                 `swift build -c \(conf)' failed:
-                
+
                 \(error)
-                
+
                 """, file: file, line: line)
         }
     }

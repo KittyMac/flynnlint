@@ -22,7 +22,7 @@ public struct FileBuildSettings: Equatable {
   public var compilerArguments: [String]
 
   /// The working directory to resolve any relative paths in `compilerArguments`.
-  public var workingDirectory: String? = nil
+  public var workingDirectory: String?
 
   /// The language of this file.
   public var language: Language
@@ -30,8 +30,7 @@ public struct FileBuildSettings: Equatable {
   public init(
     compilerArguments: [String],
     workingDirectory: String? = nil,
-    language: Language)
-  {
+    language: Language) {
     self.workingDirectory = workingDirectory
     self.language = language
     // For swift, sourcekit only accepts `working-directry` through compiler args.

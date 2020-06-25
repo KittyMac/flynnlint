@@ -12,12 +12,12 @@ import PackageModel
 import TSCBasic
 
 public struct MinimumDeploymentTarget {
-    public let xcTestMinimumDeploymentTargets: [PackageModel.Platform:PlatformVersion]
+    public let xcTestMinimumDeploymentTargets: [PackageModel.Platform: PlatformVersion]
 
     public static let `default`: MinimumDeploymentTarget = .init()
 
     public init() {
-        xcTestMinimumDeploymentTargets = PlatformRegistry.default.knownPlatforms.reduce([PackageModel.Platform:PlatformVersion]()) {
+        xcTestMinimumDeploymentTargets = PlatformRegistry.default.knownPlatforms.reduce([PackageModel.Platform: PlatformVersion]()) {
             var dict = $0
             dict[$1] = Self.computeXCTestMinimumDeploymentTarget(for: $1)
             return dict

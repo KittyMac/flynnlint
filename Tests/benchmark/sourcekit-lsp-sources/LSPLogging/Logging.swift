@@ -52,8 +52,7 @@ public func orLog<R>(
   _ prefix: String = "",
   level: LogLevel = .default,
   logger: Logger = Logger.shared,
-  _ block: () throws -> R?) -> R?
-{
+  _ block: () throws -> R?) -> R? {
   do {
     return try block()
   } catch {

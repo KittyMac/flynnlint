@@ -24,7 +24,7 @@ public enum BuildSettings {
         public static let HEADER_SEARCH_PATHS: Declaration = .init("HEADER_SEARCH_PATHS")
         public static let OTHER_CFLAGS: Declaration = .init("OTHER_CFLAGS")
         public static let OTHER_CPLUSPLUSFLAGS: Declaration = .init("OTHER_CPLUSPLUSFLAGS")
-    
+
         // Linker.
         public static let OTHER_LDFLAGS: Declaration = .init("OTHER_LDFLAGS")
         public static let LINK_LIBRARIES: Declaration = .init("LINK_LIBRARIES")
@@ -32,14 +32,14 @@ public enum BuildSettings {
 
         /// The declaration name.
         public let name: String
-    
+
         private init(_ name: String) {
             self.name = name
         }
 
         /// The list of settings that are considered as unsafe build settings.
         public static let unsafeSettings: Set<Declaration> = [
-            OTHER_CFLAGS,  OTHER_CPLUSPLUSFLAGS, OTHER_SWIFT_FLAGS, OTHER_LDFLAGS,
+            OTHER_CFLAGS, OTHER_CPLUSPLUSFLAGS, OTHER_SWIFT_FLAGS, OTHER_LDFLAGS
         ]
     }
 
@@ -52,16 +52,16 @@ public enum BuildSettings {
         /// The condition associated with this assignment.
         public var conditions: [PackageConditionProtocol] {
             get {
-                return _conditions.map{ $0.condition }
+                return _conditions.map { $0.condition }
             }
             set {
-                _conditions = newValue.map{ PackageConditionWrapper($0) }
+                _conditions = newValue.map { PackageConditionWrapper($0) }
             }
         }
 
         private var _conditions: [PackageConditionWrapper]
 
-        public init() { 
+        public init() {
             self._conditions = []
             self.value = []
         }

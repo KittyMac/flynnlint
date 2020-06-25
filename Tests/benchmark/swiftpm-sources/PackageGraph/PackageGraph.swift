@@ -28,7 +28,7 @@ public struct PackageGraph {
 
     /// Returns all the targets in the graph, regardless if they are reachable from the root targets or not.
     public let allTargets: Set<ResolvedTarget>
- 
+
     /// Returns all the products in the graph, regardless if they are reachable from the root targets or not.
     public let allProducts: Set<ResolvedProduct>
 
@@ -114,7 +114,7 @@ public struct PackageGraph {
 
             // Include the test targets whose dependencies intersect with the
             // current target's (recursive) dependencies.
-            let testTargets = testTargetDepMap.filter({ (testTarget, deps) in
+            let testTargets = testTargetDepMap.filter({ (_, deps) in
                 !deps.intersection(dependencies + [target]).isEmpty
             }).map({ $0.key })
 

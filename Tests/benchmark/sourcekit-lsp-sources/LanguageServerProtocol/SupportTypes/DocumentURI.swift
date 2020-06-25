@@ -16,7 +16,7 @@ import Foundation
 ///
 /// This normalizes escape sequences in file URLs, like `%40` --> `@`.
 /// But for non-file URLs, has no effect.
-fileprivate func standardize(url: URL) -> URL {
+private func standardize(url: URL) -> URL {
   guard url.isFileURL else { return url }
 
   // This has the side-effect of removing trailing slashes from file URLs

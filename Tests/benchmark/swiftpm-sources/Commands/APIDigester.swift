@@ -167,7 +167,7 @@ public struct SwiftAPIDigester {
             "--input-paths",
             baselineSDKJSON.pathString,
             "-input-paths",
-            currentSDKJSON.pathString,
+            currentSDKJSON.pathString
         ]
 
         try runTool(args)

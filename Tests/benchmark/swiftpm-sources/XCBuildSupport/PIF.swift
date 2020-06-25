@@ -89,7 +89,7 @@ public enum PIF {
         public var projects: [Project]
         var signature: String?
 
-        public init(guid: GUID,  name: String, path: AbsolutePath, projects: [Project]) {
+        public init(guid: GUID, name: String, path: AbsolutePath, projects: [Project]) {
             precondition(!guid.isEmpty)
             precondition(!name.isEmpty)
             precondition(Set(projects.map({ $0.guid })).count == projects.count)
@@ -197,7 +197,7 @@ public enum PIF {
             if encoder.userInfo.keys.contains(.encodeForXCBuild) {
                 precondition(signature != nil, "Expected to have project signature when encoding for XCBuild")
                 try container.encode(signature, forKey: "signature")
-                try contents.encode(targets.map{ $0.signature }, forKey: .targets)
+                try contents.encode(targets.map { $0.signature }, forKey: .targets)
             } else {
                 try contents.encode(targets, forKey: .targets)
             }
@@ -360,7 +360,7 @@ public enum PIF {
             )
 
             self.children = children
-            
+
             super.init(guid: guid, path: path, sourceTree: sourceTree, name: name)
         }
 
@@ -403,7 +403,7 @@ public enum PIF {
         /// The platform filters for this target dependency.
         public var platformFilters: [PlatformFilter]
 
-        public init(targetGUID: String, platformFilters: [PlatformFilter] = [])  {
+        public init(targetGUID: String, platformFilters: [PlatformFilter] = []) {
             self.targetGUID = targetGUID
             self.platformFilters = platformFilters
         }
@@ -614,7 +614,7 @@ public enum PIF {
                 let productReference = [
                     "type": "file",
                     "guid": "PRODUCTREF-\(guid)",
-                    "name": productName,
+                    "name": productName
                 ]
                 try contents.encode(productReference, forKey: .productReference)
 
@@ -643,7 +643,7 @@ public enum PIF {
                 self.productType = .packageProduct
                 self.productName = ""
                 let fwkBuildPhase = try container.decodeIfPresent(FrameworksBuildPhase.self, forKey: .frameworksBuildPhase)
-                buildPhases = fwkBuildPhase.map{ [$0] } ?? []
+                buildPhases = fwkBuildPhase.map { [$0] } ?? []
                 impartedBuildProperties = BuildSettings()
             } else if type == "standard" {
                 self.productType = try container.decode(ProductType.self, forKey: .productTypeIdentifier)
@@ -760,7 +760,7 @@ public enum PIF {
 
         public let guid: GUID
         public var reference: Reference
-        public var headerVisibility: HeaderVisibility? = nil
+        public var headerVisibility: HeaderVisibility?
         public var platformFilters: [PlatformFilter]
 
         public init(guid: GUID, file: FileReference, platformFilters: [PlatformFilter]) {
@@ -1080,7 +1080,7 @@ public struct XCBuildFileType: CaseIterable {
     public static let allCases: [XCBuildFileType] = [
         .xcdatamodeld,
         .xcdatamodel,
-        .xcmappingmodel,
+        .xcmappingmodel
     ]
 
     public let fileTypes: Set<String>
@@ -1168,7 +1168,7 @@ extension PIF.FileReference {
 
         default:
             return pathExtension.flatMap({ pathExtension in
-                XCBuildFileType.allCases.first(where:{ $0.fileTypes.contains(pathExtension) })
+                XCBuildFileType.allCases.first(where: { $0.fileTypes.contains(pathExtension) })
             })?.fileTypeIdentifier ?? "file"
         }
     }
@@ -1212,7 +1212,7 @@ extension PIF {
         }
 
         let projects = workspace.projects
-        try projects.flatMap{ $0.targets }.forEach(sign)
+        try projects.flatMap { $0.targets }.forEach(sign)
         try projects.forEach(sign)
         try sign(workspace)
     }

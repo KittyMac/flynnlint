@@ -71,7 +71,7 @@ final class PackageIndex {
         let bytes = try localFileSystem.readFileContents(indexFile).contents
         let entries = try JSONDecoder().decode(Array<Entry>.self, from: Data(bytes: bytes, count: bytes.count))
 
-        index = Dictionary(uniqueKeysWithValues: entries.map{($0.name, $0.url)})
+        index = Dictionary(uniqueKeysWithValues: entries.map {($0.name, $0.url)})
     }
 }
 

@@ -108,8 +108,7 @@ public struct ServerCapabilities: Codable, Hashable {
     executeCommandProvider: ExecuteCommandOptions? = nil,
     workspace: WorkspaceServerCapabilities? = nil,
     experimental: LSPAny? = nil
-  )
-  {
+  ) {
     self.textDocumentSync = textDocumentSync
     self.hoverProvider = hoverProvider
     self.completionProvider = completionProvider
@@ -146,7 +145,7 @@ public enum ValueOrBool<ValueType: Codable>: Codable, Hashable where ValueType: 
     switch self {
     case .bool(let value):
       return value
-    case .value(_):
+    case .value:
       return true
     }
   }

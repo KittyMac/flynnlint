@@ -30,7 +30,7 @@ public struct ClientCapabilities: Hashable, Codable {
 /// Helper capability wrapper for structs that only have a `dynamicRegistration` member.
 public struct DynamicRegistrationCapability: Hashable, Codable {
   /// Whether the client supports dynamic registaration of this feature.
-  public var dynamicRegistration: Bool? = nil
+  public var dynamicRegistration: Bool?
 
   public init(dynamicRegistration: Bool? = nil) {
     self.dynamicRegistration = dynamicRegistration
@@ -44,7 +44,7 @@ public struct WorkspaceClientCapabilities: Hashable, Codable {
   /// Capabilities specific to `WorkspaceEdit`.
   public struct WorkspaceEdit: Hashable, Codable {
     /// Whether the client supports the `documentChanges` field of `WorkspaceEdit`.
-    public var documentChanges: Bool? = nil
+    public var documentChanges: Bool?
 
     public init(documentChanges: Bool? = nil) {
       self.documentChanges = documentChanges
@@ -62,7 +62,7 @@ public struct WorkspaceClientCapabilities: Hashable, Codable {
       /// If not specified, the client support only the kinds from `File` to `Array` from LSP 1.
       ///
       /// If specified, the client *also* guarantees that it will handle unknown kinds gracefully.
-      public var valueSet: [LanguageServerProtocol.SymbolKind]? = nil
+      public var valueSet: [LanguageServerProtocol.SymbolKind]?
 
       public init(valueSet: [LanguageServerProtocol.SymbolKind]? = nil) {
         self.valueSet = valueSet
@@ -70,9 +70,9 @@ public struct WorkspaceClientCapabilities: Hashable, Codable {
     }
 
     /// Whether the client supports dynamic registaration of this request.
-    public var dynamicRegistration: Bool? = nil
+    public var dynamicRegistration: Bool?
 
-    public var symbolKind: SymbolKind? = nil
+    public var symbolKind: SymbolKind?
 
     public init(dynamicRegistration: Bool? = nil, symbolKind: SymbolKind? = nil) {
       self.dynamicRegistration = dynamicRegistration
@@ -83,23 +83,23 @@ public struct WorkspaceClientCapabilities: Hashable, Codable {
   // MARK: Properties
 
   /// Whether the client can apply text edits via the `workspace/applyEdit` request.
-  public var applyEdit: Bool? = nil
+  public var applyEdit: Bool?
 
-  public var workspaceEdit: WorkspaceEdit? = nil
+  public var workspaceEdit: WorkspaceEdit?
 
-  public var didChangeConfiguration: DynamicRegistrationCapability? = nil
+  public var didChangeConfiguration: DynamicRegistrationCapability?
 
-  public var didChangeWatchedFiles: DynamicRegistrationCapability? = nil
+  public var didChangeWatchedFiles: DynamicRegistrationCapability?
 
-  public var symbol: Symbol? = nil
+  public var symbol: Symbol?
 
-  public var executeCommand: DynamicRegistrationCapability? = nil
+  public var executeCommand: DynamicRegistrationCapability?
 
   /// Whether the client supports workspace folders.
-  public var workspaceFolders: Bool? = nil
+  public var workspaceFolders: Bool?
 
   /// Whether the client supports the `workspace/configuration` request.
-  public var configuration: Bool? = nil
+  public var configuration: Bool?
 
   public init(applyEdit: Bool? = nil, workspaceEdit: WorkspaceEdit? = nil, didChangeConfiguration: DynamicRegistrationCapability? = nil, didChangeWatchedFiles: DynamicRegistrationCapability? = nil, symbol: Symbol? = nil, executeCommand: DynamicRegistrationCapability? = nil, workspaceFolders: Bool? = nil, configuration: Bool? = nil) {
     self.applyEdit = applyEdit
@@ -121,16 +121,16 @@ public struct TextDocumentClientCapabilities: Hashable, Codable {
   public struct Synchronization: Hashable, Codable {
 
     /// Whether the client supports dynamic registaration of these notifications.
-    public var dynamicRegistration: Bool? = nil
+    public var dynamicRegistration: Bool?
 
     /// Whether the client supports the will-save notification.
-    public var willSave: Bool? = nil
+    public var willSave: Bool?
 
     /// Whether the client supports sending a will-save *request* and applies the edits from the response before saving.
-    public var willSaveWaitUntil: Bool? = nil
+    public var willSaveWaitUntil: Bool?
 
     /// Whether the client supports the did-save notification.
-    public var didSave: Bool? = nil
+    public var didSave: Bool?
 
     public init(dynamicRegistration: Bool? = nil, willSave: Bool? = nil, willSaveWaitUntil: Bool? = nil, didSave: Bool? = nil) {
       self.dynamicRegistration = dynamicRegistration
@@ -147,19 +147,19 @@ public struct TextDocumentClientCapabilities: Hashable, Codable {
     public struct CompletionItem: Hashable, Codable {
 
       /// Whether the client supports rich snippets using placeholders, etc.
-      public var snippetSupport: Bool? = nil
+      public var snippetSupport: Bool?
 
       /// Whether the client supports commit characters on a CompletionItem.
-      public var commitCharactersSupport: Bool? = nil
+      public var commitCharactersSupport: Bool?
 
       /// Documentation formats supported by the client from most to least preferred.
-      public var documentationFormat: [MarkupKind]? = nil
+      public var documentationFormat: [MarkupKind]?
 
       /// Whether the client supports the `deprecated` property on a CompletionItem.
-      public var deprecatedSupport: Bool? = nil
+      public var deprecatedSupport: Bool?
 
       /// Whether the client supports the `preselect` property on a CompletionItem.
-      public var preselectSupport: Bool? = nil
+      public var preselectSupport: Bool?
 
       public init(snippetSupport: Bool? = nil, commitCharactersSupport: Bool? = nil, documentationFormat: [MarkupKind]? = nil, deprecatedSupport: Bool? = nil, preselectSupport: Bool? = nil) {
         self.snippetSupport = snippetSupport
@@ -178,7 +178,7 @@ public struct TextDocumentClientCapabilities: Hashable, Codable {
       /// If not specified, the client support only the kinds from `Text` to `Reference` from LSP 1.
       ///
       /// If specified, the client *also* guarantees that it will handle unknown kinds gracefully.
-      public var valueSet: [LanguageServerProtocol.CompletionItemKind]? = nil
+      public var valueSet: [LanguageServerProtocol.CompletionItemKind]?
 
       public init(valueSet: [LanguageServerProtocol.CompletionItemKind]? = nil) {
         self.valueSet = valueSet
@@ -188,14 +188,14 @@ public struct TextDocumentClientCapabilities: Hashable, Codable {
     // MARK: Properties
 
     /// Whether the client supports dynamic registaration of these capabilities.
-    public var dynamicRegistration: Bool? = nil
+    public var dynamicRegistration: Bool?
 
-    public var completionItem: CompletionItem? = nil
+    public var completionItem: CompletionItem?
 
-    public var completionItemKind: CompletionItemKind? = nil
+    public var completionItemKind: CompletionItemKind?
 
     /// Whether the client supports sending context information in a `textDocument/completion` request.
-    public var contextSupport: Bool? = nil
+    public var contextSupport: Bool?
 
     public init(dynamicRegistration: Bool? = nil, completionItem: CompletionItem? = nil, completionItemKind: CompletionItemKind? = nil, contextSupport: Bool? = nil) {
       self.dynamicRegistration = dynamicRegistration
@@ -209,10 +209,10 @@ public struct TextDocumentClientCapabilities: Hashable, Codable {
   public struct Hover: Hashable, Codable {
 
     /// Whether the client supports dynamic registaration of this request.
-    public var dynamicRegistration: Bool? = nil
+    public var dynamicRegistration: Bool?
 
     /// Formats supported by the client for the `Hover.content` property from most to least preferred.
-    public var contentFormat: [MarkupKind]? = nil
+    public var contentFormat: [MarkupKind]?
 
     public init(dynamicRegistration: Bool? = nil, contentFormat: [MarkupKind]? = nil) {
       self.dynamicRegistration = dynamicRegistration
@@ -227,7 +227,7 @@ public struct TextDocumentClientCapabilities: Hashable, Codable {
     public struct SignatureInformation: Hashable, Codable {
       public struct ParameterInformation: Hashable, Codable {
         /// The client supports processing label offsets instead of a simple label string.
-        var labelOffsetSupport: Bool? = nil
+        var labelOffsetSupport: Bool?
 
         public init(labelOffsetSupport: Bool? = nil) {
           self.labelOffsetSupport = labelOffsetSupport
@@ -235,9 +235,9 @@ public struct TextDocumentClientCapabilities: Hashable, Codable {
       }
 
       /// Documentation formats supported by the client from most to least preferred.
-      public var documentationFormat: [MarkupKind]? = nil
+      public var documentationFormat: [MarkupKind]?
 
-      public var parameterInformation: ParameterInformation? = nil
+      public var parameterInformation: ParameterInformation?
 
       public init(signatureInformation: [MarkupKind]? = nil, parameterInformation: ParameterInformation? = nil) {
         self.documentationFormat = signatureInformation
@@ -246,9 +246,9 @@ public struct TextDocumentClientCapabilities: Hashable, Codable {
     }
 
     /// Whether the client supports dynamic registaration of this request.
-    public var dynamicRegistration: Bool? = nil
+    public var dynamicRegistration: Bool?
 
-    public var signatureInformation: SignatureInformation? = nil
+    public var signatureInformation: SignatureInformation?
 
     public init(dynamicRegistration: Bool? = nil, signatureInformation: SignatureInformation? = nil) {
       self.dynamicRegistration = dynamicRegistration
@@ -267,7 +267,7 @@ public struct TextDocumentClientCapabilities: Hashable, Codable {
       /// If not specified, the client support only the kinds from `File` to `Array` from LSP 1.
       ///
       /// If specified, the client *also* guarantees that it will handle unknown kinds gracefully.
-      public var valueSet: [LanguageServerProtocol.SymbolKind]? = nil
+      public var valueSet: [LanguageServerProtocol.SymbolKind]?
 
       public init(valueSet: [LanguageServerProtocol.SymbolKind]? = nil) {
         self.valueSet = valueSet
@@ -275,11 +275,11 @@ public struct TextDocumentClientCapabilities: Hashable, Codable {
     }
 
     /// Whether the client supports dynamic registaration of this request.
-    public var dynamicRegistration: Bool? = nil
+    public var dynamicRegistration: Bool?
 
-    public var symbolKind: SymbolKind? = nil
+    public var symbolKind: SymbolKind?
 
-    public var hierarchicalDocumentSymbolSupport: Bool? = nil
+    public var hierarchicalDocumentSymbolSupport: Bool?
 
     public init(dynamicRegistration: Bool? = nil, symbolKind: SymbolKind? = nil, hierarchicalDocumentSymbolSupport: Bool? = nil) {
       self.dynamicRegistration = dynamicRegistration
@@ -290,10 +290,10 @@ public struct TextDocumentClientCapabilities: Hashable, Codable {
 
   public struct DynamicRegistrationLinkSupportCapability: Hashable, Codable {
     /// Whether the client supports dynamic registaration of this request.
-    public var dynamicRegistration: Bool? = nil
+    public var dynamicRegistration: Bool?
 
     /// The client supports additional metadata in the form of declaration links.
-    public var linkSupport: Bool? = nil
+    public var linkSupport: Bool?
 
     public init(dynamicRegistration: Bool? = nil, linkSupport: Bool? = nil) {
       self.dynamicRegistration = dynamicRegistration
@@ -329,7 +329,7 @@ public struct TextDocumentClientCapabilities: Hashable, Codable {
     /// Whether the client supports dynamic registaration of this request.
     public var dynamicRegistration: Bool?
 
-    public var codeActionLiteralSupport: CodeActionLiteralSupport? = nil
+    public var codeActionLiteralSupport: CodeActionLiteralSupport?
 
     public init(dynamicRegistration: Bool? = nil, codeActionLiteralSupport: CodeActionLiteralSupport? = nil) {
       self.codeActionLiteralSupport = codeActionLiteralSupport
@@ -354,11 +354,11 @@ public struct TextDocumentClientCapabilities: Hashable, Codable {
   /// Capabilities specific to `textDocument/publishDiagnostics`.
   public struct PublishDiagnostics: Hashable, Codable {
     /// Whether the client accepts diagnostics with related information.
-    public var relatedInformation: Bool? = nil
+    public var relatedInformation: Bool?
 
     /// Requests that SourceKit-LSP send `Diagnostic.codeActions`.
     /// **LSP Extension from clangd**.
-    public var codeActionsInline: Bool? = nil
+    public var codeActionsInline: Bool?
 
     public init(relatedInformation: Bool? = nil,
                 codeActionsInline: Bool? = nil) {
@@ -371,14 +371,14 @@ public struct TextDocumentClientCapabilities: Hashable, Codable {
   public struct FoldingRange: Equatable, Hashable, Codable {
 
     /// Whether the client supports dynamic registration of this request.
-    public var dynamicRegistration: Bool? = nil
+    public var dynamicRegistration: Bool?
 
     /// The maximum number of folding ranges that the client prefers to receive per document.
-    public var rangeLimit: Int? = nil
+    public var rangeLimit: Int?
 
     /// If set, the client signals that it only supports folding complete lines. If set, client will
     /// ignore specified `startUTF16Index` and `endUTF16Index` properties in a FoldingRange.
-    public var lineFoldingOnly: Bool? = nil
+    public var lineFoldingOnly: Bool?
 
     public init(dynamicRegistration: Bool? = nil, rangeLimit: Int? = nil, lineFoldingOnly: Bool? = nil) {
       self.dynamicRegistration = dynamicRegistration
@@ -389,47 +389,47 @@ public struct TextDocumentClientCapabilities: Hashable, Codable {
 
   // MARK: Properties
 
-  public var synchronization: Synchronization? = nil
+  public var synchronization: Synchronization?
 
-  public var completion: Completion? = nil
+  public var completion: Completion?
 
-  public var hover: Hover? = nil
+  public var hover: Hover?
 
-  public var signatureHelp: SignatureHelp? = nil
+  public var signatureHelp: SignatureHelp?
 
-  public var references: DynamicRegistrationCapability? = nil
+  public var references: DynamicRegistrationCapability?
 
-  public var documentHighlight: DynamicRegistrationCapability? = nil
+  public var documentHighlight: DynamicRegistrationCapability?
 
-  public var documentSymbol: DocumentSymbol? = nil
+  public var documentSymbol: DocumentSymbol?
 
-  public var formatting: DynamicRegistrationCapability? = nil
+  public var formatting: DynamicRegistrationCapability?
 
-  public var rangeFormatting: DynamicRegistrationCapability? = nil
+  public var rangeFormatting: DynamicRegistrationCapability?
 
-  public var onTypeFormatting: DynamicRegistrationCapability? = nil
+  public var onTypeFormatting: DynamicRegistrationCapability?
 
-  public var declaration: DynamicRegistrationLinkSupportCapability? = nil
+  public var declaration: DynamicRegistrationLinkSupportCapability?
 
-  public var definition: DynamicRegistrationLinkSupportCapability? = nil
+  public var definition: DynamicRegistrationLinkSupportCapability?
 
-  public var typeDefinition: DynamicRegistrationLinkSupportCapability? = nil
+  public var typeDefinition: DynamicRegistrationLinkSupportCapability?
 
-  public var implementation: DynamicRegistrationLinkSupportCapability? = nil
+  public var implementation: DynamicRegistrationLinkSupportCapability?
 
-  public var codeAction: CodeAction? = nil
+  public var codeAction: CodeAction?
 
-  public var codeLens: DynamicRegistrationCapability? = nil
+  public var codeLens: DynamicRegistrationCapability?
 
-  public var documentLink: DynamicRegistrationCapability? = nil
+  public var documentLink: DynamicRegistrationCapability?
 
-  public var colorProvider: DynamicRegistrationCapability? = nil
+  public var colorProvider: DynamicRegistrationCapability?
 
-  public var rename: DynamicRegistrationCapability? = nil
+  public var rename: DynamicRegistrationCapability?
 
-  public var publishDiagnostics: PublishDiagnostics? = nil
+  public var publishDiagnostics: PublishDiagnostics?
 
-  public var foldingRange: FoldingRange? = nil
+  public var foldingRange: FoldingRange?
 
   public init(synchronization: Synchronization? = nil,
               completion: Completion? = nil,

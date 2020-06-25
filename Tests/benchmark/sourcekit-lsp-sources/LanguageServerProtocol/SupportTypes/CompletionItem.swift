@@ -59,8 +59,7 @@ public struct CompletionItem: Codable, Hashable {
     textEdit: TextEdit? = nil,
     insertText: String? = nil,
     insertTextFormat: InsertTextFormat? = nil,
-    deprecated: Bool? = nil)
-  {
+    deprecated: Bool? = nil) {
     self.label = label
     self.detail = detail
     self.sortText = sortText

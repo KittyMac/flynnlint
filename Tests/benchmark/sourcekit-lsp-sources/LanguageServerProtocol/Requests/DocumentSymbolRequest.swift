@@ -63,7 +63,7 @@ public enum DocumentSymbolResponse: ResponseType, Hashable {
 /// in a document. Document symbols can be hierarchical and they have two ranges: one that encloses
 /// its definition and one that points to its most interesting range, e.g. the range of an identifier.
 public struct DocumentSymbol: Hashable, Codable {
-  
+
   /// The name of this symbol. Will be displayed in the user interface and therefore must not be
   /// an empty string or a string only consisting of white spaces.
   public var name: String
@@ -100,8 +100,7 @@ public struct DocumentSymbol: Hashable, Codable {
     deprecated: Bool? = nil,
     range: Range<Position>,
     selectionRange: Range<Position>,
-    children: [DocumentSymbol]? = nil)
-  {
+    children: [DocumentSymbol]? = nil) {
     self.name = name
     self.detail = detail
     self.kind = kind

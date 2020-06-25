@@ -25,7 +25,7 @@ public final class PackageGraphResult {
     }
 
     public func check(roots: String..., file: StaticString = #file, line: UInt = #line) {
-        XCTAssertEqual(graph.rootPackages.map{$0.name}.sorted(), roots.sorted(), file: file, line: line)
+        XCTAssertEqual(graph.rootPackages.map {$0.name}.sorted(), roots.sorted(), file: file, line: line)
     }
 
     public func check(packages: String..., file: StaticString = #file, line: UInt = #line) {
@@ -35,8 +35,8 @@ public final class PackageGraphResult {
     public func check(targets: String..., file: StaticString = #file, line: UInt = #line) {
         XCTAssertEqual(
             graph.allTargets
-                .filter{ $0.type != .test }
-                .map{ $0.name }
+                .filter { $0.type != .test }
+                .map { $0.name }
                 .sorted(), targets.sorted(), file: file, line: line)
     }
 
@@ -87,8 +87,8 @@ public final class PackageGraphResult {
     public func check(testModules: String..., file: StaticString = #file, line: UInt = #line) {
         XCTAssertEqual(
             graph.allTargets
-                .filter{ $0.type == .test }
-                .map{ $0.name }
+                .filter { $0.type == .test }
+                .map { $0.name }
                 .sorted(), testModules.sorted(), file: file, line: line)
     }
 

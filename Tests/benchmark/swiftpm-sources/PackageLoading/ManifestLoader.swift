@@ -131,7 +131,7 @@ public final class ManifestLoader: ManifestLoaderProtocol {
         return cacheDir != nil
     }
     let cacheDir: AbsolutePath!
-    let delegate: ManifestLoaderDelegate?
+    weak var delegate: ManifestLoaderDelegate?
 
     public init(
         manifestResources: ManifestResourceProvider,
@@ -406,8 +406,7 @@ public final class ManifestLoader: ManifestLoaderProtocol {
                     // Don't diagnose root manifests so we can emit a better diagnostic during package loading.
                     if manifest.packageKind != .root &&
                        !manifest.targetMap.keys.contains(name) &&
-                       manifest.packageDependency(referencedBy: targetDependency) == nil
-                    {
+                       manifest.packageDependency(referencedBy: targetDependency) == nil {
                         try diagnostics.emit(.unknownTargetDependency(
                             dependency: name,
                             targetName: target.name
@@ -537,11 +536,11 @@ public final class ManifestLoader: ManifestLoaderProtocol {
             // If we got the binDir that means we could be developing SwiftPM in Xcode
             // which produces a framework for dynamic package products.
             let packageFrameworkPath = runtimePath.appending(component: "PackageFrameworks")
-            if resources.binDir != nil, localFileSystem.exists(packageFrameworkPath)  {
+            if resources.binDir != nil, localFileSystem.exists(packageFrameworkPath) {
                 cmd += [
                     "-F", packageFrameworkPath.pathString,
                     "-framework", "PackageDescription",
-                    "-Xlinker", "-rpath", "-Xlinker", packageFrameworkPath.pathString,
+                    "-Xlinker", "-rpath", "-Xlinker", packageFrameworkPath.pathString
                 ]
 
                 macOSPackageDescriptionPath = packageFrameworkPath.appending(RelativePath("PackageDescription.framework/PackageDescription"))
@@ -595,7 +594,7 @@ public final class ManifestLoader: ManifestLoaderProtocol {
                 if compilerResult.exitStatus != .terminated(code: 0) {
                     return
                 }
-                
+
                 // Pass an open file descriptor of a file to which the JSON representation of the manifest will be written.
                 let jsonOutputFile = tmpDir.appending(component: "\(packageIdentity)-output.json")
                 guard let jsonOutputFileDesc = fopen(jsonOutputFile.pathString, "w") else {
@@ -686,7 +685,7 @@ public final class ManifestLoader: ManifestLoaderProtocol {
         return _sdkRoot
     }
     // Cache storage for computed sdk path.
-    private var _sdkRoot: AbsolutePath? = nil
+    private var _sdkRoot: AbsolutePath?
 
     /// Returns the interpreter flags for a manifest.
     public func interpreterFlags(
@@ -761,7 +760,7 @@ private func sandboxProfile(toolsVersion: ToolsVersion, cacheDirectories: [Absol
     return stream.bytes.description
 }
 
-// MARK:- Caching support.
+// MARK: - Caching support.
 
 final class ManifestCacheDelegate: LLBuildEngineDelegate {
 

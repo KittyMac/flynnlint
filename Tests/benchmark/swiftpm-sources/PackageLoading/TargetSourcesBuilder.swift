@@ -69,16 +69,16 @@ public struct TargetSourcesBuilder {
         self.rules = FileRuleDescription.builtinRules
         self.toolsVersion = toolsVersion
         self.fs = fs
-        let excludedPaths = target.exclude.map{ path.appending(RelativePath($0)) }
+        let excludedPaths = target.exclude.map { path.appending(RelativePath($0)) }
         self.excludedPaths = Set(excludedPaths)
 
-        let declaredSources = target.sources?.map{ path.appending(RelativePath($0)) }
+        let declaredSources = target.sources?.map { path.appending(RelativePath($0)) }
         if let declaredSources = declaredSources {
             // Diagnose duplicate entries.
             let duplicates = declaredSources.spm_findDuplicateElements()
             if !duplicates.isEmpty {
                 for duplicate in duplicates {
-                    diags.emit(warning: "found duplicate sources declaration in the package manifest: \(duplicate.map{ $0.pathString }[0])")
+                    diags.emit(warning: "found duplicate sources declaration in the package manifest: \(duplicate.map { $0.pathString }[0])")
                 }
             }
         }
@@ -226,7 +226,7 @@ public struct TargetSourcesBuilder {
             }()
 
             let explicitLocalization: String? = {
-                switch rule.localization  {
+                switch rule.localization {
                 case .default?: return defaultLocalization ?? "en"
                 case .base?: return "Base"
                 case nil: return nil
@@ -381,7 +381,7 @@ public struct TargetSourcesBuilder {
             }
 
             // Check if the directory is marked to be copied.
-            let directoryMarkedToBeCopied = target.resources.contains{ resource in
+            let directoryMarkedToBeCopied = target.resources.contains { resource in
                 let resourcePath = self.targetPath.appending(RelativePath(resource.path))
                 if resource.rule == .copy && resourcePath == path {
                     return true
@@ -562,7 +562,7 @@ public struct FileRuleDescription {
         clang,
         asm,
         modulemap,
-        header,
+        header
     ] + xcbuildFileTypes
 
     /// List of file types that requires the Xcode build system.
@@ -570,7 +570,7 @@ public struct FileRuleDescription {
         xib,
         assetCatalog,
         coredata,
-        metal,
+        metal
     ]
 }
 

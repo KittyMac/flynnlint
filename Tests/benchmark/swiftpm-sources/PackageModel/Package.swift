@@ -139,11 +139,11 @@ public struct PackageReference: JSONMappable, JSONSerializable, Codable, CustomS
     /// Compute the default name of a package given its URL.
     public static func computeDefaultName(fromURL url: String) -> String {
       #if os(Windows)
-        let isSeparator : (Character) -> Bool = { $0 == "/" || $0 == "\\" }
+        let isSeparator: (Character) -> Bool = { $0 == "/" || $0 == "\\" }
       #else
-        let isSeparator : (Character) -> Bool = { $0 == "/" }
+        let isSeparator: (Character) -> Bool = { $0 == "/" }
       #endif
-       
+
         // Get the last path component of the URL.
         // Drop the last character in case it's a trailing slash.
         var endIndex = url.endIndex
@@ -215,7 +215,7 @@ public struct PackageReference: JSONMappable, JSONSerializable, Codable, CustomS
             "name": name.toJSON(),
             "identity": identity,
             "path": path,
-            "kind": kind.rawValue,
+            "kind": kind.rawValue
         ])
     }
 

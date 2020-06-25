@@ -119,7 +119,7 @@ public func initGitRepo(
             let file = dir.appending(component: "file.swift")
             try systemQuietly(["touch", file.pathString])
         }
-        
+
         try systemQuietly([Git.tool, "-C", dir.pathString, "init"])
         try systemQuietly([Git.tool, "-C", dir.pathString, "config", "user.email", "example@example.com"])
         try systemQuietly([Git.tool, "-C", dir.pathString, "config", "user.name", "Example Example"])

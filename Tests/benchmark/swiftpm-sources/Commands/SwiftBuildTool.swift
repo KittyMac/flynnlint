@@ -115,7 +115,7 @@ public class BuildToolOptions: ToolOptions {
         }
 
         guard allSubsets.count < 2 else {
-            diagnostics.emit(.mutuallyExclusiveArgumentsError(arguments: allSubsets.map{ $0.argumentName }))
+            diagnostics.emit(.mutuallyExclusiveArgumentsError(arguments: allSubsets.map { $0.argumentName }))
             return nil
         }
 
@@ -146,9 +146,9 @@ public enum BuildToolMode {
     case version
 }
 
-fileprivate let buildTestsOptionName = "--build-tests"
-fileprivate let productOptionName = "--product"
-fileprivate let targetOptionName = "--target"
+private let buildTestsOptionName = "--build-tests"
+private let productOptionName = "--product"
+private let targetOptionName = "--target"
 
 fileprivate extension BuildSubset {
     var argumentName: String {
@@ -175,6 +175,6 @@ extension Diagnostic.Message {
     //FIXME: Can we move this functionality into the argument parser?
     /// Diagnostic error when a command is run with several arguments that are mutually exclusive.
     static func mutuallyExclusiveArgumentsError(arguments: [String]) -> Diagnostic.Message {
-        .error(arguments.map{ "'\($0)'" }.spm_localizedJoin(type: .conjunction) + " are mutually exclusive")
+        .error(arguments.map { "'\($0)'" }.spm_localizedJoin(type: .conjunction) + " are mutually exclusive")
     }
 }

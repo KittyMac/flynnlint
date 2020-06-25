@@ -20,7 +20,7 @@ import LSPLogging
 /// For example, inside a language server, the `JSONRPCConnection` takes the language service implemenation as its `receiveHandler` and itself provides the client connection for sending notifications and callbacks.
 public final class JSONRPCConnection {
 
-  var receiveHandler: MessageHandler? = nil
+  var receiveHandler: MessageHandler?
   let queue: DispatchQueue = DispatchQueue(label: "jsonrpc-queue", qos: .userInitiated)
   let sendQueue: DispatchQueue = DispatchQueue(label: "jsonrpc-send-queue", qos: .userInitiated)
   let receiveIO: DispatchIO
@@ -58,8 +58,7 @@ public final class JSONRPCConnection {
     protocol messageRegistry: MessageRegistry,
     inFD: Int32,
     outFD: Int32,
-    syncRequests: Bool = false)
-  {
+    syncRequests: Bool = false) {
     state = .created
     self.messageRegistry = messageRegistry
     self.syncRequests = syncRequests
@@ -273,7 +272,7 @@ public final class JSONRPCConnection {
 
     var dispatchData = DispatchData.empty
     let header = "Content-Length: \(messageData.count)\r\n\r\n"
-    header.utf8.map{$0}.withUnsafeBytes { buffer in
+    header.utf8.map {$0}.withUnsafeBytes { buffer in
       dispatchData.append(buffer)
     }
     messageData.withUnsafeBytes { rawBufferPointer in

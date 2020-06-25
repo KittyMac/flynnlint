@@ -43,7 +43,7 @@ public final class BuildSystemManager {
   weak var mainFilesProvider: MainFilesProvider?
 
   /// Build system delegate that will receive notifications about setting changes, etc.
-  var _delegate: BuildSystemDelegate?
+  weak var _delegate: BuildSystemDelegate?
 
   /// Create a BuildSystemManager that wraps the given build system. The new manager will modify the
   /// delegate of the underlying build system.
@@ -123,7 +123,7 @@ extension BuildSystemManager: BuildSystem {
   ///
   /// *Invariant*: `mainFileSettings[mainFile]` is non-nil if and only-if `mainFile` is currently
   /// registered for settings.
-  func cachedOrRegisterForSettings(mainFile: DocumentURI, language: Language) -> FileBuildSettings?{
+  func cachedOrRegisterForSettings(mainFile: DocumentURI, language: Language) -> FileBuildSettings? {
     if let cached: FileBuildSettings? = self.mainFileSettings[mainFile] {
       return cached
     }
@@ -159,8 +159,7 @@ extension BuildSystemManager: BuildSystem {
 
   public func buildTargetSources(
     targets: [BuildTargetIdentifier],
-    reply: @escaping (LSPResult<[SourcesItem]>) -> Void)
-  {
+    reply: @escaping (LSPResult<[SourcesItem]>) -> Void) {
     queue.async {
       self.buildSystem.buildTargetSources(targets: targets, reply: reply)
     }
@@ -168,8 +167,7 @@ extension BuildSystemManager: BuildSystem {
 
   public func buildTargetOutputPaths(
     targets: [BuildTargetIdentifier],
-    reply: @escaping (LSPResult<[OutputsItem]>) -> Void)
-  {
+    reply: @escaping (LSPResult<[OutputsItem]>) -> Void) {
     queue.async {
       self.buildSystem.buildTargetOutputPaths(targets: targets, reply: reply)
     }

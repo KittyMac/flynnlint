@@ -34,7 +34,7 @@ public class MockDownloader: Downloader {
     private var downloadFile: DownloadFile!
 
     public init(fileSystem: FileSystem, downloadFile: DownloadFile? = nil) {
-        self.downloadFile = downloadFile ?? { url, destinationPath, _ , completion in
+        self.downloadFile = downloadFile ?? { url, destinationPath, _, completion in
             try! fileSystem.writeFileContents(
                 destinationPath,
                 bytes: ByteString(encodingAsUTF8: url.absoluteString),

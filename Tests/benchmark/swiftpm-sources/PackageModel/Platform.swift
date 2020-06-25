@@ -49,7 +49,7 @@ public struct Platform: Equatable, Hashable, Codable {
         self.name = name
         self.oldestSupportedVersion = oldestSupportedVersion
     }
-    
+
     public static let macOS: Platform = Platform(name: "macos", oldestSupportedVersion: "10.10")
     public static let iOS: Platform = Platform(name: "ios", oldestSupportedVersion: "8.0")
     public static let tvOS: Platform = Platform(name: "tvos", oldestSupportedVersion: "9.0")
@@ -101,13 +101,13 @@ public struct PlatformVersion: ExpressibleByStringLiteral, Comparable, Hashable,
         }
     }
 
-    // MARK:- ExpressibleByStringLiteral
+    // MARK: - ExpressibleByStringLiteral
 
     public init(stringLiteral value: String) {
         self.init(value)
     }
 
-    // MARK:- Comparable
+    // MARK: - Comparable
 
     public static func < (lhs: PlatformVersion, rhs: PlatformVersion) -> Bool {
         return lhs.version < rhs.version

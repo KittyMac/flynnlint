@@ -51,7 +51,7 @@ public func pbxproj(
 /// A set of c99 target names that are invalid for Xcode Framework targets.
 /// They will conflict with the required Framework directory structure,
 /// and cause a linker error (SR-3398).
-fileprivate let invalidXcodeModuleNames = Set(["Modules", "Headers", "Versions"])
+private let invalidXcodeModuleNames = Set(["Modules", "Headers", "Versions"])
 
 public func xcodeProject(
     xcodeprojPath: AbsolutePath,
@@ -115,7 +115,7 @@ public func xcodeProject(
         "appletvos",
         "appletvsimulator",
         "watchos",
-        "watchsimulator",
+        "watchsimulator"
     ]
 
     // Set the default `SDKROOT` to the latest macOS SDK.
@@ -666,7 +666,7 @@ public func xcodeProject(
                 assert(dependency.underlyingTarget is ClangTarget)
                 xcodeTarget.buildSettings.common.OTHER_SWIFT_FLAGS += [
                     "-Xcc",
-                    "-fmodule-map-file=$(SRCROOT)/\(moduleMap.path.relative(to: sourceRootDir).pathString)",
+                    "-fmodule-map-file=$(SRCROOT)/\(moduleMap.path.relative(to: sourceRootDir).pathString)"
                 ]
                 // Workaround for a interface generation bug. <rdar://problem/30071677>
                 if moduleMap.isGenerated {
@@ -775,7 +775,6 @@ private extension SwiftLanguageVersion {
     }
 }
 
-
 func appendSetting(
     _ value: [String],
     forDecl decl: BuildSettings.Declaration,
@@ -841,7 +840,6 @@ func appendSetting(
         case nil:
             table.common.OTHER_CPLUSPLUSFLAGS += value
         }
-
 
     case .OTHER_LDFLAGS:
         switch config {

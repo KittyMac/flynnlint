@@ -117,7 +117,7 @@ public struct PackageGraphLoader {
         requiredDependencies: Set<PackageReference> = [],
         unsafeAllowedPackages: Set<PackageReference> = [],
         remoteArtifacts: [RemoteArtifact] = [],
-        xcTestMinimumDeploymentTargets: [PackageModel.Platform:PlatformVersion] = MinimumDeploymentTarget.default.xcTestMinimumDeploymentTargets,
+        xcTestMinimumDeploymentTargets: [PackageModel.Platform: PlatformVersion] = MinimumDeploymentTarget.default.xcTestMinimumDeploymentTargets,
         diagnostics: DiagnosticsEngine,
         fileSystem: FileSystem = localFileSystem,
         shouldCreateMultipleTestProducts: Bool = false,
@@ -268,16 +268,16 @@ private func createResolvedPackages(
         guard let package = manifestToPackage[$0] else {
             return nil
         }
-        let isAllowedToVendUnsafeProducts = unsafeAllowedPackages.contains{ $0.path == package.manifest.url }
+        let isAllowedToVendUnsafeProducts = unsafeAllowedPackages.contains { $0.path == package.manifest.url }
         return ResolvedPackageBuilder(package, isAllowedToVendUnsafeProducts: isAllowedToVendUnsafeProducts)
     })
 
     // Create a map of package builders keyed by the package identity.
-    let packageMapByIdentity: [String: ResolvedPackageBuilder] = packageBuilders.spm_createDictionary{
+    let packageMapByIdentity: [String: ResolvedPackageBuilder] = packageBuilders.spm_createDictionary {
         let identity = PackageReference.computeIdentity(packageURL: $0.package.manifest.url)
         return (identity, $0)
     }
-    let packageMapByName: [String: ResolvedPackageBuilder] = packageBuilders.spm_createDictionary{ ($0.package.name, $0) }
+    let packageMapByName: [String: ResolvedPackageBuilder] = packageBuilders.spm_createDictionary { ($0.package.name, $0) }
 
     // In the first pass, we wire some basic things.
     for packageBuilder in packageBuilders {
@@ -297,8 +297,7 @@ private func createResolvedPackages(
             // We check that the explicit package dependency name matches the package name.
             if let resolvedPackage = resolvedPackage,
                 let explicitDependencyName = dependency.explicitName,
-                resolvedPackage.package.name != dependency.explicitName
-            {
+                resolvedPackage.package.name != dependency.explicitName {
                 let error = PackageGraphError.incorrectPackageDependencyName(
                     dependencyName: explicitDependencyName,
                     dependencyURL: dependency.url,

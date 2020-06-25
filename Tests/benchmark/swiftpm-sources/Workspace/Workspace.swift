@@ -280,7 +280,7 @@ public class Workspace {
     }
 
     /// The delegate interface.
-    public let delegate: WorkspaceDelegate?
+    public weak var delegate: WorkspaceDelegate?
 
     /// The path of the workspace data.
     public let dataPath: AbsolutePath
@@ -566,7 +566,7 @@ extension Workspace {
             repositoryManager.path,
             checkoutsPath,
             artifactsPath,
-            state.path,
+            state.path
         ].map({ path -> String in
             // Assert that these are present inside data directory.
             assert(path.parentDirectory == dataPath)
@@ -660,7 +660,7 @@ extension Workspace {
         } else {
             // We have input packages so we have to partially update the package graph. Remove
             // the pins for the input packages so only those packages are updated.
-            pinsMap = pinsStore.pinsMap.filter{ !packages.contains($0.value.packageRef.name) }
+            pinsMap = pinsStore.pinsMap.filter { !packages.contains($0.value.packageRef.name) }
         }
 
         let updateResults = resolveDependencies(
@@ -674,7 +674,7 @@ extension Workspace {
         activeResolver = nil
 
         guard !diagnostics.hasErrors else { return nil }
-        
+
         if dryRun {
             return diagnostics.wrap { return try computePackageStateChanges(root: graphRoot, resolvedDependencies: updateResults, updateBranches: true) }
         }
@@ -697,10 +697,10 @@ extension Workspace {
             manifests: updatedDependencyManifests,
             addedOrUpdatedPackages: addedOrUpdatedPackages,
             diagnostics: diagnostics)
-        
+
         return nil
     }
-    
+
     /// Loads a package graph from a root package using the resources associated with a particular `swiftc` executable.
     ///
     /// - Parameters:
@@ -1040,7 +1040,7 @@ extension Workspace {
 
         let requiredURLs = dependencyManifests.computePackageURLs().required
 
-        for dependency in state.dependencies  {
+        for dependency in state.dependencies {
             if requiredURLs.contains(where: { $0.path == dependency.packageRef.path }) {
                 pinsStore.pin(dependency)
             }
@@ -1171,7 +1171,6 @@ extension Workspace {
         return DependencyManifests(root: root, dependencies: deps, workspace: self)
     }
 
-
     /// Loads the given manifest, if it is present in the managed dependencies.
     fileprivate func loadManifest(forURL packageURL: String, diagnostics: DiagnosticsEngine) -> Manifest? {
         // Check if this dependency is available.
@@ -1273,8 +1272,7 @@ extension Workspace {
                 artifactsToAdd.append(artifact)
             case .remote(_, let checksum, _):
                 if let existingArtifact = existingArtifact,
-                    case .remote(_, let existingChecksum, _) = existingArtifact.source
-                {
+                    case .remote(_, let existingChecksum, _) = existingArtifact.source {
                     // If we already have an artifact with the same checksum, we don't need to download it again.
                     if checksum == existingChecksum {
                         continue
@@ -1513,7 +1511,7 @@ extension Workspace {
         //
         // FIXME: This will only work for top-level local packages right now.
         for rootManifest in rootManifests {
-            let dependencies = rootManifest.dependencies.filter{ $0.requirement == .localPackage }
+            let dependencies = rootManifest.dependencies.filter { $0.requirement == .localPackage }
             for localPackage in dependencies {
                 let package = localPackage.createPackageRef(config: self.config)
                 state.dependencies.add(ManagedDependency.local(packageRef: package))
@@ -1687,7 +1685,7 @@ extension Workspace {
         _ dependencyManifests: DependencyManifests,
         _ diagnostics: DiagnosticsEngine
     ) -> Bool {
-        let rootManifests = dependencyManifests.root.manifests.spm_createDictionary{ ($0.name, $0) }
+        let rootManifests = dependencyManifests.root.manifests.spm_createDictionary { ($0.name, $0) }
 
         for missingURLs in dependencyManifests.computePackageURLs().missing {
             guard let manifest = loadManifest(forURL: missingURLs.path, diagnostics: diagnostics) else { continue }
@@ -1811,7 +1809,7 @@ extension Workspace {
                     return "requirement(unversioned)"
                 }
             }
-            
+
             public var prettyPrinted: String {
                 switch self {
                 case .version(let version):

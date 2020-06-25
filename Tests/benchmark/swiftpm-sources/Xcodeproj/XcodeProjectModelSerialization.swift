@@ -33,7 +33,7 @@ extension Xcode.Project: PropertyListSerializable {
             "archiveVersion": .string("1"),
             "objectVersion": .string("46"),  // Xcode 8.0
             "rootObject": .identifier(serializer.id(of: self)),
-            "objects": .dictionary(serializer.idsToDicts),
+            "objects": .dictionary(serializer.idsToDicts)
         ])
     }
 
@@ -79,7 +79,7 @@ extension Xcode.Project: PropertyListSerializable {
 /// FIXME:  It would be nicer to be able to use inheritance to serialize the
 /// attributes inherited from Reference, but but in Swift 3.0 we get an error
 /// that "declarations in extensions cannot override yet".
-fileprivate func makeReferenceDict(
+private func makeReferenceDict(
     reference: Xcode.Reference,
     serializer: PropertyListSerializer,
     xcodeClassName: String
@@ -192,7 +192,7 @@ extension Xcode.Target: PropertyListSerializable {
 /// FIXME:  It would be nicer to be able to use inheritance to serialize the
 /// attributes inherited from BuildPhase, but but in Swift 3.0 we get an error
 /// that "declarations in extensions cannot override yet".
-fileprivate func makeBuildPhaseDict(
+private func makeBuildPhaseDict(
     buildPhase: Xcode.BuildPhase,
     serializer: PropertyListSerializer,
     xcodeClassName: String
@@ -356,7 +356,7 @@ extension Xcode.BuildSettingsTable: PropertyListSerializable {
                 name: "Release",
                 baseSettings: common,
                 overlaySettings: release,
-                xcconfigFileRef: xcconfigFileRef))),
+                xcconfigFileRef: xcconfigFileRef)))
         ])
         // FIXME: What is this, and why are we setting it?
         dict["defaultConfigurationIsVisible"] = .string("0")
@@ -417,7 +417,7 @@ extension Xcode.BuildSettingsTable.BuildSettings: PropertyListDictionaryConverti
 
 /// Private helper function that combines a base property list and an overlay
 /// property list, respecting the semantics of `$(inherited)` as we go.
-fileprivate func combineBuildSettingsPropertyLists(
+private func combineBuildSettingsPropertyLists(
     baseSettings: PropertyList,
     overlaySettings: PropertyList
 ) -> PropertyList {
@@ -444,7 +444,7 @@ fileprivate func combineBuildSettingsPropertyLists(
 /// A simple property list serializer with the same semantics as the Xcode
 /// property list serializer.  Not generally reusable at this point, but only
 /// because of implementation details (architecturally it isn't tied to Xcode).
-fileprivate class PropertyListSerializer {
+private class PropertyListSerializer {
 
     /// Private struct that represents a strong reference to a serializable
     /// object.  This prevents any temporary objects from being deallocated
@@ -518,7 +518,7 @@ fileprivate class PropertyListSerializer {
     }
 }
 
-fileprivate protocol PropertyListSerializable: class {
+private protocol PropertyListSerializable: class {
     /// Called by the Serializer to construct and return a dictionary for a
     /// serializable object.  The entries in the dictionary should represent
     /// the receiver's attributes and relationships, as PropertyList values.
@@ -558,7 +558,7 @@ fileprivate protocol PropertyListSerializable: class {
     ///
     /// This ID must be unique across the entire serialized graph.
     var objectID: String? { get }
-    
+
     /// Should create and return a property list dictionary of the object's
     /// attributes.  This function may also use the serializer's `serialize()`
     /// function to serialize other objects, and may use `id(of:)` to access

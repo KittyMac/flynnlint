@@ -92,29 +92,29 @@ public struct InitializeBuildResult: ResponseType, Hashable {
 
 public struct BuildServerCapabilities: Codable, Hashable {
   /// The languages the server supports compilation via method buildTarget/compile.
-  public var compileProvider: CompileProvider? = nil
+  public var compileProvider: CompileProvider?
 
   /// The languages the server supports test execution via method buildTarget/test
-  public var testProvider: TestProvider? = nil
+  public var testProvider: TestProvider?
 
   /// The languages the server supports run via method buildTarget/run
-  public var runProvider: RunProvider? = nil
+  public var runProvider: RunProvider?
 
   /// The server can provide a list of targets that contain a
   /// single text document via the method buildTarget/inverseSources
-  public var inverseSourcesProvider: Bool? = nil
+  public var inverseSourcesProvider: Bool?
 
   /// The server provides sources for library dependencies
   /// via method buildTarget/dependencySources
-  public var dependencySourcesProvider: Bool? = nil
+  public var dependencySourcesProvider: Bool?
 
   /// The server provides all the resource dependencies
   /// via method buildTarget/resources
-  public var resourcesProvider: Bool? = nil
+  public var resourcesProvider: Bool?
 
   /// The server sends notifications to the client on build
   /// target change events via buildTarget/didChange
-  public var buildTargetChangedProvider: Bool? = nil
+  public var buildTargetChangedProvider: Bool?
 }
 
 public struct CompileProvider: Codable, Hashable {

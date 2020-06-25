@@ -324,8 +324,7 @@ public class GitRepository: Repository, WorkingCheckout {
         return queue.sync {
             // Check nothing has been changed
             guard let result = try? Process.checkNonZeroExit(
-                args: Git.tool, "-C", path.pathString, "status", "-s") else
-            {
+                args: Git.tool, "-C", path.pathString, "status", "-s") else {
                 return false
             }
             return !result.spm_chomp().isEmpty
@@ -517,8 +516,7 @@ public class GitRepository: Repository, WorkingCheckout {
             }
             guard let type = Tree.Entry.EntryType(mode: mode),
                   let hash = Hash(asciiBytes: bytes.contents[(secondSpace + 1)..<(secondSpace + 1 + 40)]),
-                  let name = ByteString(bytes.contents[(secondSpace + 1 + 40 + 1)..<bytes.count]).validDescription else
-            {
+                  let name = ByteString(bytes.contents[(secondSpace + 1 + 40 + 1)..<bytes.count]).validDescription else {
                 throw GitInterfaceError.malformedResponse("unexpected tree entry '\(line)' in '\(treeInfo)'")
             }
 

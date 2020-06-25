@@ -267,10 +267,10 @@ public final class InitPackage {
         if packageType == .empty {
             return
         }
-        
+
         let moduleDir = sources.appending(component: "\(pkgname)")
         try makeDirectories(moduleDir)
-        
+
         let sourceFileName = (packageType == .executable) ? "main.swift" : "\(typeName).swift"
         let sourceFile = moduleDir.appending(RelativePath(sourceFileName))
 

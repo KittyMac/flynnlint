@@ -173,7 +173,7 @@ extension SwiftSourceKitFramework {
   ) -> sourcekitd_request_handle_t? {
     logAsync { _ in req.description }
 
-    var handle: sourcekitd_request_handle_t? = nil
+    var handle: sourcekitd_request_handle_t?
 
     api.send_request(req.dict, &handle) { [weak self] _resp in
       guard let self = self else { return }
@@ -250,7 +250,6 @@ struct sourcekitd_keys {
   let not_recommended: sourcekitd_uid_t
   let num_bytes_to_erase: sourcekitd_uid_t
   let associated_usrs: sourcekitd_uid_t
-
 
   init(api: sourcekitd_functions_t) {
     request = api.uid_get_from_cstr("key.request")!

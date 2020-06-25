@@ -14,33 +14,32 @@ class FlynnLintTests: XCTestCase {
     override func setUpWithError() throws { }
 
     override func tearDownWithError() throws { }
-    
+
     func testFlynn() throws {
         let flynnlint = FlynnLint()
         flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/flynn/Tests")
         flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/flynn/Sources")
         flynnlint.finish()
     }
-    
+
     func testFlynnLint() throws {
         let flynnlint = FlynnLint()
         flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/flynnlint/Sources")
         flynnlint.finish()
     }
-    
+
     func testBatteryTester() throws {
         let flynnlint = FlynnLint()
         flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/flynn/Examples/BatteryTester/BatteryTester")
         flynnlint.finish()
     }
-    
+
     func testCutlass() throws {
         let flynnlint = FlynnLint()
         flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/cutlass/Cutlass")
         flynnlint.finish()
     }
 
-    
     func testOneRuleOneCode() throws {
         let rule = BehaviorCallCheck()
         XCTAssert(!rule.test("""
@@ -72,9 +71,9 @@ class FlynnLintTests: XCTestCase {
             }
         """))
     }
-    
+
     func testOneRule() throws {
-        let rule = BehaviorCallCheck()
+        let rule = BehaviorUnownedSelf()
         XCTAssert(rule.test())
     }
 
@@ -98,7 +97,7 @@ class FlynnLintTests: XCTestCase {
             flynnlint.finish()
         }
     }
-    
+
     func testReleasePerformanceSet() throws {
         measure {
             let task = Process()
@@ -108,16 +107,15 @@ class FlynnLintTests: XCTestCase {
             task.waitUntilExit()
         }
     }
-    
+
     func testSwiftLintPerformanceSet() throws {
         measure {
             let task = Process()
             task.launchPath = "/usr/local/bin/swiftlint"
-            task.arguments = ["--path","/Volumes/Development/Development/chimerasw2/flynnlint/Tests/benchmark"]
+            task.arguments = ["--path", "/Volumes/Development/Development/chimerasw2/flynnlint/Tests/benchmark"]
             task.launch()
             task.waitUntilExit()
         }
     }
-
 
 }

@@ -25,8 +25,7 @@ public struct SourceKitLSPCommandMetadata: Codable, Hashable {
   public init?(fromLSPDictionary dictionary: [String: LSPAny]) {
     let textDocumentKey = CodingKeys.sourcekitlsp_textDocument.stringValue
     guard case .dictionary(let textDocumentDict)? = dictionary[textDocumentKey],
-          let textDocument = TextDocumentIdentifier(fromLSPDictionary: textDocumentDict) else
-    {
+          let textDocument = TextDocumentIdentifier(fromLSPDictionary: textDocumentDict) else {
       return nil
     }
     self.init(textDocument: textDocument)

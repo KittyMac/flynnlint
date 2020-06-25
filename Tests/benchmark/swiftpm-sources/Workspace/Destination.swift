@@ -85,12 +85,12 @@ public struct Destination: Encodable, Equatable {
     public static func hostDestination(
         _ binDir: AbsolutePath? = nil,
         originalWorkingDirectory: AbsolutePath? = localFileSystem.currentWorkingDirectory,
-        environment: [String:String] = ProcessEnv.vars
+        environment: [String: String] = ProcessEnv.vars
     ) throws -> Destination {
         // Select the correct binDir.
         let customBinDir = ProcessEnv
             .vars["SWIFTPM_CUSTOM_BINDIR"]
-            .flatMap{ try? AbsolutePath(validating: $0) }
+            .flatMap { try? AbsolutePath(validating: $0) }
         let binDir = customBinDir ?? binDir ?? Destination.hostBinDir(
             originalWorkingDirectory: originalWorkingDirectory)
 
@@ -164,7 +164,7 @@ public struct Destination: Encodable, Equatable {
         return _sdkPlatformFrameworkPath
     }
     /// Cache storage for sdk platform path.
-    private static var _sdkPlatformFrameworkPath: (fwk: AbsolutePath, lib: AbsolutePath)? = nil
+    private static var _sdkPlatformFrameworkPath: (fwk: AbsolutePath, lib: AbsolutePath)?
 }
 
 extension Destination {

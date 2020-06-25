@@ -114,7 +114,7 @@ public final class DocumentManager {
           f(document.latestSnapshot, edit)
         }
 
-        if let range = edit.range  {
+        if let range = edit.range {
 
           document.latestLineTable.replace(
             fromLine: range.lowerBound.line,

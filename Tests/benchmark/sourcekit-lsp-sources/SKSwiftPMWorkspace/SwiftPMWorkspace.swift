@@ -42,7 +42,7 @@ public final class SwiftPMWorkspace {
   }
 
   /// Delegate to handle any build system events.
-  public weak var delegate: BuildSystemDelegate? = nil
+  public weak var delegate: BuildSystemDelegate?
 
   let workspacePath: AbsolutePath
   let packageRoot: AbsolutePath
@@ -65,8 +65,7 @@ public final class SwiftPMWorkspace {
     workspacePath: AbsolutePath,
     toolchainRegistry: ToolchainRegistry,
     fileSystem: FileSystem = localFileSystem,
-    buildSetup: BuildSetup) throws
-  {
+    buildSetup: BuildSetup) throws {
     self.workspacePath = workspacePath
     self.fileSystem = fileSystem
 
@@ -120,8 +119,7 @@ public final class SwiftPMWorkspace {
   /// - Returns: nil if `workspacePath` is not part of a package or there is an error.
   public convenience init?(url: URL,
                            toolchainRegistry: ToolchainRegistry,
-                           buildSetup: BuildSetup)
-  {
+                           buildSetup: BuildSetup) {
     do {
       try self.init(
         workspacePath: try AbsolutePath(validating: url.path),
@@ -144,7 +142,7 @@ extension SwiftPMWorkspace {
   /// dependencies.
   func reloadPackage() throws {
 
-    let diags = DiagnosticsEngine(handlers: [{ diag in
+    let diags = DiagnosticsEngine(handlers: [ { diag in
       log(diag.localizedDescription, level: diag.behavior.asLogLevel)
     }])
 
@@ -200,8 +198,7 @@ extension SwiftPMWorkspace: SKCore.BuildSystem {
 
   public func settings(
     for uri: DocumentURI,
-    _ language: Language) -> FileBuildSettings?
-  {
+    _ language: Language) -> FileBuildSettings? {
     guard let url = uri.fileURL else {
       // We can't determine build settings for non-file URIs.
       return nil
@@ -274,8 +271,7 @@ extension SwiftPMWorkspace {
   public func settings(
     for path: AbsolutePath,
     _ language: Language,
-    _ td: TargetBuildDescription) -> FileBuildSettings?
-  {
+    _ td: TargetBuildDescription) -> FileBuildSettings? {
     switch (td, language) {
     case (.swift(let td), .swift):
       return settings(forSwiftFile: path, td)
@@ -297,8 +293,8 @@ extension SwiftPMWorkspace {
       }
       return nil
     }
-    
-    if let result = impl(path) { 
+
+    if let result = impl(path) {
       return result
     }
 
@@ -318,8 +314,8 @@ extension SwiftPMWorkspace {
       }
       return nil
     }
-    
-    if let result = impl(path) { 
+
+    if let result = impl(path) {
       return result
     }
 
@@ -330,8 +326,7 @@ extension SwiftPMWorkspace {
   /// Retrieve settings for the given swift file, which is part of a known target build description.
   public func settings(
     forSwiftFile path: AbsolutePath,
-    _ td: SwiftTargetBuildDescription) -> FileBuildSettings?
-  {
+    _ td: SwiftTargetBuildDescription) -> FileBuildSettings? {
     // FIXME: this is re-implementing llbuild's constructCommandLineArgs.
     var args: [String] = [
       "-module-name",
@@ -364,8 +359,7 @@ extension SwiftPMWorkspace {
   public func settings(
     forClangFile path: AbsolutePath,
     _ language: Language,
-    _ td: ClangTargetBuildDescription) -> FileBuildSettings?
-  {
+    _ td: ClangTargetBuildDescription) -> FileBuildSettings? {
     // FIXME: this is re-implementing things from swiftpm's createClangCompileTarget
 
     var args = td.basicArguments()
@@ -377,7 +371,7 @@ extension SwiftPMWorkspace {
         "-MT",
         "dependencies",
         "-MF",
-        compilePath.deps.pathString,
+        compilePath.deps.pathString
       ]
     }
 
@@ -410,7 +404,7 @@ extension SwiftPMWorkspace {
     } else {
       args += [
         "-c",
-        path.pathString,
+        path.pathString
       ]
     }
 
@@ -439,8 +433,7 @@ public final class BuildSettingProviderWorkspaceDelegate: WorkspaceDelegate {
   public func packageGraphWillLoad(
     currentGraph: PackageGraph,
     dependencies: AnySequence<ManagedDependency>,
-    missingURLs: Set<String>)
-  {}
+    missingURLs: Set<String>) {}
 
   public func fetchingWillBegin(repository: String) {}
 

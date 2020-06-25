@@ -211,7 +211,7 @@ public struct MockPackagesProvider: PackageContainerProvider {
         completion: @escaping (Result<PackageContainer, Error>
     ) -> Void) {
         DispatchQueue.global().async {
-            completion(self.containersByIdentifier[identifier].map{ .success($0) } ??
+            completion(self.containersByIdentifier[identifier].map { .success($0) } ??
                 .failure(MockLoadingError.unknownModule))
         }
     }
@@ -280,8 +280,7 @@ public func XCTAssertEqual<T: CustomStringConvertible>(
     _ assignment: [(container: T, version: Version)],
     _ expected: [T: Version],
     file: StaticString = #file, line: UInt = #line)
-    where T: Hashable
-{
+    where T: Hashable {
     var actual = [T: Version]()
     for (identifier, binding) in assignment {
         actual[identifier] = binding

@@ -76,7 +76,7 @@ public struct BuildSettingCondition: Encodable {
 }
 
 /// The underlying build setting data.
-fileprivate struct BuildSettingData: Encodable {
+private struct BuildSettingData: Encodable {
 
     /// The name of the build setting.
     let name: String

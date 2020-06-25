@@ -29,7 +29,7 @@ public struct CompilationDatabaseCompileCommand: Equatable {
   public var commandLine: [String]
 
   /// The name of the build output, or nil.
-  public var output: String? = nil
+  public var output: String?
 
   public init(directory: String, filename: String, commandLine: [String], output: String? = nil) {
     self.directory = directory

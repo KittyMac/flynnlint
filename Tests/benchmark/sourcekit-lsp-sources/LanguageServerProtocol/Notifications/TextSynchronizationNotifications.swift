@@ -77,13 +77,12 @@ public struct DidChangeTextDocumentNotification: NotificationType, Hashable {
   /// Force the LSP to rebuild its AST for the given file. This is useful for clangd to workaround clangd's assumption that
   /// missing header files will stay missing.
   /// **LSP Extension from clangd**.
-  public var forceRebuild: Bool? = nil
+  public var forceRebuild: Bool?
 
   public init(
     textDocument: VersionedTextDocumentIdentifier,
     contentChanges: [TextDocumentContentChangeEvent],
-    forceRebuild: Bool? = nil)
-  {
+    forceRebuild: Bool? = nil) {
     self.textDocument = textDocument
     self.contentChanges = contentChanges
     self.forceRebuild = forceRebuild

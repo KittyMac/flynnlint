@@ -40,7 +40,7 @@ public final class Workspace {
   public let buildSetup: BuildSetup
 
   /// The source code index, if available.
-  public var index: IndexStoreDB? = nil
+  public var index: IndexStoreDB?
 
   /// Open documents.
   public let documentManager: DocumentManager = DocumentManager()
@@ -55,8 +55,7 @@ public final class Workspace {
     buildSetup: BuildSetup,
     underlyingBuildSystem: BuildSystem,
     index: IndexStoreDB?,
-    indexDelegate: SourceKitIndexDelegate?)
-  {
+    indexDelegate: SourceKitIndexDelegate?) {
     self.buildSetup = buildSetup
     self.rootUri = rootUri
     self.clientCapabilities = clientCapabilities
@@ -98,13 +97,12 @@ public final class Workspace {
       log("cannot setup build integration for workspace at URI \(rootUri) because the URI it is not a valid file URL")
     }
 
-    var index: IndexStoreDB? = nil
-    var indexDelegate: SourceKitIndexDelegate? = nil
+    var index: IndexStoreDB?
+    var indexDelegate: SourceKitIndexDelegate?
 
     if let storePath = indexOptions.indexStorePath ?? settings.indexStorePath,
        let dbPath = indexOptions.indexDatabasePath ?? settings.indexDatabasePath,
-       let libPath = toolchainRegistry.default?.libIndexStore
-    {
+       let libPath = toolchainRegistry.default?.libIndexStore {
       do {
         let lib = try IndexStoreLibrary(dylibPath: libPath.pathString)
         indexDelegate = SourceKitIndexDelegate()

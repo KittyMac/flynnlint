@@ -34,7 +34,7 @@ public class SourceKitdService {
   /// - Parameter request: The request to send.
   /// - Parameter handler: The handler for the response in the future.
   public func send(request: SourceKitdRequest,
-                   handler: @escaping (SourceKitdResponse) -> ())  {
+                   handler: @escaping (SourceKitdResponse) -> Void) {
     sourcekitd_send_request(request.rawRequest, nil) { response in
       guard let response = response else { return }
       handler(SourceKitdResponse(resp: response))

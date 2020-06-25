@@ -183,11 +183,11 @@ private extension SourceKitdUID {
 public struct StressTesterOptions {
   public init() {}
 
-  public var astBuildLimit: Int? = nil
+  public var astBuildLimit: Int?
   public var requests: RequestSet = .all
   public var rewriteMode: RewriteMode = .none
   public var conformingMethodsTypeList = ["s:SQ", "s:SH"] // Equatable and Hashable
-  public var responseHandler: ((SourceKitResponseData) throws -> Void)? = nil
+  public var responseHandler: ((SourceKitResponseData) throws -> Void)?
   public var page = Page(1, of: 1)
 }
 

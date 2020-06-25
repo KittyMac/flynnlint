@@ -160,7 +160,6 @@ extension TestClient: Connection {
     return send(request, queue: replyQueue, reply: reply)
   }
 
-
   /// Send a notification and expect a notification in reply synchronously.
   /// For testing notifications that behave like requests  - e.g. didChange & publishDiagnostics.
   public func sendNoteSync<NSend, NReply>(_ notification: NSend, _ handler: @escaping (Notification<NReply>) -> Void) where NSend: NotificationType {

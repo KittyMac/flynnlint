@@ -71,7 +71,7 @@ public final class PackageEditor {
         } else {
             // Otherwise, first lookup the dependency.
             let spec = RepositorySpecifier(url: options.url)
-            let handle = try await{ context.repositoryManager.lookup(repository: spec, completion: $0) }
+            let handle = try await { context.repositoryManager.lookup(repository: spec, completion: $0) }
             let repo = try handle.open()
 
             // Compute the requirement.
@@ -79,9 +79,9 @@ public final class PackageEditor {
                 requirement = inputRequirement
             } else {
                 // Use the latest version or the master branch.
-                let versions = repo.tags.compactMap{ Version(string: $0) }
+                let versions = repo.tags.compactMap { Version(string: $0) }
                 let latestVersion = versions.filter({ $0.prereleaseIdentifiers.isEmpty }).max() ?? versions.max()
-                requirement = latestVersion.map{ PackageDependencyRequirement.upToNextMajor($0.description) } ?? PackageDependencyRequirement.branch("master")
+                requirement = latestVersion.map { PackageDependencyRequirement.upToNextMajor($0.description) } ?? PackageDependencyRequirement.branch("master")
             }
 
             // Load the manifest.
@@ -96,8 +96,8 @@ public final class PackageEditor {
         try editor.addPackageDependency(url: options.url, requirement: requirement)
 
         // Add the product in the first regular target, if possible.
-        let productName = dependencyManifest.products.filter{ $0.type.isLibrary }.map{ $0.name }.first
-        let destTarget = loadedManifest.targets.filter{ $0.type == .regular }.first
+        let productName = dependencyManifest.products.filter { $0.type.isLibrary }.map { $0.name }.first
+        let destTarget = loadedManifest.targets.filter { $0.type == .regular }.first
         if let product = productName,
             let destTarget = destTarget,
             !destTarget.dependencies.containsDependency(product) {

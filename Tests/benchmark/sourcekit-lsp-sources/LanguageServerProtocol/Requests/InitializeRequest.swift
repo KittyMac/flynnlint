@@ -35,12 +35,12 @@ public struct InitializeRequest: RequestType, Hashable {
   /// was started by e.g. a user shell and should not be monitored.
   ///
   /// If the client process dies, the server should exit.
-  public var processId: Int? = nil
+  public var processId: Int?
 
   /// The workspace path, or nil if no workspace is open.
   ///
   /// - Note: deprecated in favour of `rootURI`.
-  public var rootPath: String? = nil
+  public var rootPath: String?
 
   /// The workspace URI, or nil if no workspace is open.
   ///
@@ -48,12 +48,12 @@ public struct InitializeRequest: RequestType, Hashable {
   public var rootURI: DocumentURI?
 
   /// User-provided options.
-  public var initializationOptions: LSPAny? = nil
+  public var initializationOptions: LSPAny?
 
   /// The capabilities provided by the client editor.
   public var capabilities: ClientCapabilities
 
-  public enum Tracing: String, Codable  {
+  public enum Tracing: String, Codable {
     case off
     case messages
     case verbose
@@ -72,8 +72,7 @@ public struct InitializeRequest: RequestType, Hashable {
     initializationOptions: LSPAny? = nil,
     capabilities: ClientCapabilities,
     trace: Tracing = .off,
-    workspaceFolders: [WorkspaceFolder]?)
-  {
+    workspaceFolders: [WorkspaceFolder]?) {
     self.processId = processId
     self.rootPath = rootPath
     self.rootURI = rootURI

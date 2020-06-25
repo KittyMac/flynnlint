@@ -35,7 +35,7 @@ public final class Toolchain {
   /// The path to this toolchain, if applicable.
   ///
   /// For example, this may be the path to an ".xctoolchain" directory.
-  public var path: AbsolutePath? = nil
+  public var path: AbsolutePath?
 
   // MARK: Tool Paths
 
@@ -62,8 +62,7 @@ public final class Toolchain {
     swiftc: AbsolutePath? = nil,
     clangd: AbsolutePath? = nil,
     sourcekitd: AbsolutePath? = nil,
-    libIndexStore: AbsolutePath? = nil)
-  {
+    libIndexStore: AbsolutePath? = nil) {
     self.identifier = identifier
     self.displayName = displayName
     self.path = path
@@ -172,8 +171,7 @@ extension Toolchain {
 /// Find a containing xctoolchain with plist, if available.
 func containingXCToolchain(
   _ path: AbsolutePath,
-  _ fileSystem: FileSystem) -> (XCToolchainPlist, AbsolutePath)?
-{
+  _ fileSystem: FileSystem) -> (XCToolchainPlist, AbsolutePath)? {
   var path = path
   while !path.isRoot {
     if path.extension == "xctoolchain" {

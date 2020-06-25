@@ -32,8 +32,7 @@ public struct SemanticRefactorCommand: SwiftCommand {
     guard case .dictionary(let documentDict)? = dictionary[CodingKeys.textDocument.stringValue],
           case .string(let title)? = dictionary[CodingKeys.title.stringValue],
           case .string(let actionString)? = dictionary[CodingKeys.actionString.stringValue],
-          case .dictionary(let rangeDict)? = dictionary[CodingKeys.positionRange.stringValue] else
-    {
+          case .dictionary(let rangeDict)? = dictionary[CodingKeys.positionRange.stringValue] else {
       return nil
     }
     guard let positionRange = Range<Position>(fromLSPDictionary: rangeDict),
@@ -72,8 +71,7 @@ extension Array where Element == SemanticRefactorCommand {
     results.forEach { _, value in
       if let name: String = value[keys.actionname],
          let actionuid: sourcekitd_uid_t = value[keys.actionuid],
-         let ptr = api.uid_get_string_ptr(actionuid)
-      {
+         let ptr = api.uid_get_string_ptr(actionuid) {
         let actionName = String(cString: ptr)
         guard !actionName.hasPrefix("source.refactoring.kind.rename.") else {
           // TODO: Rename.

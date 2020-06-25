@@ -35,7 +35,7 @@ public final class ToolchainRegistry {
   var toolchainsByPath: [AbsolutePath: Toolchain] = [:]
 
   /// The default toolchain. **Must be accessed on `queue`**.
-  var _default: Toolchain? = nil
+  var _default: Toolchain?
 
   /// Mutex for registering and accessing toolchains.
   var queue: DispatchQueue = DispatchQueue(label: "toolchain-registry-queue")
@@ -202,8 +202,7 @@ extension ToolchainRegistry {
   ///   already been seen.
   public func registerToolchain(
     _ path: AbsolutePath,
-    _ fileSystem: FileSystem = localFileSystem) throws -> Toolchain
-  {
+    _ fileSystem: FileSystem = localFileSystem) throws -> Toolchain {
     return try queue.sync { try _registerToolchain(path, fileSystem) }
   }
 
@@ -233,17 +232,15 @@ extension ToolchainRegistry {
     xcodes: [AbsolutePath] = [currentXcodeDeveloperPath].compactMap({$0}),
     xctoolchainSearchPaths: [AbsolutePath] = [
       AbsolutePath(expandingTilde: "~/Library/Developer/Toolchains"),
-      AbsolutePath("/Library/Developer/Toolchains"),
+      AbsolutePath("/Library/Developer/Toolchains")
     ],
     pathVariables: [String] = ["SOURCEKIT_PATH", "PATH"],
-    _ fileSystem: FileSystem)
-  {
+    _ fileSystem: FileSystem) {
     queue.sync {
       _scanForToolchains(environmentVariables: environmentVariables, setDefault: true, fileSystem)
       if let installPath = installPath,
         let toolchain = try? _registerToolchain(installPath, fileSystem),
-        _default == nil
-      {
+        _default == nil {
         _default = toolchain
       }
       xcodes.forEach { _scanForToolchains(xcode: $0, fileSystem) }
@@ -261,8 +258,7 @@ extension ToolchainRegistry {
   public func scanForToolchains(
     environmentVariables: [String],
     setDefault: Bool,
-    _ fileSystem: FileSystem = localFileSystem)
-  {
+    _ fileSystem: FileSystem = localFileSystem) {
     queue.sync {
       _scanForToolchains(
         environmentVariables: environmentVariables,
@@ -274,15 +270,13 @@ extension ToolchainRegistry {
   func _scanForToolchains(
     environmentVariables: [String],
     setDefault: Bool,
-    _ fileSystem: FileSystem)
-  {
+    _ fileSystem: FileSystem) {
     var shouldSetDefault = setDefault
     for envVar in environmentVariables {
       if let pathStr = ProcessEnv.vars[envVar],
          let path = try? AbsolutePath(validating: pathStr),
          let toolchain = try? _registerToolchain(path, fileSystem),
-         shouldSetDefault
-      {
+         shouldSetDefault {
         shouldSetDefault = false
         _default = toolchain
       }
@@ -329,12 +323,11 @@ extension ToolchainRegistry {
   /// - parameter toolchains: Directory containing xctoolchains, e.g. /Library/Developer/Toolchains
   public func scanForToolchains(
     xctoolchainSearchPath searchPath: AbsolutePath,
-    _ fileSystem: FileSystem = localFileSystem)
-  {
+    _ fileSystem: FileSystem = localFileSystem) {
     queue.sync { _scanForToolchains(xctoolchainSearchPath: searchPath, fileSystem) }
   }
 
-  func _scanForToolchains(xctoolchainSearchPath searchPath: AbsolutePath, _ fileSystem: FileSystem){
+  func _scanForToolchains(xctoolchainSearchPath searchPath: AbsolutePath, _ fileSystem: FileSystem) {
     guard let direntries = try? fileSystem.getDirectoryContents(searchPath) else { return }
     for name in direntries {
       let path = searchPath.appending(component: name)
@@ -347,8 +340,7 @@ extension ToolchainRegistry {
   /// The path of the current Xcode.app/Contents/Developer.
   public static var currentXcodeDeveloperPath: AbsolutePath? {
     if let str = try? Process.checkNonZeroExit(args: "/usr/bin/xcode-select", "-p"),
-       let path = try? AbsolutePath(validating: str.spm_chomp())
-    {
+       let path = try? AbsolutePath(validating: str.spm_chomp()) {
       return path
     }
     return nil

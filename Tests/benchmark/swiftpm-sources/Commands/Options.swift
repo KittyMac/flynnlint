@@ -82,7 +82,7 @@ public class ToolOptions {
     public var enableResolverTrace = false
 
     /// The number of jobs for llbuild to start (aka the number of schedulerLanes)
-    public var jobs: UInt32? = nil
+    public var jobs: UInt32?
 
     /// Whether to enable test discovery on platforms without Objective-C runtime.
     public var enableTestDiscovery: Bool = false
@@ -117,7 +117,7 @@ public enum BuildSystemKind: String, ArgumentKind {
     public static var completion: ShellCompletion {
         return .values([
             (value: "native", description: "Native build system"),
-            (value: "xcode", description: "Xcode build system"),
+            (value: "xcode", description: "Xcode build system")
         ])
     }
 }

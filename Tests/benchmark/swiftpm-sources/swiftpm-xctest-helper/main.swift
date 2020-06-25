@@ -86,7 +86,7 @@ func run() throws {
         })
         testCases.append([
             "name": testCaseSuite.name as NSString,
-            "tests": testSuite as NSArray,
+            "tests": testSuite as NSArray
         ])
     }
 
@@ -99,7 +99,7 @@ func run() throws {
     // Create output dictionary.
     let output = [
         "name" as NSString: "All Tests" as NSString,
-        "tests" as NSString: testCases as NSArray,
+        "tests" as NSString: testCases as NSArray
     ] as NSDictionary
     // Convert output dictionary to JSON and write to output file.
     let outputData = try JSONSerialization.data(withJSONObject: output, options: .prettyPrinted)

@@ -57,8 +57,7 @@ public struct FoldingRange: ResponseType, Hashable {
     startUTF16Index: Int? = nil,
     endLine: Int,
     endUTF16Index: Int? = nil,
-    kind: FoldingRangeKind? = nil)
-  {
+    kind: FoldingRangeKind? = nil) {
     self.startLine = startLine
     self.startUTF16Index = startUTF16Index
     self.endLine = endLine

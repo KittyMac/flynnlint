@@ -90,7 +90,7 @@ private final class DotDumper: DependenciesDumper {
             stream <<< #""\#(url)" [label="\#(package.name)\n\#(url)\n\#(pkgVersion)"]"# <<< "\n"
             nodesAlreadyPrinted.insert(url)
         }
-        
+
         struct DependencyURLs: Hashable {
             var root: String
             var dependency: String
@@ -103,7 +103,7 @@ private final class DotDumper: DependenciesDumper {
                 let dependencyURL = dependency.manifest.url
                 let urlPair = DependencyURLs(root: rootURL, dependency: dependencyURL)
                 if dependenciesAlreadyPrinted.contains(urlPair) { continue }
-                
+
                 printNode(dependency)
                 stream <<< #""\#(rootURL)" -> "\#(dependencyURL)""# <<< "\n"
                 dependenciesAlreadyPrinted.insert(urlPair)
@@ -133,7 +133,7 @@ private final class JSONDumper: DependenciesDumper {
                 "url": .string(package.manifest.url),
                 "version": .string(package.manifest.version?.description ?? "unspecified"),
                 "path": .string(package.path.pathString),
-                "dependencies": .array(package.dependencies.map(convert)),
+                "dependencies": .array(package.dependencies.map(convert))
             ])
         }
 

@@ -227,7 +227,7 @@ public final class PackageBuilder {
     private let additionalFileRules: [FileRuleDescription]
 
     /// Minimum deployment target of XCTest per platform.
-    private let xcTestMinimumDeploymentTargets: [PackageModel.Platform:PlatformVersion]
+    private let xcTestMinimumDeploymentTargets: [PackageModel.Platform: PlatformVersion]
 
     /// Create a builder for the given manifest and package `path`.
     ///
@@ -244,7 +244,7 @@ public final class PackageBuilder {
         path: AbsolutePath,
         additionalFileRules: [FileRuleDescription] = [],
         remoteArtifacts: [RemoteArtifact] = [],
-        xcTestMinimumDeploymentTargets: [PackageModel.Platform:PlatformVersion],
+        xcTestMinimumDeploymentTargets: [PackageModel.Platform: PlatformVersion],
         fileSystem: FileSystem = localFileSystem,
         diagnostics: DiagnosticsEngine,
         shouldCreateMultipleTestProducts: Bool = false,
@@ -271,7 +271,7 @@ public final class PackageBuilder {
     public static func loadPackage(
         packagePath: AbsolutePath,
         swiftCompiler: AbsolutePath,
-        xcTestMinimumDeploymentTargets: [PackageModel.Platform:PlatformVersion],
+        xcTestMinimumDeploymentTargets: [PackageModel.Platform: PlatformVersion],
         diagnostics: DiagnosticsEngine,
         kind: PackageReference.Kind = .root
     ) throws -> Package {
@@ -631,7 +631,7 @@ public final class PackageBuilder {
                 diagnostics.emit(.targetHasNoSources(targetPath: potentialModule.path.pathString, target: potentialModule.name))
             }
         }
-        return targets.values.map{ $0 }.sorted{ $0.name > $1.name  }
+        return targets.values.map { $0 }.sorted { $0.name > $1.name  }
     }
 
     /// Private function that checks whether a target name is valid.  This method doesn't return anything, but rather,
@@ -898,7 +898,7 @@ public final class PackageBuilder {
         return supportedPlatforms
     }
     // Keep two sets of supported platforms, based on the `isTest` parameter.
-    private var _platforms = [Bool:[SupportedPlatform]]()
+    private var _platforms = [Bool: [SupportedPlatform]]()
 
     /// The platform registry instance.
     private var platformRegistry: PlatformRegistry {
@@ -927,7 +927,7 @@ public final class PackageBuilder {
         _swiftVersion = computedSwiftVersion
         return computedSwiftVersion
     }
-    private var _swiftVersion: SwiftLanguageVersion? = nil
+    private var _swiftVersion: SwiftLanguageVersion?
 
     /// The set of the sources computed so far.
     private var allSources = Set<AbsolutePath>()
@@ -1208,7 +1208,7 @@ extension Sources {
     }
 
     var containsMixedLanguage: Bool {
-        let swiftSources = relativePaths.filter{ $0.extension == "swift" }
+        let swiftSources = relativePaths.filter { $0.extension == "swift" }
         if swiftSources.isEmpty { return false }
         return swiftSources.count != relativePaths.count
     }

@@ -97,12 +97,12 @@ public struct ExpectedIssue: Equatable, Codable {
     case .conformingMethodList(let document, let offset, _, _):
       guard case .conformingMethodList(let specOffset) = issueDetail else { return false }
       return match(document.path, against: path) &&
-        match (document.modification?.summaryCode, against: modification) &&
-        match (offset, against: specOffset)
+        match(document.modification?.summaryCode, against: modification) &&
+        match(offset, against: specOffset)
     case .collectExpressionType(let document, _):
       guard case .collectExpressionType = issueDetail else { return false }
       return match(document.path, against: path) &&
-        match (document.modification?.summaryCode, against: modification)
+        match(document.modification?.summaryCode, against: modification)
     }
   }
 

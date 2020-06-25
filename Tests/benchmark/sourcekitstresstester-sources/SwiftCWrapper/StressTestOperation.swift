@@ -14,7 +14,7 @@ import Foundation
 import Common
 
 struct ParsedMessages {
-  fileprivate(set) var sourceKitError: SourceKitError? = nil
+  fileprivate(set) var sourceKitError: SourceKitError?
   fileprivate(set) var sourceKitResponses: [SourceKitResponseData] = []
 }
 

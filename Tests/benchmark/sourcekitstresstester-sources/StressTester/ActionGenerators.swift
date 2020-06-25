@@ -340,7 +340,7 @@ public final class InsideOutRewriteActionGenerator: ActionGenerator {
 
     // This strategy may result in duplicate, adjacent actions. Dedupe them if
     // they're non-source-mutating.
-    var previous: Action? = nil
+    var previous: Action?
     return actions.filter { action in
       defer { previous = action }
       if case .replaceText = action { return true }
@@ -478,7 +478,7 @@ private struct ActionToken {
     }
     if let parent = parent.as(IdentifierExprSyntax.self), parent.identifier == token {
       if let refArgs = parent.declNameArguments {
-        let name = SwiftName(base: token.text, labels: refArgs.arguments.map{ $0.name.text })
+        let name = SwiftName(base: token.text, labels: refArgs.arguments.map { $0.name.text })
         return ExpectedResult(name: name, kind: .reference)
       }
       if let (kind, callArgs) = getParentArgs(of: parent) {
@@ -488,7 +488,7 @@ private struct ActionToken {
     }
     if let parent = parent.as(MemberAccessExprSyntax.self), parent.name == token {
       if let refArgs = parent.declNameArguments {
-        let name = SwiftName(base: token.text, labels: refArgs.arguments.map{ $0.name.text })
+        let name = SwiftName(base: token.text, labels: refArgs.arguments.map { $0.name.text })
         return ExpectedResult(name: name, kind: .reference)
       }
       if let (kind, callArgs) = getParentArgs(of: parent) {
@@ -500,7 +500,7 @@ private struct ActionToken {
     return ExpectedResult(name: name, kind: .reference)
   }
 
-  static func getParentArgs<T:SyntaxProtocol>(of syntax: T) -> (kind: ExpectedResult.Kind, args: [String])? {
+  static func getParentArgs<T: SyntaxProtocol>(of syntax: T) -> (kind: ExpectedResult.Kind, args: [String])? {
     guard let parent = syntax.parent else { return nil }
     if let call = parent.as(FunctionCallExprSyntax.self) {
       // Check for: Bar.foo(instanceOfBar)(x:1)
@@ -523,7 +523,7 @@ private struct ActionToken {
           // at least one parameter, the extras are assumed to be variadic terms
           // of the last parameter. If foo has no parameters however, there's no
           // possibly-variadic parameter to match arguments, so it will fail.
-          return (.call, outerCall.argumentList.map{ $0.label?.text ?? "_" })
+          return (.call, outerCall.argumentList.map { $0.label?.text ?? "_" })
         }
       }
       let kind: ExpectedResult.Kind
@@ -532,7 +532,7 @@ private struct ActionToken {
       } else {
         kind = .call
       }
-      return (kind, call.argumentList.map{ $0.label?.text ?? "_" })
+      return (kind, call.argumentList.map { $0.label?.text ?? "_" })
     }
     return nil
   }

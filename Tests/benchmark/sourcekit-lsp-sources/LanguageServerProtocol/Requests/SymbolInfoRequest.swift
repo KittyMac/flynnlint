@@ -76,14 +76,13 @@ public struct SymbolDetails: ResponseType, Hashable {
   /// the best known location within a single compilation unit. For example, in C++ this might be
   /// the declaration location from a header as opposed to the definition in some other
   /// translation unit.
-  public var bestLocalDeclaration: Location? = nil
+  public var bestLocalDeclaration: Location?
 
   public init(
     name: String?,
     containerName: String? = nil,
     usr: String?,
-    bestLocalDeclaration: Location? = nil)
-  {
+    bestLocalDeclaration: Location? = nil) {
     self.name = name
     self.containerName = containerName
     self.usr = usr

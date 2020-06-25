@@ -24,10 +24,10 @@ import struct Foundation.URL
 public final class CompilationDatabaseBuildSystem {
 
   /// The compilation database.
-  var compdb: CompilationDatabase? = nil
+  var compdb: CompilationDatabase?
 
   /// Delegate to handle any build system events.
-  public weak var delegate: BuildSystemDelegate? = nil
+  public weak var delegate: BuildSystemDelegate?
 
   let fileSystem: FileSystem
 

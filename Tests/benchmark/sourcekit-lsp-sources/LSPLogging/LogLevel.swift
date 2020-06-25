@@ -51,7 +51,6 @@ extension LogLevel {
     case custom(String)
   }
 
-
   public init(argument: String) throws {
     switch argument {
     case "error":
@@ -71,7 +70,7 @@ extension LogLevel {
 
       if let level = LogLevel(rawValue: value) {
         self = level
-      } else if value > LogLevel.debug.rawValue  {
+      } else if value > LogLevel.debug.rawValue {
         self = .debug
       } else {
         throw ConversionError.custom("numerical log level \(value) is out of range")

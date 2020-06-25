@@ -36,7 +36,7 @@ public struct SymbolGraphExtract {
         try localFileSystem.createDirectory(symbolGraphDirectory, recursive: true)
 
         // Run the tool for each target in the root package.
-        let targets = buildPlan.graph.rootPackages.flatMap{ $0.targets }.filter{ $0.type == .library || $0.type == .executable }
+        let targets = buildPlan.graph.rootPackages.flatMap { $0.targets }.filter { $0.type == .library || $0.type == .executable }
         for target in targets {
             var args = [String]()
             args += ["-module-name", target.c99name]

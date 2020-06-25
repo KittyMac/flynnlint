@@ -38,9 +38,9 @@ fileprivate extension Range {
 }
 
 /// Explicitly blacklisted `DocumentURI` schemes.
-fileprivate let excludedDocumentURISchemes: [String] = [
+private let excludedDocumentURISchemes: [String] = [
   "git",
-  "hg",
+  "hg"
 ]
 
 /// Returns true if diagnostics should be emitted for the given document.
@@ -53,7 +53,7 @@ fileprivate let excludedDocumentURISchemes: [String] = [
 /// the `-working-directory` argument is passed since it incorrectly applies it to the input
 /// argument but not the internal primary file, leading sourcekitd to believe that the input
 /// file is missing.
-fileprivate func diagnosticsEnabled(for document: DocumentURI) -> Bool {
+private func diagnosticsEnabled(for document: DocumentURI) -> Bool {
   guard let scheme = document.scheme else { return true }
   return !excludedDocumentURISchemes.contains(scheme)
 }
@@ -98,8 +98,7 @@ public final class SwiftLanguageServer: ToolchainLanguageServer {
   /// Should be called on self.queue.
   func publishDiagnostics(
     response: SKResponseDictionary,
-    for snapshot: DocumentSnapshot)
-  {
+    for snapshot: DocumentSnapshot) {
     let documentUri = snapshot.document.uri
     guard diagnosticsEnabled(for: documentUri) else {
       log("Ignoring diagnostics for blacklisted file \(documentUri.pseudoPath)", level: .debug)
@@ -340,7 +339,7 @@ extension SwiftLanguageServer {
     let keys = self.keys
 
     self.queue.async {
-      var lastResponse: SKResponseDictionary? = nil
+      var lastResponse: SKResponseDictionary?
 
       let snapshot = self.documentManager.edit(note) { (before: DocumentSnapshot, edit: TextDocumentContentChangeEvent) in
         let req = SKRequestDictionary(sourcekitd: self.sourcekitd)
@@ -485,7 +484,7 @@ extension SwiftLanguageServer {
 
         var result = CompletionList(isIncomplete: false, items: [])
 
-        let cancelled = !completions.forEach { (i, value) -> Bool in
+        let cancelled = !completions.forEach { (_, value) -> Bool in
           guard let name: String = value[self.keys.description] else {
             return true // continue
           }
@@ -721,7 +720,7 @@ extension SwiftLanguageServer {
 
         func documentSymbols(array: SKResponseArray) -> [DocumentSymbol] {
           var result: [DocumentSymbol] = []
-          array.forEach { (i: Int, value: SKResponseDictionary) in
+          array.forEach { (_: Int, value: SKResponseDictionary) in
             if let documentSymbol = documentSymbol(value: value) {
               result.append(documentSymbol)
             } else if let substructure: SKResponseArray = value[self.keys.substructure] {
@@ -779,7 +778,7 @@ extension SwiftLanguageServer {
             return nil
           }
           var red, green, blue, alpha: Double?
-          substructure.forEach{ (i: Int, value: SKResponseDictionary) in
+          substructure.forEach { (_: Int, value: SKResponseDictionary) in
             guard let name: String = value[self.keys.name],
                   let bodyoffset: Int = value[self.keys.bodyoffset],
                   let bodylength: Int = value[self.keys.bodylength] else {
@@ -816,7 +815,7 @@ extension SwiftLanguageServer {
 
         func colorInformation(array: SKResponseArray) -> [ColorInformation] {
           var result: [ColorInformation] = []
-          array.forEach { (i: Int, value: SKResponseDictionary) in
+          array.forEach { (_: Int, value: SKResponseDictionary) in
             if let documentSymbol = colorInformation(dict: value) {
               result.append(documentSymbol)
             } else if let substructure: SKResponseArray = value[self.keys.substructure] {
@@ -887,8 +886,7 @@ extension SwiftLanguageServer {
           if let offset: Int = value[self.keys.offset],
              let start: Position = snapshot.positionOf(utf8Offset: offset),
              let length: Int = value[self.keys.length],
-             let end: Position = snapshot.positionOf(utf8Offset: offset + length)
-          {
+             let end: Position = snapshot.positionOf(utf8Offset: offset + length) {
             highlights.append(DocumentHighlight(
               range: start..<end,
               kind: .read // unknown
@@ -950,14 +948,13 @@ extension SwiftLanguageServer {
         }
 
         // Merge successive comments into one big comment by adding their lengths.
-        var currentComment: (offset: Int, length: Int)? = nil
+        var currentComment: (offset: Int, length: Int)?
 
         syntaxMap.forEach { _, value in
           if let kind: sourcekitd_uid_t = value[self.keys.kind],
              kind.isCommentKind(self.values),
              let offset: Int = value[self.keys.offset],
-             let length: Int = value[self.keys.length]
-          {
+             let length: Int = value[self.keys.length] {
             if let comment = currentComment, comment.offset + comment.length == offset {
               currentComment!.length += length
               return true
@@ -981,8 +978,7 @@ extension SwiftLanguageServer {
           substructure.forEach { _, value in
             if let offset: Int = value[self.keys.bodyoffset],
                let length: Int = value[self.keys.bodylength],
-               length > 0
-            {
+               length > 0 {
               self.addFoldingRange(offset: offset, length: length, in: snapshot, toArray: &ranges)
               if hasReachedLimit {
                 return false
@@ -1086,8 +1082,7 @@ extension SwiftLanguageServer {
     _cursorInfo(
       params.textDocument.uri,
       params.range,
-      additionalParameters: additionalCursorInfoParameters)
-    { result in
+      additionalParameters: additionalCursorInfoParameters) { result in
       guard let dict: CursorInfo = result.success ?? nil else {
         if let failure = result.failure {
           let message = "failed to find refactor actions: \(failure)"
@@ -1126,7 +1121,7 @@ extension SwiftLanguageServer {
 
       let codeActions: [CodeAction] =
         (diag.codeActions ?? []) +
-        (diag.relatedInformation?.flatMap{ $0.codeActions ?? [] } ?? [])
+        (diag.relatedInformation?.flatMap { $0.codeActions ?? [] } ?? [])
 
       if codeActions.isEmpty {
         // The diagnostic doesn't have fix-its. Don't return anything.
@@ -1233,8 +1228,7 @@ extension DocumentSnapshot {
 
   func utf8OffsetRange(of range: Range<Position>) -> Range<Int>? {
     guard let startOffset = utf8Offset(of: range.lowerBound),
-          let endOffset = utf8Offset(of: range.upperBound) else
-    {
+          let endOffset = utf8Offset(of: range.upperBound) else {
       return nil
     }
     return startOffset..<endOffset
@@ -1344,10 +1338,10 @@ extension sourcekitd_uid_t {
       case vals.decl_class:
         return .class
       case vals.decl_function_method_instance,
-           vals.decl_function_method_static, 
+           vals.decl_function_method_static,
            vals.decl_function_method_class:
         return .method
-      case vals.decl_var_instance, 
+      case vals.decl_var_instance,
            vals.decl_var_static,
            vals.decl_var_class:
         return .property
@@ -1359,7 +1353,7 @@ extension sourcekitd_uid_t {
         return .interface
       case vals.decl_function_free:
         return .function
-      case vals.decl_var_global, 
+      case vals.decl_var_global,
            vals.decl_var_local:
         return .variable
       case vals.decl_struct:

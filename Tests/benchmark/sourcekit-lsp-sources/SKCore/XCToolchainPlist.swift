@@ -43,7 +43,7 @@ extension XCToolchainPlist {
 #if os(macOS)
     let plistNames = [
       RelativePath("ToolchainInfo.plist"), // Xcode
-      RelativePath("Info.plist"), // Swift.org
+      RelativePath("Info.plist") // Swift.org
     ]
 
     for plistPath in plistNames.lazy.map({ path.appending($0) }) {

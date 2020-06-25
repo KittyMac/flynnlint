@@ -27,7 +27,7 @@ public protocol Connection: AnyObject {
 
 extension Connection {
   public func sendSync<Request>(_ request: Request) throws -> Request.Response where Request: RequestType {
-    var result: LSPResult<Request.Response>? = nil
+    var result: LSPResult<Request.Response>?
     let semaphore = DispatchSemaphore(value: 0)
     _ = send(request, queue: DispatchQueue.global()) { _result in
       result = _result
@@ -72,7 +72,7 @@ public final class LocalConnection {
 
   var state: State = .ready
 
-  var handler: MessageHandler? = nil
+  var handler: MessageHandler?
 
   public init() {}
 

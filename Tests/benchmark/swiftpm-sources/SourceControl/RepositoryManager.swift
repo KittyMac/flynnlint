@@ -118,7 +118,7 @@ public class RepositoryManager {
             return .init([
                 "status": status.rawValue,
                 "repositoryURL": repository,
-                "subpath": subpath,
+                "subpath": subpath
             ])
         }
     }
@@ -130,7 +130,7 @@ public class RepositoryManager {
     public let provider: RepositoryProvider
 
     /// The delegate interface.
-    private let delegate: RepositoryManagerDelegate?
+    private weak var delegate: RepositoryManagerDelegate?
 
     // FIXME: We should use a more sophisticated map here, which tracks the
     // full specifier but then is capable of efficiently determining if two
@@ -265,7 +265,7 @@ public class RepositoryManager {
                     }
 
                     // Fetch the repo.
-                    var fetchError: Swift.Error? = nil
+                    var fetchError: Swift.Error?
                     do {
                         // Start fetching.
                         try self.provider.fetch(repository: handle.repository, to: repositoryPath)
