@@ -16,7 +16,7 @@ struct BehaviorNamingConvention: Rule {
     let description = RuleDescription(
         identifier: "behavior_name",
         name: "Behavior Name Violation",
-        description: "Behaviour names must start with '\(FlynnLint.prefixBehavior)', such as 'actor.\(FlynnLint.prefixBehavior)HelloWorld()'",
+        description: "Behavior names must start with '\(FlynnLint.prefixBehavior)', such as 'actor.\(FlynnLint.prefixBehavior)HelloWorld()'",
         syntaxTriggers: [.class, .extension],
         nonTriggeringExamples: [
             Example("""

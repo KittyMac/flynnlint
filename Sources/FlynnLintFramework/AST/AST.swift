@@ -74,13 +74,15 @@ struct AST {
         }
 
         let syntax: FileSyntax
+        let bodySyntax: FileSyntax
         let anyParams: Bool
         let noParams: Bool
         let parameters: [Parameter]
         let argsName: String
 
-        init(_ syntax: FileSyntax, _ parameters: [Parameter], _ argsName: String) {
+        init(_ syntax: FileSyntax, _ bodySyntax: FileSyntax, _ parameters: [Parameter], _ argsName: String) {
             self.syntax = syntax
+            self.bodySyntax = bodySyntax
             self.argsName = argsName
             if argsName == "_" || argsName == "None" {
                 self.parameters = []
@@ -173,6 +175,7 @@ struct AST {
                             if siblingName.contains("Behavior") && sibling.kind == .exprCall {
                                 // Check for the existance of the flynnlint markup
                                 let variableSyntax = actor.clone(variable)
+                                let siblingSyntax = actor.clone(sibling)
                                 var params: [Parameter] = []
                                 let flynnlintParameterStrings = variableSyntax.markup("parameter")
                                 for parameterInfo in flynnlintParameterStrings {
@@ -191,6 +194,7 @@ struct AST {
                                 let argsStructure = findSubstructureOfType(sibling, "BehaviorArgs")
                                 let argsName = argsStructure?.name ?? "_"
                                 behaviors[name]?.append(Behavior(variableSyntax,
+                                                                 siblingSyntax,
                                                                  params,
                                                                  argsName))
                             }

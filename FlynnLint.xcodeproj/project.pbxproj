@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		462EA9E224A44BE400F153EA /* BehaviorUnownedSelf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462EA9E124A44BDC00F153EA /* BehaviorUnownedSelf.swift */; };
 		OBJ_200 /* api.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_111 /* api.c */; };
 		OBJ_201 /* emitter.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_112 /* emitter.c */; };
 		OBJ_202 /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_113 /* parser.c */; };
@@ -450,6 +451,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		462EA9E124A44BDC00F153EA /* BehaviorUnownedSelf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorUnownedSelf.swift; sourceTree = "<group>"; };
 		"Commandant::Commandant::Product" /* Commandant.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Commandant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Flynn::Flynn::Product" /* Flynn.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Flynn.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Flynn::Pony::Product" /* Pony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Pony.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -942,6 +944,7 @@
 				OBJ_20 /* BehaviorCallCheck.swift */,
 				OBJ_21 /* BehaviorNamingConvention.swift */,
 				OBJ_22 /* BehaviorParamsDefined.swift */,
+				462EA9E124A44BDC00F153EA /* BehaviorUnownedSelf.swift */,
 				OBJ_23 /* PrivateFunctionInActorRule.swift */,
 				OBJ_24 /* PrivateVariablesInActorRule.swift */,
 				OBJ_25 /* SafeFunctionRule.swift */,
@@ -1055,7 +1058,7 @@
 			path = include;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -1066,7 +1069,6 @@
 				OBJ_193 /* Makefile */,
 				OBJ_194 /* README.md */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_53 /* SourceKit */ = {
@@ -1564,7 +1566,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_179 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1611,7 +1613,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint --path ${SRCROOT}/Sources\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint autocorrect\n  swiftlint --path ${SRCROOT}/Sources\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 		466A9C422493D5C800470C18 /* FlynnLint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1700,6 +1702,7 @@
 				OBJ_265 /* SourceKittenConstants.swift in Sources */,
 				OBJ_266 /* BuildCombinedAST.swift in Sources */,
 				OBJ_267 /* CheckRules.swift in Sources */,
+				462EA9E224A44BE400F153EA /* BehaviorUnownedSelf.swift in Sources */,
 				OBJ_268 /* FindFiles.swift in Sources */,
 				OBJ_269 /* ParseFile.swift in Sources */,
 				OBJ_270 /* PrintError.swift in Sources */,

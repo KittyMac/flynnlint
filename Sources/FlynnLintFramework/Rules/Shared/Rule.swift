@@ -22,7 +22,8 @@ struct Ruleset {
             SafeVariableRule.self,
             BehaviorParamsDefined.self,
             BehaviorNamingConvention.self,
-            BehaviorCallCheck.self
+            BehaviorCallCheck.self,
+            BehaviorUnownedSelf.self
         ]
 
         for ruleClass in allRules {
