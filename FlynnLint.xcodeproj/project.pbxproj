@@ -1616,7 +1616,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint autocorrect\n  swiftlint --path ${SRCROOT}/Sources\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint autocorrect --path ${SRCROOT}/Sources/\n  swiftlint --path ${SRCROOT}/Sources/\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 		462EAA0924A454C700F153EA /* FlynnLint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1634,7 +1634,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "FLYNNLINTSWIFTPM=${SRCROOT}/.build/checkouts/flynn/meta/FlynnLint\nFLYNNLINTXCODE=${BUILD_ROOT}/../../SourcePackages/checkouts/flynn/meta/FlynnLint\n\nif [ -f \"${FLYNNLINTSWIFTPM}\" ]; then\n    ${FLYNNLINTSWIFTPM} ${SRCROOT}/Sources ${SRCROOT}/Tests\nelif [ -f \"${FLYNNLINTXCODE}\" ]; then\n    ${FLYNNLINTXCODE} ${SRCROOT}\nelse\n    echo \"warning: Unable to find FlynnLint, aborting...\"\nfi\n";
+			shellScript = "FLYNNLINTSWIFTPM=${SRCROOT}/.build/checkouts/flynn/meta/FlynnLint\nFLYNNLINTXCODE=${BUILD_ROOT}/../../SourcePackages/checkouts/flynn/meta/FlynnLint\n\nif [ -f \"${FLYNNLINTSWIFTPM}\" ]; then\n    ${FLYNNLINTSWIFTPM} ${SRCROOT}\nelif [ -f \"${FLYNNLINTXCODE}\" ]; then\n    ${FLYNNLINTXCODE} ${SRCROOT}\nelse\n    echo \"warning: Unable to find FlynnLint, aborting...\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
