@@ -28,7 +28,7 @@ class PrintError: Actor, Flowable {
         self.onComplete = onComplete
     }
 
-    lazy var beFlow = Behavior(self) { (args: BehaviorArgs) in
+    lazy var beFlow = Behavior(self) { [unowned self] (args: BehaviorArgs) in
         // flynnlint:parameter Any
         if args.isEmpty == false {
             let error: String = args[x:0]

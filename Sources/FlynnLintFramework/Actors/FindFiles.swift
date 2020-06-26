@@ -19,7 +19,7 @@ class FindFiles: Actor, Flowable {
         self.extensions = extensions
     }
 
-    lazy var beFlow = Behavior(self) { (args: BehaviorArgs) in
+    lazy var beFlow = Behavior(self) { [unowned self] (args: BehaviorArgs) in
         // flynnlint:parameter Any
         if args.isEmpty { return self.safeFlowToNextTarget(args) }
 

@@ -25,6 +25,7 @@ class FlynnLintTests: XCTestCase {
     func testFlynnLint() throws {
         let flynnlint = FlynnLint()
         flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/flynnlint/Sources")
+        flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/flynnlint/Tests")
         flynnlint.finish()
     }
 

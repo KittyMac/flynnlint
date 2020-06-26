@@ -7,6 +7,7 @@
 //
 
 // swiftlint:disable function_body_length
+// swiftlint:disable cyclomatic_complexity
 
 import Foundation
 import SourceKittenFramework
@@ -54,10 +55,18 @@ class AutoCorrectFile: Actor, Flowable {
                 while true {
                     offset -= 1
                     let offsetIdx = corrected.index(markerRange.lowerBound, offsetBy: offset)
-                    if corrected[offsetIdx] == " " || corrected[offsetIdx] == "\t" || corrected[offsetIdx] == "\n" {
+                    let char = corrected[offsetIdx]
+                    if char.isLetter || char.isNumber {
+                        continue
+                    }
+
+                    if char.isWhitespace {
                         offset += 1
                         break
                     }
+
+                    // error, bail!
+                    return corrected
                 }
 
                 var name = "HelloWorld"
@@ -95,6 +104,8 @@ class AutoCorrectFile: Actor, Flowable {
                     fixedReplacement = fixedReplacement.replacingOccurrences(of: "NAME", with: name)
 
                     corrected = corrected.replacingCharacters(in: range, with: fixedReplacement)
+                } else {
+                    break
                 }
 
             } else {
@@ -105,7 +116,7 @@ class AutoCorrectFile: Actor, Flowable {
         return corrected
     }
 
-    lazy var beFlow = Behavior(self) { (args: BehaviorArgs) in
+    lazy var beFlow = Behavior(self) { [unowned self] (args: BehaviorArgs) in
         // flynnlint:parameter Any
         if args.isEmpty { return self.safeFlowToNextTarget(args) }
 

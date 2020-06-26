@@ -15,7 +15,7 @@ class ParseFile: Actor, Flowable {
     // output: SourceKitten File, SourceKitten Structure
     lazy var safeFlowable = FlowableState(self)
 
-    lazy var beFlow = Behavior(self) { (args: BehaviorArgs) in
+    lazy var beFlow = Behavior(self) { [unowned self] (args: BehaviorArgs) in
         // flynnlint:parameter Any
         if args.isEmpty { return self.safeFlowToNextTarget(args) }
 
