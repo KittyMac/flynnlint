@@ -24,6 +24,7 @@ public class FlynnLint {
         let poolSize = max(1, (Flynn.cores / Flynn.cpus) - 2 )
 
         pipeline = FindFiles(["swift"]) |>
+            AutoCorrectFile() |>
             Array(count: poolSize) { ParseFile() } |>
             BuildCombinedAST() |>
             Array(count: poolSize) { CheckRules(ruleset) } |>

@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		465FDF4324A599F800BF1358 /* AutoCorrectFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465FDF4224A599F800BF1358 /* AutoCorrectFile.swift */; };
 		OBJ_201 /* api.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_112 /* api.c */; };
 		OBJ_202 /* emitter.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_113 /* emitter.c */; };
 		OBJ_203 /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_114 /* parser.c */; };
@@ -451,6 +452,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		465FDF4224A599F800BF1358 /* AutoCorrectFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoCorrectFile.swift; sourceTree = "<group>"; };
 		"Commandant::Commandant::Product" /* Commandant.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Commandant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Flynn::Flynn::Product" /* Flynn.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Flynn.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Flynn::Pony::Product" /* Pony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Pony.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -798,6 +800,7 @@
 				OBJ_13 /* BuildCombinedAST.swift */,
 				OBJ_14 /* CheckRules.swift */,
 				OBJ_15 /* FindFiles.swift */,
+				465FDF4224A599F800BF1358 /* AutoCorrectFile.swift */,
 				OBJ_16 /* ParseFile.swift */,
 				OBJ_17 /* PrintError.swift */,
 			);
@@ -1058,7 +1061,7 @@
 			path = include;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -1069,7 +1072,6 @@
 				OBJ_194 /* Makefile */,
 				OBJ_195 /* README.md */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_54 /* SourceKit */ = {
@@ -1567,7 +1569,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_180 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1715,6 +1717,7 @@
 				OBJ_278 /* PrivateVariablesInActorRule.swift in Sources */,
 				OBJ_279 /* SafeFunctionRule.swift in Sources */,
 				OBJ_280 /* SafeVariableRule.swift in Sources */,
+				465FDF4324A599F800BF1358 /* AutoCorrectFile.swift in Sources */,
 				OBJ_281 /* Rule.swift in Sources */,
 				OBJ_282 /* RuleDescription.swift in Sources */,
 			);
