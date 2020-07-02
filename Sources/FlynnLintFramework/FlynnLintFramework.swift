@@ -21,7 +21,7 @@ public class FlynnLint {
 
     public init() {
         let ruleset = Ruleset()
-        let poolSize = max(1, (Flynn.cores / Flynn.cpus) - 2 )
+        let poolSize = max(1, Flynn.cores - 2)
 
         pipeline = FindFiles(["swift"]) |>
             AutoCorrectFile() |>
