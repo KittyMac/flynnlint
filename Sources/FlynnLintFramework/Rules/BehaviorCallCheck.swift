@@ -50,6 +50,21 @@ struct BehaviorCallCheck: Rule {
         syntaxTriggers: [ ],
         nonTriggeringExamples: [
             Example("""
+                class HelloWorld: Actor {
+                    private func _beSomething(_ args: BehaviorArgs) {
+                        // flynnlint:parameter String - string to print
+                        print(args[x:0])
+                    }
+                    lazy var beSomething = Behavior(self, _beSomething)
+                }
+                class Foo {
+                    init() {
+                        let a = HelloWorld()
+                        a.beSomething("Hello")
+                    }
+                }
+            """),
+            Example("""
                 \(BehaviorCallCheckConst.stringBuilder)
                 class Foo {
                     init() {
@@ -145,13 +160,13 @@ struct BehaviorCallCheck: Rule {
 
                     if arguments.count < behavior.parameters.count {
                         if let output = output {
-                            let msg = description.console("Not enough arguments for behavior (expected \(behaviors.count) arguments)")
+                            let msg = description.console("Not enough arguments for behavior (expected \(arguments.count) arguments)")
                             output.beFlow(error(Int64(match.range.location), syntax, msg))
                             noErrors = false
                         }
                     } else if arguments.count > behavior.parameters.count {
                         if let output = output {
-                            let msg = description.console("Too many arguments for behavior (expected \(behaviors.count) arguments)")
+                            let msg = description.console("Too many arguments for behavior (expected \(arguments.count) arguments)")
                             output.beFlow(error(Int64(match.range.location), syntax, msg))
                             noErrors = false
                         }

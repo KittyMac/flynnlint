@@ -148,8 +148,19 @@ struct AST {
         return "\(path): error: \(message)"
     }
 
+    func warning(_ offset: Int64?, _ file: File, _ message: String) -> String {
+        let path = file.path ?? "<nopath>"
+        if let offset = offset {
+            let stringView = StringView.init(file.contents)
+            if let (line, character) = stringView.lineAndCharacter(forByteOffset: ByteCount(offset)) {
+                return "\(path):\(line):\(character): warning: \(message)"
+            }
+        }
+        return "\(path): warning: \(message)"
+    }
+
     // swiftlint:disable cyclomatic_complexity
-    mutating func cacheAllBehaviorsByClass() {
+    private mutating func cacheAllBehaviorsByClass() {
         // To support behavior argument checking, we allow the dev to annoate the arguments
         // a behavior is supposed to accept ( // flynnlint:parameter String - this is a string
         // To make it easier for rules to access later, we run through all behaviors of all
@@ -177,22 +188,23 @@ struct AST {
                                 let variableSyntax = actor.clone(variable)
                                 let siblingSyntax = actor.clone(sibling)
                                 var params: [Parameter] = []
-                                let flynnlintParameterStrings = variableSyntax.markup("parameter")
-                                for parameterInfo in flynnlintParameterStrings {
-                                    let parameter = Parameter(parameterInfo.1)
-                                    if !parameter.type.isEmpty && !parameter.description.isEmpty {
-                                        params.append( parameter )
+
+                                extractDocumentedParamatersFrom(variableSyntax, &params)
+
+                                var argsStructure = findSubstructureOfType(sibling, "BehaviorArgs")
+                                if params.count == 0 && argsStructure == nil {
+                                    if let function = cacheCompanionFunctionForBehaviorInClass(variableSyntax, &params) {
+                                        argsStructure = findSubstructureOfType(function.structure, "BehaviorArgs")
                                     } else {
-                                        let err = error(Int64(parameterInfo.0.value),
-                                                        actor.file,
-                                                        "Malformed Hint: flynnlint:parameter <Type> - <Description>")
+                                        let err = warning(siblingSyntax.structure.offset,
+                                                          siblingSyntax.file,
+                                                          "Companion Function Missing: expected function _\(variable.name!)() not found")
                                         print(err)
                                     }
                                 }
 
-                                // Extract the name of the "args" closure parameter
-                                let argsStructure = findSubstructureOfType(sibling, "BehaviorArgs")
                                 let argsName = argsStructure?.name ?? "_"
+                                // Extract the name of the "args" closure parameter
                                 behaviors[name]?.append(Behavior(variableSyntax,
                                                                  siblingSyntax,
                                                                  params,
@@ -201,6 +213,56 @@ struct AST {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private func cacheCompanionFunctionForBehaviorInClass(_ behavior: FileSyntax, _ params: inout [Parameter]) -> FileSyntax? {
+        // It is cool to write behaviors like this:
+        // private func something(_ args: BehaviorArgs) {
+        //    // flynnlint:parameter String - string to print
+        //    print(args[x:0])
+        // }
+        // lazy var beSomething = Behavior(self, something)
+
+        // Where the meat & potatoes of the behavior are actually
+        // in a function and not a closure on the Behavior. In these
+        // scenarios, we need to run through the functions after the
+        // behaviors have been cached so we can read in the documentation
+
+        if let behaviorName = behavior.structure.name {
+            let companionFuncName = "_\(behaviorName)("
+            for actor in classes.values {
+                guard let functions = actor.structure.substructure else { continue }
+                for idx in 0..<functions.count {
+                    let function = functions[idx]
+                    if function.kind == .functionMethodInstance {
+                        if let functionName = function.name {
+                            if functionName.hasPrefix(companionFuncName) {
+                                let functionSyntax = actor.clone(function)
+                                extractDocumentedParamatersFrom(functionSyntax, &params)
+                                return functionSyntax
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return nil
+    }
+
+    private func extractDocumentedParamatersFrom(_ variableSyntax: FileSyntax, _ params: inout [Parameter]) {
+        let flynnlintParameterStrings = variableSyntax.markup("parameter")
+        for parameterInfo in flynnlintParameterStrings {
+            let parameter = Parameter(parameterInfo.1)
+            if !parameter.type.isEmpty && !parameter.description.isEmpty {
+                params.append( parameter )
+            } else {
+                let err = error(Int64(parameterInfo.0.value),
+                                variableSyntax.file,
+                                "Malformed Hint: flynnlint:parameter <Type> - <Description>")
+                print(err)
             }
         }
     }

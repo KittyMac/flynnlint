@@ -74,7 +74,7 @@ class FlynnLintTests: XCTestCase {
     }
 
     func testOneRule() throws {
-        let rule = BehaviorUnownedSelf()
+        let rule = BehaviorCallCheck()
         XCTAssert(rule.test())
     }
 

@@ -130,7 +130,7 @@ class AutoCorrectFile: Actor, Flowable {
                                         """
                                         INDENTclass NAME: Actor {
                                         INDENT
-                                        INDENT    HelloWorld::BEHAVIOR
+                                        INDENT    printString::BEHAVIOR
                                         INDENT
                                         INDENT}
                                         """)
@@ -138,7 +138,8 @@ class AutoCorrectFile: Actor, Flowable {
             corrected = self.autocorrect(corrected,
                                         "::BEHAVIOR",
                                         """
-                                        INDENTlazy var beNAME = Behavior(self) { [unowned self] (args: BehaviorArgs) in
+                                        INDENTlazy var beNAME = Behavior(self, _beNAME)
+                                        INDENTprivate func _beNAME(args: BehaviorArgs) {
                                         INDENT    // flynnlint:parameter String - string to print
                                         INDENT    let value: String = args[x:0]
                                         INDENT    print(value)
