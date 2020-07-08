@@ -159,7 +159,6 @@ struct AST {
         return "\(path): warning: \(message)"
     }
 
-    // swiftlint:disable cyclomatic_complexity
     private mutating func cacheAllBehaviorsByClass() {
         // To support behavior argument checking, we allow the dev to annoate the arguments
         // a behavior is supposed to accept ( // flynnlint:parameter String - this is a string
@@ -193,6 +192,7 @@ struct AST {
 
                                 var argsStructure = findSubstructureOfType(sibling, "BehaviorArgs")
                                 if params.count == 0 && argsStructure == nil {
+
                                     if let function = cacheCompanionFunctionForBehaviorInClass(variableSyntax, &params) {
                                         argsStructure = findSubstructureOfType(function.structure, "BehaviorArgs")
                                     } else {
@@ -201,6 +201,11 @@ struct AST {
                                                           "Companion Function Missing: expected function _\(variable.name!)() not found")
                                         print(err)
                                     }
+
+                                    let err = warning(siblingSyntax.structure.offset,
+                                                      siblingSyntax.file,
+                                                      "Prefer Closures: Behaviors should use a closure with unowned self to avoid strong retain cycles")
+                                    print(err)
                                 }
 
                                 let argsName = argsStructure?.name ?? "_"

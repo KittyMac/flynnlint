@@ -3,6 +3,9 @@ import PackageDescription
 
 let package = Package(
     name: "FlynnLint",
+    platforms: [
+        .macOS(.v10_12)
+    ],
     products: [
         .executable(name: "flynnlint", targets: ["flynnlint"]),
         .library(name: "FlynnLintFramework", targets: ["FlynnLintFramework"])

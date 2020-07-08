@@ -286,7 +286,7 @@ class BuildCombinedAST: Actor, Flowable {
 
     override init() {
         super.init()
-        safePriority = 1
+        unsafePriority = 1
     }
 
     lazy var beFlow = Behavior(self) { [unowned self] (args: BehaviorArgs) in
@@ -296,7 +296,7 @@ class BuildCombinedAST: Actor, Flowable {
             return
         }
 
-        self.safePriority = -1
+        self.unsafePriority = -1
 
         // Once we have all of the relevant structures from all of the files captured, we turn that
         // into an immutable struct which will allow us to share that safely with many actors. Then
