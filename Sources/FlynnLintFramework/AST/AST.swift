@@ -7,6 +7,7 @@
 //
 
 // swiftlint:disable line_length
+// swiftlint:disable cyclomatic_complexity
 
 import Foundation
 import SourceKittenFramework

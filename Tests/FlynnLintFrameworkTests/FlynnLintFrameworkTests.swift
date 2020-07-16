@@ -99,6 +99,17 @@ class FlynnLintTests: XCTestCase {
         }
     }
 
+    func testReleaseCrashTest() throws {
+        for _ in 0..<1000 {
+            let task = Process()
+            task.launchPath = "/Volumes/Development/Development/chimerasw2/flynnlint/.build/release/flynnlint"
+            task.arguments = ["/Volumes/Development/Development/chimerasw2/flynnlint/Tests/benchmark"]
+            task.launch()
+            task.waitUntilExit()
+            XCTAssert(task.terminationStatus == 0)
+        }
+    }
+    
     func testReleasePerformanceSet() throws {
         measure {
             let task = Process()
@@ -106,6 +117,7 @@ class FlynnLintTests: XCTestCase {
             task.arguments = ["/Volumes/Development/Development/chimerasw2/flynnlint/Tests/benchmark"]
             task.launch()
             task.waitUntilExit()
+            XCTAssert(task.terminationStatus == 0)
         }
     }
 
@@ -116,6 +128,7 @@ class FlynnLintTests: XCTestCase {
             task.arguments = ["--path", "/Volumes/Development/Development/chimerasw2/flynnlint/Tests/benchmark"]
             task.launch()
             task.waitUntilExit()
+            XCTAssert(task.terminationStatus == 0)
         }
     }
 
