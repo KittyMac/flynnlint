@@ -145,7 +145,9 @@ class AutoCorrectFile: Actor, Flowable {
                                         INDENT}
                                         """)
 
-            try? corrected.write(toFile: path, atomically: false, encoding: .utf8)
+            if corrected != fileString {
+                try? corrected.write(toFile: path, atomically: false, encoding: .utf8)
+            }
         }
 
         self.safeFlowToNextTarget([path])
