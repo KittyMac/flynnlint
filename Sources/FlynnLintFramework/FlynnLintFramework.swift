@@ -34,8 +34,8 @@ public class FlynnLint {
     }
 
     public func process(directory path: String) {
-        pipeline!.beFlow(path)
-        pipeline!.beFlow()
+        pipeline!.beFlow([path])
+        pipeline!.beFlow([])
     }
 
     @discardableResult

@@ -90,14 +90,14 @@ struct PrivateVariablesInActorRule: Rule {
                                 // allow variables to be "unsafe"
                                 if name.hasPrefix(FlynnLint.prefixUnsafe) {
                                     if let output = output {
-                                        output.beFlow(warning(variable.offset, syntax, description.console("Unsafe variables should not be used")))
+                                        output.beFlow([warning(variable.offset, syntax, description.console("Unsafe variables should not be used"))])
                                     }
                                     continue
                                 }
                             }
 
                             if let output = output {
-                                output.beFlow(error(variable.offset, syntax))
+                                output.beFlow([error(variable.offset, syntax)])
                             }
                             return false
                         }

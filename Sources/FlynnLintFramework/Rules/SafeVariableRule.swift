@@ -89,7 +89,7 @@ struct SafeVariableRule: Rule {
         // AST what can we do?
         if let innerOffset = syntax.match(#"\w+(?<!self)\."# + FlynnLint.prefixSafe + #"\w"#) {
             if let output = output {
-                output.beFlow(error(innerOffset, syntax))
+                output.beFlow([error(innerOffset, syntax)])
             }
             return false
         }

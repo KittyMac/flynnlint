@@ -281,7 +281,7 @@ class ASTBuilder: Sequence {
 class BuildCombinedAST: Actor, Flowable {
     // input: a File and  a syntax structure
     // output: an immutable AST and pass all syntax
-    lazy var safeFlowable = FlowableState(self)
+    var safeFlowable = FlowableState()
     private var astBuilder = ASTBuilder()
 
     override init() {
@@ -289,8 +289,7 @@ class BuildCombinedAST: Actor, Flowable {
         unsafePriority = 1
     }
 
-    lazy var beFlow = Behavior(self) { [unowned self] (args: BehaviorArgs) in
-        // flynnlint:parameter Any
+    fileprivate func _beFlow(_ args: FlowableArgs) {
         if args.isEmpty == false {
             self.astBuilder.add(args[x:0])
             return
@@ -314,5 +313,14 @@ class BuildCombinedAST: Actor, Flowable {
         }
 
         self.safeFlowToNextTarget([])
+    }
+    
+}
+
+extension BuildCombinedAST {
+    func beFlow(_ args: FlowableArgs) {
+        unsafeSend { [unowned self] in
+            self._beFlow(args)
+        }
     }
 }

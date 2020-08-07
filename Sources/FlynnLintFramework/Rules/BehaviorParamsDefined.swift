@@ -118,7 +118,7 @@ struct BehaviorParamsDefined: Rule {
             if let output = output,
                let bodyoffset = behavior.syntax.structure.offset {
                 let msg = description.console("Behaviors must document their parameters using flynnlint:parameter")
-                output.beFlow(error(bodyoffset, behavior.syntax, msg))
+                output.beFlow([error(bodyoffset, behavior.syntax, msg)])
                 noErrors = false
             }
         }
@@ -130,7 +130,7 @@ struct BehaviorParamsDefined: Rule {
                     let paramIdx = Int(groups[2]) {
                     if paramIdx < 0 || paramIdx >= behavior.parameters.count {
                         let msg = description.console("Access to undocumented parameters is not allowed")
-                        output.beFlow(error(Int64(match.range.location), behavior.syntax, msg))
+                        output.beFlow([error(Int64(match.range.location), behavior.syntax, msg)])
                         noErrors = false
                     }
                 }

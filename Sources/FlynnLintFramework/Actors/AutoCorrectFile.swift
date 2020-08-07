@@ -26,7 +26,7 @@ extension String {
 class AutoCorrectFile: Actor, Flowable {
     // input: path to swift file
     // output: path to swift file
-    lazy var safeFlowable = FlowableState(self)
+    var safeFlowable = FlowableState()
 
     private func autocorrect(_ string: String, _ marker: String, _ replacement: String) -> String {
         // Expectation is the following:
@@ -116,8 +116,7 @@ class AutoCorrectFile: Actor, Flowable {
         return corrected
     }
 
-    lazy var beFlow = Behavior(self) { [unowned self] (args: BehaviorArgs) in
-        // flynnlint:parameter Any
+    fileprivate func _beFlow(_ args: FlowableArgs) {
         if args.isEmpty { return self.safeFlowToNextTarget(args) }
 
         let path: String = args[x:0]
@@ -152,4 +151,14 @@ class AutoCorrectFile: Actor, Flowable {
 
         self.safeFlowToNextTarget([path])
     }
+    
 }
+
+extension AutoCorrectFile {
+    func beFlow(_ args: FlowableArgs) {
+        unsafeSend { [unowned self] in
+            self._beFlow(args)
+        }
+    }
+}
+

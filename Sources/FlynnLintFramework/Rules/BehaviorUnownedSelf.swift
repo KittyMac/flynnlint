@@ -65,7 +65,7 @@ struct BehaviorUnownedSelf: Rule {
                     behavior.bodySyntax.match(#"\[\s*weak\s*self\]"#) == nil {
                     if  let output = output,
                         let bodyoffset = behavior.syntax.structure.offset {
-                        output.beFlow(warning(bodyoffset, behavior.bodySyntax))
+                        output.beFlow([warning(bodyoffset, behavior.bodySyntax)])
                         noErrors = false
                     }
                 }

@@ -12,15 +12,14 @@ import Flynn
 class FindFiles: Actor, Flowable {
     // input: path to source directory
     // output: paths to individual swift files
-    lazy var safeFlowable = FlowableState(self)
+    var safeFlowable = FlowableState()
     private let extensions: [String]
 
     init (_ extensions: [String]) {
         self.extensions = extensions
     }
 
-    lazy var beFlow = Behavior(self) { [unowned self] (args: BehaviorArgs) in
-        // flynnlint:parameter Any
+    fileprivate func _beFlow(_ args: FlowableArgs) {
         if args.isEmpty { return self.safeFlowToNextTarget(args) }
 
         let path: String = args[x:0]
@@ -43,6 +42,15 @@ class FindFiles: Actor, Flowable {
             }
         } catch {
             print(error)
+        }
+    }
+    
+}
+
+extension FindFiles {
+    func beFlow(_ args: FlowableArgs) {
+        unsafeSend { [unowned self] in
+            self._beFlow(args)
         }
     }
 }

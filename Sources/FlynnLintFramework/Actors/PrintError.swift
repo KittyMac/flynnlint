@@ -15,7 +15,7 @@ typealias PrintErrorResult = ((Int) -> Void)
 class PrintError: Actor, Flowable {
     // input: error string
     // output: none
-    lazy var safeFlowable = FlowableState(self)
+    var safeFlowable = FlowableState()
 
     private var onComplete: PrintErrorResult?
     private var numErrors: Int = 0
@@ -28,8 +28,7 @@ class PrintError: Actor, Flowable {
         self.onComplete = onComplete
     }
 
-    lazy var beFlow = Behavior(self) { [unowned self] (args: BehaviorArgs) in
-        // flynnlint:parameter Any
+    fileprivate func _beFlow(_ args: FlowableArgs) {
         if args.isEmpty == false {
             let error: String = args[x:0]
             print(error)
@@ -40,6 +39,15 @@ class PrintError: Actor, Flowable {
 
         if let onComplete = self.onComplete {
             onComplete(self.numErrors)
+        }
+    }
+    
+}
+
+extension PrintError {
+    func beFlow(_ args: FlowableArgs) {
+        unsafeSend { [unowned self] in
+            self._beFlow(args)
         }
     }
 }

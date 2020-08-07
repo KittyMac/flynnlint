@@ -14,8 +14,8 @@
         "package": "Flynn",
         "repositoryURL": "https://github.com/KittyMac/Flynn.git",
         "state": {
-          "branch": "master",
-          "revision": "c437d008059197cb34e8f1229f0665e8c3972e61",
+          "branch": "ponyrt_v2",
+          "revision": "97a155f0a5f16bea1ab4711178c80e9ea389bc1a",
           "version": null
         }
       },

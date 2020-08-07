@@ -92,7 +92,7 @@ struct BehaviorNamingConvention: Rule {
             behavior.syntax.structure.name?.starts(with: FlynnLint.prefixBehavior) == false {
             if let output = output,
                let bodyoffset = behavior.syntax.structure.offset {
-                output.beFlow(error(bodyoffset, behavior.syntax))
+                output.beFlow([error(bodyoffset, behavior.syntax)])
                 noErrors = false
             }
         }

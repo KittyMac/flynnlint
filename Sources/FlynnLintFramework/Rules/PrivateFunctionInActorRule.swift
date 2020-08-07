@@ -88,7 +88,7 @@ struct PrivateFunctionInActorRule: Rule {
                         function.accessibility != .private {
                         if let output = output {
                             let msg = error(function.offset, syntax)
-                            output.beFlow(msg)
+                            output.beFlow([msg])
                         }
                         return false
                     }
@@ -97,7 +97,7 @@ struct PrivateFunctionInActorRule: Rule {
                         function.kind == .functionMethodInstance &&
                         function.accessibility != .private {
                         if let output = output {
-                            output.beFlow(warning(function.offset, syntax, description.console("Unsafe functions should not be used")))
+                            output.beFlow([warning(function.offset, syntax, description.console("Unsafe functions should not be used"))])
                         }
                     }
                 }

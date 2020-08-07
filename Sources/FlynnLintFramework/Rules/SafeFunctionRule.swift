@@ -127,7 +127,7 @@ struct SafeFunctionRule: Rule {
             if  functionCall.range(of: safeCallString) != nil &&
                 functionCall.hasPrefix("self.") == false {
                 if let output = output {
-                    output.beFlow(error(syntax.structure.offset, syntax))
+                    output.beFlow([error(syntax.structure.offset, syntax)])
                 }
                 return false
             }

@@ -133,12 +133,12 @@ struct BehaviorCallCheck: Rule {
             if behaviors.count == 0 {
                 if let output = output {
                     let msg = description.console("Unable to find behavior declaration for \(behaviorName)")
-                    output.beFlow(warning(Int64(match.range.location), syntax, msg))
+                    output.beFlow([warning(Int64(match.range.location), syntax, msg)])
                 }
             } else if behaviors.count > 1 && !checkBehaviorsAreTheSame(behaviors) {
                 if let output = output {
                     let msg = description.console("Ambiguous behavior \(behaviorName), unable to check arguments")
-                    output.beFlow(warning(Int64(match.range.location), syntax, msg))
+                    output.beFlow([warning(Int64(match.range.location), syntax, msg)])
                 }
             } else if let behavior = behaviors.first {
                 if !behavior.anyParams {
@@ -148,7 +148,7 @@ struct BehaviorCallCheck: Rule {
                     if behaviorName.contains("(") || argumentString.contains("(") {
                         if let output = output {
                             let msg = description.console("Unable to check arguments when there are nested parenthesis")
-                            output.beFlow(warning(Int64(match.range.location), syntax, msg))
+                            output.beFlow([warning(Int64(match.range.location), syntax, msg)])
                         }
                         return
                     }
@@ -161,13 +161,13 @@ struct BehaviorCallCheck: Rule {
                     if arguments.count < behavior.parameters.count {
                         if let output = output {
                             let msg = description.console("Not enough arguments for behavior (expected \(arguments.count) arguments)")
-                            output.beFlow(error(Int64(match.range.location), syntax, msg))
+                            output.beFlow([error(Int64(match.range.location), syntax, msg)])
                             noErrors = false
                         }
                     } else if arguments.count > behavior.parameters.count {
                         if let output = output {
                             let msg = description.console("Too many arguments for behavior (expected \(arguments.count) arguments)")
-                            output.beFlow(error(Int64(match.range.location), syntax, msg))
+                            output.beFlow([error(Int64(match.range.location), syntax, msg)])
                             noErrors = false
                         }
                     } else {
@@ -180,7 +180,7 @@ struct BehaviorCallCheck: Rule {
                                 paramA != paramB {
                                 if let output = output {
                                     let msg = description.console("Type mismatch for argument #\(idx+1), expected \(paramA.description) got \(paramB.description)")
-                                    output.beFlow(warning(Int64(match.range.location), syntax, msg))
+                                    output.beFlow([warning(Int64(match.range.location), syntax, msg)])
                                 }
                             }
                         }

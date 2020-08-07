@@ -13,15 +13,14 @@ import Flynn
 class CheckRules: Actor, Flowable {
     // input: an AST and one syntax structure
     // output: error string if rule failed
-    lazy var safeFlowable = FlowableState(self)
+    var safeFlowable = FlowableState()
     private let rules: Ruleset
 
     init(_ rules: Ruleset) {
         self.rules = rules
     }
 
-    lazy var beFlow = Behavior(self) { [unowned self] (args: BehaviorArgs) in
-        // flynnlint:parameter Any
+    fileprivate func _beFlow(_ args: FlowableArgs) {
         if args.isEmpty == false {
             let ast: AST = args[x:0]
             let syntax: FileSyntax = args[x:1]
@@ -47,5 +46,14 @@ class CheckRules: Actor, Flowable {
         }
 
         self.safeFlowToNextTarget(args)
+    }
+    
+}
+
+extension CheckRules {
+    func beFlow(_ args: FlowableArgs) {
+        unsafeSend { [unowned self] in
+            self._beFlow(args)
+        }
     }
 }

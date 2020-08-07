@@ -13,10 +13,9 @@ import Flynn
 class ParseFile: Actor, Flowable {
     // input: path to swift file
     // output: SourceKitten File, SourceKitten Structure
-    lazy var safeFlowable = FlowableState(self)
+    var safeFlowable = FlowableState()
 
-    lazy var beFlow = Behavior(self) { [unowned self] (args: BehaviorArgs) in
-        // flynnlint:parameter Any
+    fileprivate func _beFlow(_ args: FlowableArgs) {
         if args.isEmpty { return self.safeFlowToNextTarget(args) }
 
         let path: String = args[x:0]
@@ -37,6 +36,15 @@ class ParseFile: Actor, Flowable {
             } catch {
                 print("Parsing error: \(error)")
             }
+        }
+    }
+    
+}
+
+extension ParseFile {
+    func beFlow(_ args: FlowableArgs) {
+        unsafeSend { [unowned self] in
+            self._beFlow(args)
         }
     }
 }
