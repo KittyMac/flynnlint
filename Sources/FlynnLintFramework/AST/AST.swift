@@ -7,7 +7,6 @@
 //
 
 // swiftlint:disable line_length
-// swiftlint:disable cyclomatic_complexity
 
 import Foundation
 import SourceKittenFramework
@@ -67,75 +66,45 @@ struct ASTSimpleType: Equatable, CustomStringConvertible {
 
 struct AST {
 
-    struct Behavior: Equatable {
-        static func == (lhs: AST.Behavior, rhs: AST.Behavior) -> Bool {
-            return  lhs.parameters == rhs.parameters &&
-                    lhs.anyParams == rhs.anyParams &&
-                    lhs.noParams == rhs.noParams
+    struct Behavior {
+        let actor: FileSyntax
+        let function: FileSyntax
+        init(actor: FileSyntax, behavior: FileSyntax) {
+            self.actor = actor
+            self.function = behavior
         }
 
-        let syntax: FileSyntax
-        let bodySyntax: FileSyntax
-        let anyParams: Bool
-        let noParams: Bool
-        let parameters: [Parameter]
-        let argsName: String
-
-        init(_ syntax: FileSyntax, _ bodySyntax: FileSyntax, _ parameters: [Parameter], _ argsName: String) {
-            self.syntax = syntax
-            self.bodySyntax = bodySyntax
-            self.argsName = argsName
-            if argsName == "_" || argsName == "None" {
-                self.parameters = []
-                self.anyParams = false
-                self.noParams = true
-            } else if parameters.isEmpty == false && parameters[0].type == "Any" {
-                self.parameters = []
-                self.anyParams = true
-                self.noParams = false
-            } else {
-                self.parameters = parameters
-                self.anyParams = false
-                self.noParams = false
+        func isSymbioticWith(_ other: Behavior) -> Bool {
+            if  let name1 = function.structure.name,
+                let name2 = other.function.structure.name {
+                return name1 == "_\(name2)" || name2 == "_\(name1)"
             }
-        }
-    }
-    struct Parameter: Equatable {
-        static func == (lhs: AST.Parameter, rhs: AST.Parameter) -> Bool {
-            return  lhs.type == rhs.type
-        }
-
-        let type: String
-        let description: String
-        init(_ paramString: String) {
-            if let range = paramString.range(of: " - ") {
-                type = String(paramString.prefix(upTo: range.lowerBound))
-                description = String(paramString.suffix(from: range.upperBound))
-            } else if paramString.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("None") {
-                type = "None"
-                description = "This behavior accepts no parameters"
-            } else if paramString.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("Any") {
-                type = "Any"
-                description = "This behavior accepts any parameters"
-            } else {
-                type = ""
-                description = ""
-            }
+            return false
         }
     }
 
     let classes: [String: FileSyntax]
     let protocols: [String: FileSyntax]
-    var behaviors: [String: [Behavior]]
+    var internalBehaviors: [String: [Behavior]]
+    var externalBehaviors: [String: [Behavior]]
     let extensions: [FileSyntax]
 
     init (_ classes: [String: FileSyntax], _ protocols: [String: FileSyntax], _ extensions: [FileSyntax]) {
         self.classes = classes
         self.protocols = protocols
         self.extensions = extensions
-        self.behaviors = [:]
+        self.internalBehaviors = [:]
+        self.externalBehaviors = [:]
 
-        cacheAllBehaviorsByClass()
+        for actor in classes.values {
+            cacheInternalBehaviorsByClass(actor)
+            cacheExternalBehaviorsByClass(actor)
+        }
+        for actor in extensions {
+            cacheInternalBehaviorsByClass(actor)
+            cacheExternalBehaviorsByClass(actor)
+        }
+
     }
 
     func error(_ offset: Int64?, _ file: File, _ message: String) -> String {
@@ -160,116 +129,46 @@ struct AST {
         return "\(path): warning: \(message)"
     }
 
-    private mutating func cacheAllBehaviorsByClass() {
-        // To support behavior argument checking, we allow the dev to annoate the arguments
-        // a behavior is supposed to accept ( // flynnlint:parameter String - this is a string
-        // To make it easier for rules to access later, we run through all behaviors of all
-        // classes here and add then to the SyntaxStructure of the class for easy lookup
-        for actor in classes.values {
-            guard let name = actor.structure.name else { continue }
-            guard let variables = actor.structure.substructure else { continue }
+    private mutating func cacheInternalBehaviorsByClass(_ actor: FileSyntax) {
+        // Find all instances of internal behavior functions:
+        //  class Test: Actor {
+        //    private func _bePrint() { }
+        //  }
 
-            if behaviors[name] == nil {
-               behaviors[name] = []
-            }
+        guard let name = actor.structure.name else { return }
+        guard let functions = actor.structure.substructure else { return }
 
-            for idx in 0..<variables.count {
-                let variable = variables[idx]
-                if (variable.kind == .varGlobal ||
-                    variable.kind == .varClass ||
-                    variable.kind == .varInstance) &&
-                    variable.accessibility != .private {
+        if internalBehaviors[name] == nil {
+           internalBehaviors[name] = []
+        }
 
-                    if idx+1 < variables.count {
-                        let sibling = variables[idx+1]
-                        if let siblingName = sibling.name {
-                            if siblingName.contains("Behavior") && sibling.kind == .exprCall {
-                                // Check for the existance of the flynnlint markup
-                                let variableSyntax = actor.clone(variable)
-                                let siblingSyntax = actor.clone(sibling)
-                                var params: [Parameter] = []
-
-                                extractDocumentedParamatersFrom(variableSyntax, &params)
-
-                                var argsStructure = findSubstructureOfType(sibling, "BehaviorArgs")
-                                if params.count == 0 && argsStructure == nil {
-
-                                    if let function = cacheCompanionFunctionForBehaviorInClass(variableSyntax, &params) {
-                                        argsStructure = findSubstructureOfType(function.structure, "BehaviorArgs")
-                                    } else {
-                                        let err = warning(siblingSyntax.structure.offset,
-                                                          siblingSyntax.file,
-                                                          "Companion Function Missing: expected function _\(variable.name!)() not found")
-                                        print(err)
-                                    }
-
-                                    let err = warning(siblingSyntax.structure.offset,
-                                                      siblingSyntax.file,
-                                                      "Prefer Closures: Behaviors should use a closure with unowned self to avoid strong retain cycles")
-                                    print(err)
-                                }
-
-                                let argsName = argsStructure?.name ?? "_"
-                                // Extract the name of the "args" closure parameter
-                                behaviors[name]?.append(Behavior(variableSyntax,
-                                                                 siblingSyntax,
-                                                                 params,
-                                                                 argsName))
-                            }
-                        }
-                    }
-                }
-            }
+        for function in functions where
+            (function.name ?? "").hasPrefix(FlynnLint.prefixBehaviorInternal) &&
+            function.kind == .functionMethodInstance &&
+            function.accessibility == .private {
+                internalBehaviors[name]?.append(Behavior(actor: actor,
+                                                         behavior: actor.clone(function)))
         }
     }
 
-    private func cacheCompanionFunctionForBehaviorInClass(_ behavior: FileSyntax, _ params: inout [Parameter]) -> FileSyntax? {
-        // It is cool to write behaviors like this:
-        // private func something(_ args: BehaviorArgs) {
-        //    // flynnlint:parameter String - string to print
-        //    print(args[x:0])
-        // }
-        // lazy var beSomething = Behavior(self, something)
+    private mutating func cacheExternalBehaviorsByClass(_ actor: FileSyntax) {
+        // Find all instances of external behavior functions:
+        //  extension Test {
+        //    func bePrint() { }
+        //  }
+        guard let name = actor.structure.name else { return }
+        guard let functions = actor.structure.substructure else { return }
 
-        // Where the meat & potatoes of the behavior are actually
-        // in a function and not a closure on the Behavior. In these
-        // scenarios, we need to run through the functions after the
-        // behaviors have been cached so we can read in the documentation
-
-        if let behaviorName = behavior.structure.name {
-            let companionFuncName = "_\(behaviorName)("
-            for actor in classes.values {
-                guard let functions = actor.structure.substructure else { continue }
-                for idx in 0..<functions.count {
-                    let function = functions[idx]
-                    if function.kind == .functionMethodInstance {
-                        if let functionName = function.name {
-                            if functionName.hasPrefix(companionFuncName) {
-                                let functionSyntax = actor.clone(function)
-                                extractDocumentedParamatersFrom(functionSyntax, &params)
-                                return functionSyntax
-                            }
-                        }
-                    }
-                }
-            }
+        if externalBehaviors[name] == nil {
+           externalBehaviors[name] = []
         }
 
-        return nil
-    }
-
-    private func extractDocumentedParamatersFrom(_ variableSyntax: FileSyntax, _ params: inout [Parameter]) {
-        let flynnlintParameterStrings = variableSyntax.markup("parameter")
-        for parameterInfo in flynnlintParameterStrings {
-            let parameter = Parameter(parameterInfo.1)
-            if !parameter.type.isEmpty && !parameter.description.isEmpty {
-                params.append( parameter )
-            } else {
-                let err = error(Int64(parameterInfo.0.value),
-                                variableSyntax.file,
-                                "Malformed Hint: flynnlint:parameter <Type> - <Description>")
-                print(err)
-            }
+        for function in functions where
+            (function.name ?? "").hasPrefix(FlynnLint.prefixBehaviorExternal) &&
+            function.kind == .functionMethodInstance &&
+            (function.accessibility == .public || function.accessibility == .open) {
+                externalBehaviors[name]?.append(Behavior(actor: actor,
+                                                         behavior: actor.clone(function)))
         }
     }
 
@@ -295,11 +194,39 @@ struct AST {
         return protocols[name]
     }
 
-    func getBehaviors(_ name: String) -> [Behavior] {
+    func getBehaviorsForActor(_ actor: FileSyntax) -> ([Behavior], [Behavior]) {
+        var internals: [Behavior] = []
+        var externals: [Behavior] = []
+
+        if let name = actor.structure.name {
+            if let behaviors = internalBehaviors[name] {
+                internals.append(contentsOf: behaviors)
+            }
+            if let behaviors = externalBehaviors[name] {
+                externals.append(contentsOf: behaviors)
+            }
+        }
+
+        return (internals, externals)
+    }
+
+    func getInternalBehaviors(_ name: String) -> [Behavior] {
         var retBehaviors: [Behavior] = []
-        for key in behaviors.keys {
-            if let classBehaviors = behaviors[key] {
-                for behavior in classBehaviors where behavior.syntax.structure.name == name {
+        for key in internalBehaviors.keys {
+            if let classBehaviors = internalBehaviors[key] {
+                for behavior in classBehaviors where behavior.function.structure.name == name {
+                    retBehaviors.append(behavior)
+                }
+            }
+        }
+        return retBehaviors
+    }
+
+    func getExternalBehaviors(_ name: String) -> [Behavior] {
+        var retBehaviors: [Behavior] = []
+        for key in externalBehaviors.keys {
+            if let classBehaviors = externalBehaviors[key] {
+                for behavior in classBehaviors where behavior.function.structure.name == name {
                     retBehaviors.append(behavior)
                 }
             }
@@ -348,5 +275,59 @@ struct AST {
             }
         }
         return false
+    }
+
+    private func recurseClassFullName(_ path: inout [String], _ current: SyntaxStructure, _ target: String) -> Bool {
+
+        if let substructures = current.substructure {
+            for substructure in substructures {
+                if substructure.name == target {
+                    if let name = substructure.name {
+                        path.append(name)
+                        return false
+                    }
+                }
+
+                if let name = substructure.name {
+                    path.append(name)
+
+                    if recurseClassFullName(&path, substructure, target) == false {
+                        return false
+                    }
+
+                    path.removeLast()
+                }
+            }
+        }
+        return true
+    }
+
+    func getFullName(_ file: FileSyntax, _ target: FileSyntax) -> String {
+        guard let name = target.structure.name else { return "Unknown" }
+        return getFullName(file, name)
+    }
+
+    func getFullName(_ file: FileSyntax, _ targetName: String) -> String {
+        let isArray = targetName.hasPrefix("[")
+
+        var actualTargetName = targetName
+
+        if isArray {
+            actualTargetName = targetName.trimmingCharacters(in: CharacterSet(charactersIn: "[]"))
+        }
+
+        var names: [String] = []
+        _ = recurseClassFullName(&names, file.structure, actualTargetName)
+        if names.count == 0 {
+            return targetName
+        }
+
+        let fullName = names.joined(separator: ".")
+
+        if isArray {
+            return "[\(fullName)]"
+        }
+
+        return fullName
     }
 }

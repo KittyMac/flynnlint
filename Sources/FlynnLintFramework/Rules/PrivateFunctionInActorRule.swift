@@ -27,6 +27,8 @@ struct PrivateFunctionInActorRule: Rule {
             Example("class SomeActor: Actor { override func safeFlowProcess() { } }\n"),
             Example("class SomeClass { public func foo() { } }\n"),
 
+            Example("class SomeActor: Actor { private func _bePrint(_ string: String) { } }\n"),
+
             Example("class SomeActor: Actor { public func unsafeFoo() { } }\n"),
             Example("class SomeActor: Actor { fileprivate func unsafeFoo() { } }\n"),
             Example("class SomeActor: Actor { internal func unsafeFoo() { } }\n"),
@@ -34,6 +36,10 @@ struct PrivateFunctionInActorRule: Rule {
             Example("class SomeActor: Actor { override func unsafeFlowProcess() { } }\n")
         ],
         triggeringExamples: [
+
+            Example("class SomeActor: Actor { public func _bePrint(_ string: String) { } }\n"),
+            Example("class SomeActor: Actor { fileprivate func _bePrint(_ string: String) { } }\n"),
+
             Example("class SomeActor: Actor { public func foo() { } }\n"),
             Example("class SomeActor: Actor { fileprivate func foo() { } }\n"),
             Example("class SomeActor: Actor { internal func foo() { } }\n"),
@@ -80,18 +86,36 @@ struct PrivateFunctionInActorRule: Rule {
             if ast.isActor(resolvedClass) {
                 if let functions = syntax.structure.substructure {
                     for function in functions where
+                        (function.name ?? "").hasPrefix(FlynnLint.prefixBehaviorExternal) &&
+                        function.kind == .functionMethodInstance {
+                        // This might be an external behavior; if it is, then the body should
+                        // start with unsafeSend(). We have other rules in place to ensure that
+                        // this compliance is in place, so for here we just need to exempt it
+                        return true
+                    }
+                    for function in functions where
                         !(function.name ?? "").hasPrefix(FlynnLint.prefixUnsafe) &&
                         !(function.name ?? "").hasPrefix(FlynnLint.prefixSafe) &&
+                        !(function.name ?? "").hasPrefix(FlynnLint.prefixBehaviorInternal) &&
                         !(function.name ?? "").hasPrefix("init(") &&
                         !(function.name ?? "").hasPrefix("deinit") &&
                         function.kind == .functionMethodInstance &&
                         function.accessibility != .private {
                         if let output = output {
-                            let msg = error(function.offset, syntax)
-                            output.beFlow([msg])
+                            output.beFlow([error(function.offset, syntax)])
                         }
                         return false
                     }
+                    for function in functions where
+                        (function.name ?? "").hasPrefix(FlynnLint.prefixBehaviorInternal) &&
+                        function.kind == .functionMethodInstance &&
+                        function.accessibility != .private {
+                        if let output = output {
+                            output.beFlow([error(function.offset, syntax, description.console("Behaviors must be private"))])
+                        }
+                        return false
+                    }
+
                     for function in functions where
                         (function.name ?? "").hasPrefix(FlynnLint.prefixUnsafe) &&
                         function.kind == .functionMethodInstance &&

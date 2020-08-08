@@ -12,7 +12,8 @@ import SourceKittenFramework
 
 public class FlynnLint {
 
-    static let prefixBehavior = "be"
+    static let prefixBehaviorExternal = "be"
+    static let prefixBehaviorInternal = "_be"
     static let prefixSafe = "safe"
     static let prefixUnsafe = "unsafe"
 
@@ -24,9 +25,9 @@ public class FlynnLint {
         let poolSize = max(1, Flynn.cores - 2)
 
         pipeline = FindFiles(["swift"]) |>
-            AutoCorrectFile() |>
             Array(count: poolSize) { ParseFile() } |>
             BuildCombinedAST() |>
+            AutogenerateExternalBehaviors() |>
             Array(count: poolSize) { CheckRules(ruleset) } |>
             PrintError { (numErrors: Int) in
                 self.numErrors += numErrors

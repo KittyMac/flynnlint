@@ -19,11 +19,7 @@ struct Ruleset {
             PrivateFunctionInActorRule.self,
             SafeFunctionRule.self,
             PrivateVariablesInActorRule.self,
-            SafeVariableRule.self,
-            BehaviorParamsDefined.self,
-            BehaviorNamingConvention.self,
-            BehaviorCallCheck.self,
-            BehaviorUnownedSelf.self
+            SafeVariableRule.self
         ]
 
         for ruleClass in allRules {
@@ -96,7 +92,7 @@ extension Rule {
         do {
             let file = File(contents: code)
             let syntax = try StructureAndSyntax(file: file)
-            let fileSyntax = FileSyntax(file, syntax.structure, syntax.syntax, [])
+            let fileSyntax = FileSyntax("/tmp", file, syntax.structure, syntax.syntax, [])
 
             let astBuilder = ASTBuilder()
             astBuilder.add(fileSyntax)
