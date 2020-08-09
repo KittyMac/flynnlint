@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FlynnLint::flynnlint"
-               BuildableName = "flynnlint"
-               BlueprintName = "flynnlint"
+               BlueprintIdentifier = "FlynnLint::FlynnLintFramework"
+               BuildableName = "FlynnLintFramework.framework"
+               BlueprintName = "FlynnLintFramework"
                ReferencedContainer = "container:FlynnLint.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,9 +28,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FlynnLint::FlynnLintFramework"
-               BuildableName = "FlynnLintFramework.framework"
-               BlueprintName = "FlynnLintFramework"
+               BlueprintIdentifier = "FlynnLint::flynnlint"
+               BuildableName = "flynnlint"
+               BlueprintName = "flynnlint"
                ReferencedContainer = "container:FlynnLint.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

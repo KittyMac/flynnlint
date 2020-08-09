@@ -7,6 +7,8 @@
 //
 
 // swiftlint:disable line_length
+// swiftlint:disable cyclomatic_complexity
+// swiftlint:disable function_body_length
 
 import Foundation
 import Flynn
@@ -82,53 +84,84 @@ struct PrivateFunctionInActorRule: Rule {
         //    but a subclass of this Actor calling safe methods
         // 3. if it is an init function
 
+        var allPassed = true
+
         if let resolvedClass = ast.getClassOrProtocol(syntax.structure.name) {
             if ast.isActor(resolvedClass) {
                 if let functions = syntax.structure.substructure {
-                    for function in functions where
-                        (function.name ?? "").hasPrefix(FlynnLint.prefixBehaviorExternal) &&
-                        function.kind == .functionMethodInstance {
-                        // This might be an external behavior; if it is, then the body should
-                        // start with unsafeSend(). We have other rules in place to ensure that
-                        // this compliance is in place, so for here we just need to exempt it
-                        return true
-                    }
-                    for function in functions where
-                        !(function.name ?? "").hasPrefix(FlynnLint.prefixUnsafe) &&
-                        !(function.name ?? "").hasPrefix(FlynnLint.prefixSafe) &&
-                        !(function.name ?? "").hasPrefix(FlynnLint.prefixBehaviorInternal) &&
-                        !(function.name ?? "").hasPrefix("init(") &&
-                        !(function.name ?? "").hasPrefix("deinit") &&
-                        function.kind == .functionMethodInstance &&
-                        function.accessibility != .private {
-                        if let output = output {
-                            output.beFlow([error(function.offset, syntax)])
-                        }
-                        return false
-                    }
-                    for function in functions where
-                        (function.name ?? "").hasPrefix(FlynnLint.prefixBehaviorInternal) &&
-                        function.kind == .functionMethodInstance &&
-                        function.accessibility != .private {
-                        if let output = output {
-                            output.beFlow([error(function.offset, syntax, description.console("Behaviors must be private"))])
-                        }
-                        return false
-                    }
+                    for function in functions {
+                        if (function.name ?? "").hasPrefix(FlynnLint.prefixBehaviorExternal) &&
+                            function.kind == .functionMethodInstance {
+                            // This might be an external behavior; if it is, then the body should
+                            // start with unsafeSend(). We have other rules in place to ensure that
+                            // this compliance is in place, so for here we just need to exempt it
 
-                    for function in functions where
-                        (function.name ?? "").hasPrefix(FlynnLint.prefixUnsafe) &&
-                        function.kind == .functionMethodInstance &&
-                        function.accessibility != .private {
-                        if let output = output {
-                            output.beFlow([warning(function.offset, syntax, description.console("Unsafe functions should not be used"))])
+                            if let substructures = function.substructure {
+
+                                // must contain only parameters and one unsafe send
+                                var numParameters = 0
+                                var numUnsafeSend = 0
+                                var numOther = 0
+
+                                for substructure in substructures {
+                                    if substructure.kind == .exprCall && substructure.name == "unsafeSend" {
+                                        numUnsafeSend += 1
+                                    } else if substructure.kind == .varParameter {
+                                        numParameters += 1
+                                    } else {
+                                        numOther += 1
+                                    }
+                                }
+
+                                if !(numUnsafeSend == 1 && numOther == 0) {
+                                    if let output = output {
+                                        output.beFlow([error(function.offset, syntax, description.console("Behaviors must wrap their contents in a call to unsafeSend()"))])
+                                    }
+                                    allPassed = false
+                                }
+                            }
+                            continue
                         }
+
+                        if !(function.name ?? "").hasPrefix(FlynnLint.prefixUnsafe) &&
+                            !(function.name ?? "").hasPrefix(FlynnLint.prefixSafe) &&
+                            !(function.name ?? "").hasPrefix(FlynnLint.prefixBehaviorInternal) &&
+                            !(function.name ?? "").hasPrefix("init(") &&
+                            !(function.name ?? "").hasPrefix("deinit") &&
+                            function.kind == .functionMethodInstance &&
+                            function.accessibility != .private {
+                            if let output = output {
+                                output.beFlow([error(function.offset, syntax)])
+                            }
+                            allPassed = false
+                            continue
+                        }
+
+                        if (function.name ?? "").hasPrefix(FlynnLint.prefixBehaviorInternal) &&
+                            function.kind == .functionMethodInstance &&
+                            function.accessibility != .private {
+                            if let output = output {
+                                output.beFlow([error(function.offset, syntax, description.console("Behaviors must be private"))])
+                            }
+                            allPassed = false
+                            continue
+                        }
+
+                        if (function.name ?? "").hasPrefix(FlynnLint.prefixUnsafe) &&
+                            function.kind == .functionMethodInstance &&
+                            function.accessibility != .private {
+                            if let output = output {
+                                output.beFlow([warning(function.offset, syntax, description.console("Unsafe functions should not be used"))])
+                            }
+                            continue
+                        }
+
                     }
                 }
             }
         }
 
-        return true
+        return allPassed
     }
 
 }
