@@ -101,7 +101,7 @@ class FlynnLintTests: XCTestCase {
             flynnlint.finish()
         }
     }
-
+/*
     func testReleaseCrashTest() throws {
         for _ in 0..<1000 {
             let task = Process()
@@ -112,7 +112,7 @@ class FlynnLintTests: XCTestCase {
             XCTAssert(task.terminationStatus == 0)
         }
     }
-    
+    */
     func testReleasePerformanceSet() throws {
         measure {
             let task = Process()

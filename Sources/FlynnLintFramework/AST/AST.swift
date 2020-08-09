@@ -283,8 +283,13 @@ struct AST {
             for substructure in substructures {
                 if substructure.name == target {
                     if let name = substructure.name {
-                        path.append(name)
-                        return false
+                        if  substructure.kind == .class ||
+                            substructure.kind == .extension ||
+                            substructure.kind == .extensionEnum ||
+                            substructure.kind == .extensionStruct {
+                            path.append(name)
+                            return false
+                        }
                     }
                 }
 
