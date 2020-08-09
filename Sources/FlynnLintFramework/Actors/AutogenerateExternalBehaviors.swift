@@ -178,7 +178,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     }
 
                     if let outputFilePath = syntax.file.path {
-                        try? fileString.write(toFile: outputFilePath, atomically: false, encoding: .utf8)
+                        try? fileString.write(toFile: outputFilePath, atomically: true, encoding: .utf8)
                         print("Generating behaviors for \(URL(fileURLWithPath: outputFilePath).lastPathComponent)")
                     }
                 }
