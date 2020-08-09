@@ -137,11 +137,10 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                 let parts = fileString.components(separatedBy: fileMarker)
                 fileString = parts[0]
 
-                let previousExtensionString = parts.count > 1 ? parts[1] : ""
-
-                fileString.append(fileMarker)
+                let previousExtensionString = parts.count > 1 ? parts[1] : "NOT FOUND"
 
                 var newExtensionString = ""
+
                 newExtensionString.append("// Contents of file after this marker will be overwritten as needed\n")
 
                 // 1. run over all actor definitions in this file
@@ -169,14 +168,18 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                 // - Actor in file with existing FlynnLint generation, but does not need updated (no changes)
                 // - Actor in file with existing FlynnLint generation, but does need updated
                 // - Actor in file, but an existing FlynnLint generation.
-                if  (numOfExtensions > 0 && previousExtensionString == "") ||
+                if  (numOfExtensions > 0 && previousExtensionString == "NOT FOUND") ||
                     (numOfExtensions > 0 && newExtensionString != previousExtensionString) ||
-                    (numOfExtensions == 0 && previousExtensionString != "") {
+                    (numOfExtensions == 0 && previousExtensionString != "NOT FOUND") {
 
-                    fileString.append(newExtensionString)
+                    if numOfExtensions > 0 {
+                        fileString.append(fileMarker)
+                        fileString.append(newExtensionString)
+                    }
 
                     if let outputFilePath = syntax.file.path {
                         try? fileString.write(toFile: outputFilePath, atomically: false, encoding: .utf8)
+                        print("Generating behaviors for \(URL(fileURLWithPath: outputFilePath).lastPathComponent)")
                     }
                 }
 
