@@ -19,6 +19,109 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
     // output: an AST and one syntax structure
     var safeFlowable = FlowableState()
 
+    private func createExtensionIfRequired(_ syntax: FileSyntax,
+                                           _ ast: AST,
+                                           _ numOfExtensions: inout Int,
+                                           _ newExtensionString: inout String,
+                                           _ actorSyntax: FileSyntax) {
+        if  actorSyntax.file == syntax.file &&
+            ast.isActor(actorSyntax) {
+
+            let (internals, _) = ast.getBehaviorsForActor(actorSyntax)
+
+            if internals.count > 0 {
+                numOfExtensions += 1
+
+                let fullActorName = ast.getFullName(syntax, actorSyntax)
+
+                var scratch = ""
+                scratch.append("\n")
+                scratch.append("extension \(fullActorName) {\n\n")
+                for behavior in internals {
+                    if let fullName = behavior.function.structure.name {
+
+                        // Note: The information we need comes from two places:
+                        // 1. behavior.function.structure.name is formatted like this:
+                        //    _beSetCoreAffinity(theAffinity:arg2:)
+
+                        var name = ""
+                        var parameterLabels: [String] = []
+
+                        let regex = #"(.*)\(([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?\)"#
+                        fullName.matches(regex) { (_, groups) in
+                            // ["_beSetCoreAffinity(theAffinity:arg2:)", "_beSetCoreAffinity", "theAffinity:", "arg2:"]
+
+                            name = groups[1]
+                            if name.hasPrefix("_") {
+                                name.removeFirst()
+                            }
+
+                            for idx in 2..<groups.count {
+                                var label = groups[idx]
+                                if label.hasSuffix(":") {
+                                    label.removeLast()
+                                }
+                                parameterLabels.append(label)
+                            }
+                        }
+
+                        // 2. the names and type of the parameters are in the substructures
+                        scratch.append("    @discardableResult\n")
+                        scratch.append("    public func \(name)(")
+                        if parameterLabels.count > 0 {
+                            if let parameters = behavior.function.structure.substructure {
+                                var idx = 0
+                                for parameter in parameters where parameter.kind == .varParameter {
+                                    let label = parameterLabels[idx]
+
+                                    if let typename = parameter.typename,
+                                        let name = parameter.name {
+                                        let typename = ast.getFullName(syntax, typename)
+                                        scratch.append("\(label) \(name): \(typename), ")
+                                    }
+                                    idx += 1
+                                }
+                                scratch.removeLast()
+                                scratch.removeLast()
+                            }
+                        }
+                        scratch.append(") -> Self {\n")
+
+                        if parameterLabels.count == 0 {
+                            scratch.append("        unsafeSend(_\(name))\n")
+                        } else {
+                            scratch.append("        unsafeSend { self._\(name)(")
+
+                            if let parameters = behavior.function.structure.substructure {
+                                var idx = 0
+                                for parameter in parameters where parameter.kind == .varParameter {
+                                    let label = parameterLabels[idx]
+                                    if label == "_" {
+                                        scratch.append("\(parameter.name!), ")
+                                    } else {
+                                        scratch.append("\(label): \(parameter.name!), ")
+                                    }
+                                    idx += 1
+                                }
+                                scratch.removeLast()
+                                scratch.removeLast()
+                            }
+                            scratch.append(") }\n")
+                        }
+                        scratch.append("        return self\n")
+                        scratch.append("    }\n")
+                    }
+                }
+
+                scratch.append("\n}\n")
+
+                if newExtensionString.contains(scratch) == false {
+                    newExtensionString.append(scratch)
+                }
+            }
+        }
+    }
+
     private func _beFlow(_ args: FlowableArgs) {
         if args.isEmpty == false {
             let ast: AST = args[x:0]
@@ -27,7 +130,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
             if fileOnly {
 
-                var numOfExtensions = 0
+                var numOfExtensions: Int = 0
                 var fileString = syntax.file.contents
                 let fileMarker = "\n// MARK: - Autogenerated by FlynnLint\n"
 
@@ -42,96 +145,23 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                 newExtensionString.append("// Contents of file after this marker will be overwritten as needed\n")
 
                 // 1. run over all actor definitions in this file
+
                 for (_, actorSyntax) in ast.classes.sorted(by: { $0.0 > $1.0 }) {
-                    if  actorSyntax.file == syntax.file &&
-                        ast.isActor(actorSyntax) {
+                    createExtensionIfRequired(syntax,
+                                              ast,
+                                              &numOfExtensions,
+                                              &newExtensionString,
+                                              actorSyntax)
+                }
 
-                        let (internals, _) = ast.getBehaviorsForActor(actorSyntax)
-
-                        numOfExtensions += 1
-
-                        let fullActorName = ast.getFullName(syntax, actorSyntax)
-
-                        newExtensionString.append("\n")
-                        newExtensionString.append("extension \(fullActorName) {\n\n")
-                        for behavior in internals {
-                            if let fullName = behavior.function.structure.name {
-
-                                // Note: The information we need comes from two places:
-                                // 1. behavior.function.structure.name is formatted like this:
-                                //    _beSetCoreAffinity(theAffinity:arg2:)
-
-                                var name = ""
-                                var parameterLabels: [String] = []
-
-                                let regex = #"(.*)\(([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?\)"#
-                                fullName.matches(regex) { (_, groups) in
-                                    // ["_beSetCoreAffinity(theAffinity:arg2:)", "_beSetCoreAffinity", "theAffinity:", "arg2:"]
-
-                                    name = groups[1]
-                                    if name.hasPrefix("_") {
-                                        name.removeFirst()
-                                    }
-
-                                    for idx in 2..<groups.count {
-                                        var label = groups[idx]
-                                        if label.hasSuffix(":") {
-                                            label.removeLast()
-                                        }
-                                        parameterLabels.append(label)
-                                    }
-                                }
-
-                                // 2. the names and type of the parameters are in the substructures
-                                newExtensionString.append("    @discardableResult\n")
-                                newExtensionString.append("    public func \(name)(")
-                                if parameterLabels.count > 0 {
-                                    if let parameters = behavior.function.structure.substructure {
-                                        var idx = 0
-                                        for parameter in parameters where parameter.kind == .varParameter {
-                                            let label = parameterLabels[idx]
-
-                                            if let typename = parameter.typename,
-                                                let name = parameter.name {
-                                                let typename = ast.getFullName(syntax, typename)
-                                                newExtensionString.append("\(label) \(name): \(typename), ")
-                                            }
-                                            idx += 1
-                                        }
-                                        newExtensionString.removeLast()
-                                        newExtensionString.removeLast()
-                                    }
-                                }
-                                newExtensionString.append(") -> Self {\n")
-
-                                if parameterLabels.count == 0 {
-                                    newExtensionString.append("        unsafeSend(_\(name))\n")
-                                } else {
-                                    newExtensionString.append("        unsafeSend { self._\(name)(")
-
-                                    if let parameters = behavior.function.structure.substructure {
-                                        var idx = 0
-                                        for parameter in parameters where parameter.kind == .varParameter {
-                                            let label = parameterLabels[idx]
-                                            if label == "_" {
-                                                newExtensionString.append("\(parameter.name!), ")
-                                            } else {
-                                                newExtensionString.append("\(label): \(parameter.name!), ")
-                                            }
-                                            idx += 1
-                                        }
-                                        newExtensionString.removeLast()
-                                        newExtensionString.removeLast()
-                                    }
-                                    newExtensionString.append(") }\n")
-                                }
-                                newExtensionString.append("        return self\n")
-                                newExtensionString.append("    }\n")
-                            }
-                        }
-
-                        newExtensionString.append("\n}\n")
-                    }
+                for actorSyntax in ast.extensions {
+                    // Note: we don't want to do extensions which were
+                    // created previously by FlynnLint... but how?
+                    createExtensionIfRequired(syntax,
+                                              ast,
+                                              &numOfExtensions,
+                                              &newExtensionString,
+                                              actorSyntax)
                 }
 
                 // Four scenarios we want to make sure we handle:
