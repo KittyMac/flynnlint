@@ -18,7 +18,7 @@ struct PrivateVariablesInActorRule: Rule {
     let description = RuleDescription(
         identifier: "actors_private_vars",
         name: "Access Level Violation",
-        description: "Non-private variables are not allowed in Actors; make this private or safe/unsafe",
+        description: "Non-private variables are not allowed in Actors; change to private or safe/unsafe",
         syntaxTriggers: [.class, .extension],
         nonTriggeringExamples: [
             Example("class SomeClass {}\n"),
@@ -57,6 +57,8 @@ struct PrivateVariablesInActorRule: Rule {
     )
 
     func check(_ ast: AST, _ syntax: FileSyntax, _ output: Flowable?) -> Bool {
+        var allPassed = true
+
         if let resolvedClass = ast.getClassOrProtocol(syntax.structure.name) {
             if ast.isActor(resolvedClass) {
                 if let variables = syntax.structure.substructure {
@@ -99,12 +101,12 @@ struct PrivateVariablesInActorRule: Rule {
                             if let output = output {
                                 output.beFlow([error(variable.offset, syntax)])
                             }
-                            return false
+                            allPassed = false
                         }
                     }
                 }
             }
         }
-        return true
+        return allPassed
     }
 }
