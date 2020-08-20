@@ -77,7 +77,11 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                     if let typename = parameter.typename,
                                         let name = parameter.name {
                                         let typename = ast.getFullName(syntax, typename)
-                                        scratch.append("\(label) \(name): \(typename), ")
+                                        if label == name {
+                                            scratch.append("\(name): \(typename), ")
+                                        } else {
+                                            scratch.append("\(label) \(name): \(typename), ")
+                                        }
                                     }
                                     idx += 1
                                 }
