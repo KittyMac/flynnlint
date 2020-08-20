@@ -19,7 +19,7 @@ struct PrivateFunctionInActorRule: Rule {
     let description = RuleDescription(
         identifier: "actors_private_func",
         name: "Access Level Violation",
-        description: "Non-private functions are not allowed in Actors; make this private, a behavior, or label it safe.",
+        description: "Non-private functions are not allowed in Actors; make this private, safe/unsafe, or a behavior",
         syntaxTriggers: [.class, .extension],
         nonTriggeringExamples: [
             Example("class SomeClass {}\n"),

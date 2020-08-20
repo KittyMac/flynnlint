@@ -22,8 +22,8 @@ pipeline = FindFiles(["swift"]) |>
 Each node in the graph is a Flynn actor.  An actor is and "island of serialization in a sea of concurrency", where an actor processes sequentually but concurrently to all other actors.
 
 **FindFiles** - walks the target directories looking for files ending in ".swift", flows the file path  
-**AutoCorrectFile** - checks to see if the file contains ``::BEHAVIOR`` or ``::ACTOR`` and replaces with templates, flows the file path  
 **ParseFile** - uses SourceKitten to parse the Swift file into syntax structures, flows a ``FileSyntax`` with this info  
+**AutogenerateExternalBehaviors** - checks the file for internal behaviors ( private functions which start with "_be" ) and automatically generates external behaviors if needed  
 **BuildCombinedAST** - combines all ``FileSyntax`` together into an ``AST``, which represents the syntax structure of all files in the program; flows individual files + combined AST  
 **CheckRules** - Checks the file against the entire ruleset, using file structure and combined AST, flows any errors found  
 **PrintError** - Prints the errors to the console, in format appropriate for Xcode error/warning display

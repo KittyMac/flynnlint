@@ -18,7 +18,7 @@ struct PrivateVariablesInActorRule: Rule {
     let description = RuleDescription(
         identifier: "actors_private_vars",
         name: "Access Level Violation",
-        description: "Non-private variables are not allowed in Actors.",
+        description: "Non-private variables are not allowed in Actors; make this private or safe/unsafe",
         syntaxTriggers: [.class, .extension],
         nonTriggeringExamples: [
             Example("class SomeClass {}\n"),
