@@ -30,15 +30,17 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
             let (internals, _) = ast.getBehaviorsForActor(actorSyntax)
 
             if internals.count > 0 {
-                numOfExtensions += 1
-
                 let fullActorName = ast.getFullName(syntax, actorSyntax)
+
+                var didHaveBehavior = false
 
                 var scratch = ""
                 scratch.append("\n")
                 scratch.append("extension \(fullActorName) {\n\n")
-                for behavior in internals {
+                for behavior in internals where behavior.function.file.path == syntax.file.path {
                     if let fullName = behavior.function.structure.name {
+
+                        didHaveBehavior = true
 
                         // Note: The information we need comes from two places:
                         // 1. behavior.function.structure.name is formatted like this:
@@ -121,6 +123,10 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                 if newExtensionString.contains(scratch) == false {
                     newExtensionString.append(scratch)
+                }
+
+                if didHaveBehavior {
+                    numOfExtensions += 1
                 }
             }
         }
