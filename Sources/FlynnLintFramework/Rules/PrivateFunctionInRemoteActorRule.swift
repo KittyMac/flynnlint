@@ -36,7 +36,17 @@ struct PrivateFunctionInRemoteActorRule: Rule {
             Example("class SomeActor: RemoteActor { fileprivate func safeFoo() { } }\n"),
             Example("class SomeActor: RemoteActor { internal func safeFoo() { } }\n"),
             Example("class SomeActor: RemoteActor { func safeFoo() { } }\n"),
-            Example("class SomeActor: RemoteActor { override func safeFlowProcess() { } }\n")
+            Example("class SomeActor: RemoteActor { override func safeFlowProcess() { } }\n"),
+            Example("class RemoteActor { public func unsafeSend() { } }\n"),
+
+            Example("""
+                class SomeActor: RemoteActor {
+                    public func bePrint() {
+                        let serialized: [String: Codable] = ["foo" = "bar"]
+                        self.unsafeSend(serialized)
+                    }
+                }
+            """)
         ],
         triggeringExamples: [
             Example("class SomeActor: RemoteActor { init(_ data: OffToTheRacesData) { self.data = data } }\n"),
@@ -95,7 +105,7 @@ struct PrivateFunctionInRemoteActorRule: Rule {
                         if (function.name ?? "").hasPrefix(FlynnLint.prefixBehaviorExternal) &&
                             function.kind == .functionMethodInstance {
                             // This might be an external behavior; if it is, then the body should
-                            // start with unsafeSend(). We have other rules in place to ensure that
+                            // contain an unsafeSend(). We have other rules in place to ensure that
                             // this compliance is in place, so for here we just need to exempt it
 
                             if let substructures = function.substructure {
@@ -106,7 +116,8 @@ struct PrivateFunctionInRemoteActorRule: Rule {
                                 var numOther = 0
 
                                 for substructure in substructures {
-                                    if substructure.kind == .exprCall && substructure.name == "unsafeSend" {
+                                    if substructure.kind == .exprCall &&
+                                        (substructure.name == "unsafeSend" || substructure.name == "self.unsafeSend") {
                                         numUnsafeSend += 1
                                     } else if substructure.kind == .varParameter {
                                         numParameters += 1
@@ -115,9 +126,9 @@ struct PrivateFunctionInRemoteActorRule: Rule {
                                     }
                                 }
 
-                                if !(numUnsafeSend == 1 && numOther == 0) {
+                                if !(numUnsafeSend == 1) {
                                     if let output = output {
-                                        output.beFlow([error(function.offset, syntax, description.console("Behaviors must wrap their contents in a call to unsafeSend()"))])
+                                        output.beFlow([error(function.offset, syntax, description.console("Behaviors must call unsafeSend()"))])
                                     }
                                     allPassed = false
                                 }
@@ -150,6 +161,7 @@ struct PrivateFunctionInRemoteActorRule: Rule {
                         }
 
                         if (function.name ?? "").hasPrefix(FlynnLint.prefixUnsafe) &&
+                            !(function.name ?? "").hasPrefix("unsafeSend(") &&
                             function.kind == .functionMethodInstance &&
                             function.accessibility != .private {
                             if let output = output {

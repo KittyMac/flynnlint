@@ -77,7 +77,7 @@ class FlynnLintTests: XCTestCase {
     }
 
     func testOneRule() throws {
-        let rule = PrivateVariablesInRemoteActorRule()
+        let rule = PrivateFunctionInRemoteActorRule()
         XCTAssert(rule.test())
     }
 

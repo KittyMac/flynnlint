@@ -104,7 +104,8 @@ struct PrivateFunctionInActorRule: Rule {
                                 var numOther = 0
 
                                 for substructure in substructures {
-                                    if substructure.kind == .exprCall && substructure.name == "unsafeSend" {
+                                    if substructure.kind == .exprCall &&
+                                        (substructure.name == "unsafeSend" || substructure.name == "self.unsafeSend") {
                                         numUnsafeSend += 1
                                     } else if substructure.kind == .varParameter {
                                         numParameters += 1
