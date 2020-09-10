@@ -277,6 +277,19 @@ struct AST {
         return false
     }
 
+    func isRemoteActor(_ syntax: FileSyntax) -> Bool {
+        let actorName = "RemoteActor"
+        if let name = syntax.structure.name {
+            if name == actorName {
+                return true
+            }
+            if let actualClass = getClassOrProtocol(name) {
+                return isSubclassOf(actualClass, actorName)
+            }
+        }
+        return false
+    }
+
     private func recurseClassFullName(_ path: inout [String], _ current: SyntaxStructure, _ target: String) -> Bool {
 
         if let substructures = current.substructure {
@@ -334,5 +347,31 @@ struct AST {
         }
 
         return fullName
+    }
+
+    func parseFunctionDefinition(_ function: SyntaxStructure) -> (String, [String]) {
+        var parameterLabels: [String] = []
+        var name = ""
+
+        if let fullName = function.name {
+            let regex = #"(.*)\(([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?\)"#
+            fullName.matches(regex) { (_, groups) in
+                // ["_beSetCoreAffinity(theAffinity:arg2:)", "_beSetCoreAffinity", "theAffinity:", "arg2:"]
+
+                name = groups[1]
+                if name.hasPrefix("_") {
+                    name.removeFirst()
+                }
+
+                for idx in 2..<groups.count {
+                    var label = groups[idx]
+                    if label.hasSuffix(":") {
+                        label.removeLast()
+                    }
+                    parameterLabels.append(label)
+                }
+            }
+        }
+        return (name, parameterLabels)
     }
 }

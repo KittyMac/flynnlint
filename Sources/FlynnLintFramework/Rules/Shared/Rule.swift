@@ -19,7 +19,9 @@ struct Ruleset {
             PrivateFunctionInActorRule.self,
             SafeFunctionRule.self,
             PrivateVariablesInActorRule.self,
-            SafeVariableRule.self
+            SafeVariableRule.self,
+            PrivateFunctionInRemoteActorRule.self,
+            PrivateVariablesInRemoteActorRule.self
         ]
 
         for ruleClass in allRules {

@@ -37,86 +37,64 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                 var scratch = ""
                 scratch.append("\n")
                 scratch.append("extension \(fullActorName) {\n\n")
-                for behavior in internals where behavior.function.file.path == syntax.file.path {
-                    if let fullName = behavior.function.structure.name {
+                for behavior in internals where behavior.function.file.path == syntax.file.path && behavior.function.structure.name != nil {
+                    didHaveBehavior = true
 
-                        didHaveBehavior = true
+                    // Note: The information we need comes from two places:
+                    // 1. behavior.function.structure.name is formatted like this:
+                    //    _beSetCoreAffinity(theAffinity:arg2:)
 
-                        // Note: The information we need comes from two places:
-                        // 1. behavior.function.structure.name is formatted like this:
-                        //    _beSetCoreAffinity(theAffinity:arg2:)
+                    let (name, parameterLabels) = ast.parseFunctionDefinition(behavior.function.structure)
 
-                        var name = ""
-                        var parameterLabels: [String] = []
+                    // 2. the names and type of the parameters are in the substructures
+                    scratch.append("    @discardableResult\n")
+                    scratch.append("    public func \(name)(")
+                    if parameterLabels.count > 0 {
+                        if let parameters = behavior.function.structure.substructure {
+                            var idx = 0
+                            for parameter in parameters where parameter.kind == .varParameter {
+                                let label = parameterLabels[idx]
 
-                        let regex = #"(.*)\(([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?\)"#
-                        fullName.matches(regex) { (_, groups) in
-                            // ["_beSetCoreAffinity(theAffinity:arg2:)", "_beSetCoreAffinity", "theAffinity:", "arg2:"]
-
-                            name = groups[1]
-                            if name.hasPrefix("_") {
-                                name.removeFirst()
-                            }
-
-                            for idx in 2..<groups.count {
-                                var label = groups[idx]
-                                if label.hasSuffix(":") {
-                                    label.removeLast()
-                                }
-                                parameterLabels.append(label)
-                            }
-                        }
-
-                        // 2. the names and type of the parameters are in the substructures
-                        scratch.append("    @discardableResult\n")
-                        scratch.append("    public func \(name)(")
-                        if parameterLabels.count > 0 {
-                            if let parameters = behavior.function.structure.substructure {
-                                var idx = 0
-                                for parameter in parameters where parameter.kind == .varParameter {
-                                    let label = parameterLabels[idx]
-
-                                    if let typename = parameter.typename,
-                                        let name = parameter.name {
-                                        let typename = ast.getFullName(syntax, typename)
-                                        if label == name {
-                                            scratch.append("\(name): \(typename), ")
-                                        } else {
-                                            scratch.append("\(label) \(name): \(typename), ")
-                                        }
-                                    }
-                                    idx += 1
-                                }
-                                scratch.removeLast()
-                                scratch.removeLast()
-                            }
-                        }
-                        scratch.append(") -> Self {\n")
-
-                        if parameterLabels.count == 0 {
-                            scratch.append("        unsafeSend(_\(name))\n")
-                        } else {
-                            scratch.append("        unsafeSend { self._\(name)(")
-
-                            if let parameters = behavior.function.structure.substructure {
-                                var idx = 0
-                                for parameter in parameters where parameter.kind == .varParameter {
-                                    let label = parameterLabels[idx]
-                                    if label == "_" {
-                                        scratch.append("\(parameter.name!), ")
+                                if let typename = parameter.typename,
+                                    let name = parameter.name {
+                                    let typename = ast.getFullName(syntax, typename)
+                                    if label == name {
+                                        scratch.append("\(name): \(typename), ")
                                     } else {
-                                        scratch.append("\(label): \(parameter.name!), ")
+                                        scratch.append("\(label) \(name): \(typename), ")
                                     }
-                                    idx += 1
                                 }
-                                scratch.removeLast()
-                                scratch.removeLast()
+                                idx += 1
                             }
-                            scratch.append(") }\n")
+                            scratch.removeLast()
+                            scratch.removeLast()
                         }
-                        scratch.append("        return self\n")
-                        scratch.append("    }\n")
                     }
+                    scratch.append(") -> Self {\n")
+
+                    if parameterLabels.count == 0 {
+                        scratch.append("        unsafeSend(_\(name))\n")
+                    } else {
+                        scratch.append("        unsafeSend { self._\(name)(")
+
+                        if let parameters = behavior.function.structure.substructure {
+                            var idx = 0
+                            for parameter in parameters where parameter.kind == .varParameter {
+                                let label = parameterLabels[idx]
+                                if label == "_" {
+                                    scratch.append("\(parameter.name!), ")
+                                } else {
+                                    scratch.append("\(label): \(parameter.name!), ")
+                                }
+                                idx += 1
+                            }
+                            scratch.removeLast()
+                            scratch.removeLast()
+                        }
+                        scratch.append(") }\n")
+                    }
+                    scratch.append("        return self\n")
+                    scratch.append("    }\n")
                 }
 
                 scratch.append("\n}\n")
