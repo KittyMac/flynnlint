@@ -90,6 +90,12 @@ struct PrivateVariablesInRemoteActorRule: Rule {
                                 }
                                 // disallow variables to be "unsafe"
                                 if name.hasPrefix(FlynnLint.prefixUnsafe) {
+
+                                    // For RemoteActor, access to its uuid needs to be allowed.
+                                    if name == "unsafeUUID" {
+                                        continue
+                                    }
+
                                     if let output = output {
                                         output.beFlow([error(variable.offset, syntax, description.console("Unsafe variables are not allowed in RemoteActor"))])
                                     }

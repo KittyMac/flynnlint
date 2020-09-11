@@ -46,6 +46,21 @@ struct PrivateFunctionInRemoteActorRule: Rule {
                         self.unsafeSend(serialized)
                     }
                 }
+            """),
+            Example("""
+                public func bePrint(_ string: String) {
+                    struct bePrintMessage: Codable {
+                        let uuid: String
+                        let type: String
+                        let arg0: String
+                    }
+                    let msg = bePrintMessage(uuid: safeUUID, type: "Echo", arg0: string)
+                    if let data = try? JSONEncoder().encode(msg) {
+                        unsafeSend(data)
+                    }else{
+                        fatalError("Echo.bePrint() arguments failed to serialize")
+                    }
+                }
             """)
         ],
         triggeringExamples: [
@@ -108,30 +123,11 @@ struct PrivateFunctionInRemoteActorRule: Rule {
                             // contain an unsafeSend(). We have other rules in place to ensure that
                             // this compliance is in place, so for here we just need to exempt it
 
-                            if let substructures = function.substructure {
-
-                                // must contain only parameters and one unsafe send
-                                var numParameters = 0
-                                var numUnsafeSend = 0
-                                var numOther = 0
-
-                                for substructure in substructures {
-                                    if substructure.kind == .exprCall &&
-                                        (substructure.name == "unsafeSend" || substructure.name == "self.unsafeSend") {
-                                        numUnsafeSend += 1
-                                    } else if substructure.kind == .varParameter {
-                                        numParameters += 1
-                                    } else {
-                                        numOther += 1
-                                    }
+                            if syntax.match(#"unsafeSendToRemote\s*\("#) == nil {
+                                if let output = output {
+                                    output.beFlow([error(function.offset, syntax, description.console("Behaviors must call unsafeSendToRemote()"))])
                                 }
-
-                                if !(numUnsafeSend == 1) {
-                                    if let output = output {
-                                        output.beFlow([error(function.offset, syntax, description.console("Behaviors must call unsafeSend()"))])
-                                    }
-                                    allPassed = false
-                                }
+                                allPassed = false
                             }
                             continue
                         }
@@ -162,6 +158,7 @@ struct PrivateFunctionInRemoteActorRule: Rule {
 
                         if (function.name ?? "").hasPrefix(FlynnLint.prefixUnsafe) &&
                             !(function.name ?? "").hasPrefix("unsafeSend(") &&
+                            !(function.name ?? "").hasPrefix("unsafeSendToRemote(") &&
                             function.kind == .functionMethodInstance &&
                             function.accessibility != .private {
                             if let output = output {
