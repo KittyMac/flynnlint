@@ -157,8 +157,10 @@ struct PrivateFunctionInRemoteActorRule: Rule {
                         }
 
                         if (function.name ?? "").hasPrefix(FlynnLint.prefixUnsafe) &&
-                            !(function.name ?? "").hasPrefix("unsafeSend(") &&
                             !(function.name ?? "").hasPrefix("unsafeSendToRemote(") &&
+                            !(function.name ?? "").hasPrefix("unsafeExecuteBehavior(") &&
+                            !(function.name ?? "").hasPrefix("unsafeHandleBehaviorReply(") &&
+                            !(function.name ?? "").hasPrefix("unsafeRegisterAllBehaviors(") &&
                             function.kind == .functionMethodInstance &&
                             function.accessibility != .private {
                             if let output = output {
