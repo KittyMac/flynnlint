@@ -233,37 +233,51 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     //    _beSetCoreAffinity(theAffinity:arg2:)
 
                     let (name, parameterLabels) = ast.parseFunctionDefinition(behavior.function.structure)
+                    let returnType = behavior.function.structure.typename
 
                     // 2. the names and type of the parameters are in the substructures
                     scratch.append("    @discardableResult\n")
-                    scratch.append("    public func \(name)(")
+                    let functionNameHeader = "    public func \(name)("
+                    scratch.append(functionNameHeader)
+                    let parameterNameHeader = String(repeating: " ", count: functionNameHeader.count)
                     if parameterLabels.count > 0 {
                         if let parameters = behavior.function.structure.substructure {
                             var idx = 0
                             for parameter in parameters where parameter.kind == .varParameter {
                                 let label = parameterLabels[idx]
 
+                                if idx != 0 {
+                                    scratch.append(parameterNameHeader)
+                                }
+
                                 if let typename = parameter.typename,
                                     let name = parameter.name {
                                     let typename = ast.getFullName(syntax, typename)
                                     if label == name {
-                                        scratch.append("\(name): \(typename), ")
+                                        scratch.append("\(name): \(typename),\n")
                                     } else {
-                                        scratch.append("\(label) \(name): \(typename), ")
+                                        scratch.append("\(label) \(name): \(typename),\n")
                                     }
                                 }
                                 idx += 1
                             }
-                            scratch.removeLast()
-                            scratch.removeLast()
                         }
+                        scratch.removeLast()
+                        scratch.removeLast()
+                    }
+
+                    if let returnType = returnType {
+                        if parameterLabels.count > 0 {
+                            scratch.append(parameterNameHeader)
+                        }
+                        scratch.append("_ sender: Actor,\n")
+                        scratch.append("\(parameterNameHeader)_ callback: @escaping ((\(returnType)) -> Void)")
                     }
                     scratch.append(") -> Self {\n")
 
-                    if parameterLabels.count == 0 {
-                        scratch.append("        unsafeSend(_\(name))\n")
-                    } else {
-                        scratch.append("        unsafeSend { self._\(name)(")
+                    if returnType != nil {
+                        scratch.append("        unsafeSend() {\n")
+                        scratch.append("            let result = self._\(name)(")
 
                         if let parameters = behavior.function.structure.substructure {
                             var idx = 0
@@ -279,10 +293,36 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                             scratch.removeLast()
                             scratch.removeLast()
                         }
-                        scratch.append(") }\n")
+                        scratch.append(")\n")
+                        scratch.append("            sender.unsafeSend { callback(result) }\n")
+                        scratch.append("        }\n")
+                        scratch.append("        return self\n")
+                        scratch.append("    }\n")
+                    } else {
+                        if parameterLabels.count == 0 {
+                            scratch.append("        unsafeSend(_\(name))\n")
+                        } else {
+                            scratch.append("        unsafeSend { self._\(name)(")
+
+                            if let parameters = behavior.function.structure.substructure {
+                                var idx = 0
+                                for parameter in parameters where parameter.kind == .varParameter {
+                                    let label = parameterLabels[idx]
+                                    if label == "_" {
+                                        scratch.append("\(parameter.name!), ")
+                                    } else {
+                                        scratch.append("\(label): \(parameter.name!), ")
+                                    }
+                                    idx += 1
+                                }
+                                scratch.removeLast()
+                                scratch.removeLast()
+                            }
+                            scratch.append(") }\n")
+                        }
+                        scratch.append("        return self\n")
+                        scratch.append("    }\n")
                     }
-                    scratch.append("        return self\n")
-                    scratch.append("    }\n")
                 }
 
                 scratch.append("\n}\n")
