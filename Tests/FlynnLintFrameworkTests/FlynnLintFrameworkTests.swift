@@ -87,6 +87,12 @@ class FlynnLintTests: XCTestCase {
             XCTAssert(rule.test())
         }
     }
+    
+    func testCodeGen() throws {
+        let flynnlint = FlynnLint()
+        flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/flynn/Tests/FlynnTests/Support Files")
+        flynnlint.finish()
+    }
 
     func testSampleSet() throws {
         let flynnlint = FlynnLint()
