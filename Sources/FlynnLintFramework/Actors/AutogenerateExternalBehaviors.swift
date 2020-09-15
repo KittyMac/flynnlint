@@ -32,7 +32,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
             let (internals, _) = ast.getBehaviorsForActor(actorSyntax)
 
-            if internals.count > 0 {
+            if internals.count >= 0 {
                 let fullActorName = ast.getFullName(syntax, actorSyntax)
 
                 var didHaveBehavior = false
@@ -62,7 +62,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     }
                 }
 
-                scratch.append("\n")
+                if internals.count > 0 { scratch.append("\n") }
 
                 // 1. Create all external behaviors (two types, with and without return values)
 
@@ -152,11 +152,11 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     }
                 }
 
-                scratch.append("\n")
+                if internals.count > 0 { scratch.append("\n") }
 
                 // 2. Create unsafeRegisterAllBehaviors()
 
-                scratch.append("    func unsafeRegisterAllBehaviors() {\n")
+                scratch.append("    public func unsafeRegisterAllBehaviors() {\n")
 
                 for behavior in internals where behavior.function.file.path == syntax.file.path && behavior.function.structure.name != nil {
                     didHaveBehavior = true
@@ -189,6 +189,9 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         scratch.append("            return nil\n")
                         scratch.append("        }\n")
                     }
+                }
+                if internals.count == 0 {
+                    scratch.append("\n")
                 }
 
                 scratch.append("    }\n")
