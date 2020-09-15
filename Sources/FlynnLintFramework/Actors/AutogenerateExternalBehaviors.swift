@@ -16,6 +16,11 @@ import Foundation
 import SourceKittenFramework
 import Flynn
 
+private func codableName(_ name: String) -> String {
+    let cappedName = name.prefix(1).capitalized + name.dropFirst()
+    return "\(cappedName)Codable"
+}
+
 class AutogenerateExternalBehaviors: Actor, Flowable {
     // input: an AST and one syntax structure
     // output: an AST and one syntax structure
@@ -44,7 +49,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     let (name, parameterLabels) = ast.parseFunctionDefinition(behavior.function.structure)
 
                     if parameterLabels.count > 0 {
-                        scratch.append("    struct \(name)Message: Codable {\n")
+                        scratch.append("    struct \(codableName(name)): Codable {\n")
                         if let parameters = behavior.function.structure.substructure {
                             var idx = 0
                             for parameter in parameters where parameter.kind == .varParameter {
@@ -120,7 +125,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         scratch.removeLast()
                         scratch.append(" ) -> Self {\n")
 
-                        scratch.append("        let msg = \(name)Message(")
+                        scratch.append("        let msg = \(codableName(name))(")
                         if let parameters = behavior.function.structure.substructure {
                             var idx = 0
                             for parameter in parameters where parameter.kind == .varParameter {
@@ -160,7 +165,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                     if parameterLabels.count > 0 {
                         scratch.append("        safeRegisterRemoteBehavior(\"\(name)\") { [unowned self] (data) in\n")
-                        scratch.append("            if let msg = try? JSONDecoder().decode(\(name)Message.self, from: data) {\n")
+                        scratch.append("            if let msg = try? JSONDecoder().decode(\(codableName(name)).self, from: data) {\n")
 
                         if returnType != nil {
                             scratch.append("                return self._\(name)(")
