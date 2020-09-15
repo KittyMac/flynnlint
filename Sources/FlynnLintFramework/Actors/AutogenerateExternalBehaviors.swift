@@ -35,16 +35,12 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
             if internals.count >= 0 {
                 let fullActorName = ast.getFullName(syntax, actorSyntax)
 
-                var didHaveBehavior = false
-
                 var scratch = ""
                 scratch.append("\n")
                 scratch.append("extension \(fullActorName) {\n\n")
 
                 // 0. Create all Codable structs for message serializations (only if it has arguments)
                 for behavior in internals where behavior.function.file.path == syntax.file.path && behavior.function.structure.name != nil {
-                    didHaveBehavior = true
-
                     let (name, parameterLabels) = ast.parseFunctionDefinition(behavior.function.structure)
 
                     if parameterLabels.count > 0 {
@@ -67,7 +63,6 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                 // 1. Create all external behaviors (two types, with and without return values)
 
                 for behavior in internals where behavior.function.file.path == syntax.file.path && behavior.function.structure.name != nil {
-                    didHaveBehavior = true
 
                     let (name, parameterLabels) = ast.parseFunctionDefinition(behavior.function.structure)
                     let returnType = behavior.function.structure.typename
@@ -159,7 +154,6 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                 scratch.append("    public func unsafeRegisterAllBehaviors() {\n")
 
                 for behavior in internals where behavior.function.file.path == syntax.file.path && behavior.function.structure.name != nil {
-                    didHaveBehavior = true
 
                     let (name, parameterLabels) = ast.parseFunctionDefinition(behavior.function.structure)
                     let returnType = behavior.function.structure.typename
@@ -202,9 +196,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     newExtensionString.append(scratch)
                 }
 
-                if didHaveBehavior {
-                    numOfExtensions += 1
-                }
+                numOfExtensions += 1
             }
         }
     }
