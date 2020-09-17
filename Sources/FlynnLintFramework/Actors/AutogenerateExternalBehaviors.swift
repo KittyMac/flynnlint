@@ -187,6 +187,15 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         scratch.append("            }\n")
                         scratch.append("            return nil\n")
                         scratch.append("        }\n")
+                    } else {
+                        scratch.append("        safeRegisterRemoteBehavior(\"\(name)\") { [unowned self] (data) in\n")
+                        if returnType != nil {
+                            scratch.append("            return self._\(name)()\n")
+                        } else {
+                            scratch.append("            self._\(name)()\n")
+                            scratch.append("            return nil\n")
+                        }
+                        scratch.append("        }\n")
                     }
                 }
                 if internals.count == 0 {
