@@ -271,8 +271,6 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                 idx += 1
                             }
                         }
-                        scratch.removeLast()
-                        scratch.removeLast()
                     }
 
                     if let returnType = returnType {
@@ -281,6 +279,11 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         }
                         scratch.append("_ sender: Actor,\n")
                         scratch.append("\(parameterNameHeader)_ callback: @escaping ((\(returnType)) -> Void)")
+                    } else {
+                        if parameterLabels.count > 0 {
+                            scratch.removeLast()
+                            scratch.removeLast()
+                        }
                     }
                     scratch.append(") -> Self {\n")
 
