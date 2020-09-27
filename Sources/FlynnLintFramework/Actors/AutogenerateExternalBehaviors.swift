@@ -47,9 +47,19 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                 // 0. Create all Codable structs for message serializations (only if it has arguments)
                 for behavior in internals where behavior.function.file.path == syntax.file.path && behavior.function.structure.name != nil {
                     let (name, parameterLabels) = ast.parseFunctionDefinition(behavior.function.structure)
+                    var returnType = behavior.function.structure.typename
+                    if returnType == "Void" {
+                        returnType = nil
+                    }
+
+                    if let returnType = returnType {
+                        scratch.append("    struct \(codableName(name))Response: Codable {\n")
+                        scratch.append("        let response: \(returnType)\n")
+                        scratch.append("    }\n")
+                    }
 
                     if parameterLabels.count > 0 {
-                        scratch.append("    struct \(codableName(name)): Codable {\n")
+                        scratch.append("    struct \(codableName(name))Request: Codable {\n")
                         if let parameters = behavior.function.structure.substructure {
                             var idx = 0
                             for parameter in parameters where parameter.kind == .varParameter {
@@ -70,16 +80,20 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                 for behavior in internals where behavior.function.file.path == syntax.file.path && behavior.function.structure.name != nil {
 
                     let (name, parameterLabels) = ast.parseFunctionDefinition(behavior.function.structure)
-                    let returnType = behavior.function.structure.typename
+                    var returnType = behavior.function.structure.typename
+                    if returnType == "Void" {
+                        returnType = nil
+                    }
 
                     if parameterLabels.count == 0 {
                         if let returnType = returnType {
-                            if returnType != "Data" {
-                                scratch.append("\n    #error(\"Internal behavior \(name) must return a value of type Data (not \(returnType))\")\n")
-                            }
                             scratch.append("    @discardableResult\n")
-                            scratch.append("    public func \(name)(_ sender: Actor, _ callback: @escaping RemoteBehaviorReply) -> Self {\n")
-                            scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", Data(), sender, callback)\n")
+                            scratch.append("    public func \(name)(_ sender: Actor, _ callback: @escaping (\(returnType)) -> Void) -> Self {\n")
+                            scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", Data(), sender) {\n")
+                            scratch.append("            callback(\n")
+                            scratch.append("                (try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0)).response\n")
+                            scratch.append("            )\n")
+                            scratch.append("        }\n")
                             scratch.append("        return self\n")
                             scratch.append("    }\n")
                         } else {
@@ -116,36 +130,41 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                             }
                         }
 
-                        if returnType != nil {
+                        if let returnType = returnType {
                             scratch.append("\(parameterNameHeader)_ sender: Actor,\n")
-                            scratch.append("\(parameterNameHeader)_ callback: @escaping RemoteBehaviorReply,\n")
+                            scratch.append("\(parameterNameHeader)_ callback: @escaping (\(returnType)) -> Void,\n")
                         }
 
                         scratch.removeLast()
                         scratch.removeLast()
                         scratch.append(" ) -> Self {\n")
 
-                        scratch.append("        let msg = \(codableName(name))(")
+                        scratch.append("        let msg = \(codableName(name))Request(")
                         if let parameters = behavior.function.structure.substructure {
                             var idx = 0
                             for parameter in parameters where parameter.kind == .varParameter {
                                 if let name = parameter.name {
-                                    scratch.append("arg\(idx): \(name)")
+                                    scratch.append("arg\(idx): \(name), ")
                                 }
                                 idx += 1
+                            }
+                            if idx > 0 {
+                                scratch.removeLast()
+                                scratch.removeLast()
                             }
                         }
                         scratch.append(")\n")
 
-                        scratch.append("        if let data = try? JSONEncoder().encode(msg) {\n")
+                        scratch.append("        let data = try! JSONEncoder().encode(msg)\n")
                         if returnType != nil {
-                            scratch.append("            unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", data, sender, callback)\n")
+                            scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", data, sender) {\n")
+                            scratch.append("            callback(\n")
+                            scratch.append("                (try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0).response)\n")
+                            scratch.append("            )\n")
+                            scratch.append("        }\n")
                         } else {
-                            scratch.append("            unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", data, nil, nil)\n")
+                            scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", data, nil, nil)\n")
                         }
-                        scratch.append("        } else {\n")
-                        scratch.append("            fatalError()\n")
-                        scratch.append("        }\n")
                         scratch.append("        return self\n")
                         scratch.append("    }\n")
 
@@ -161,16 +180,19 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                 for behavior in internals where behavior.function.file.path == syntax.file.path && behavior.function.structure.name != nil {
 
                     let (name, parameterLabels) = ast.parseFunctionDefinition(behavior.function.structure)
-                    let returnType = behavior.function.structure.typename
+                    var returnType = behavior.function.structure.typename
+                    if returnType == "Void" {
+                        returnType = nil
+                    }
 
                     if parameterLabels.count > 0 {
                         scratch.append("        safeRegisterRemoteBehavior(\"\(name)\") { [unowned self] (data) in\n")
-                        scratch.append("            if let msg = try? JSONDecoder().decode(\(codableName(name)).self, from: data) {\n")
+                        scratch.append("            let msg = try! JSONDecoder().decode(\(codableName(name))Request.self, from: data)\n")
 
                         if returnType != nil {
-                            scratch.append("                return self._\(name)(")
+                            scratch.append("            return try! JSONEncoder().encode(\(codableName(name))Response(response: self._\(name)(")
                         } else {
-                            scratch.append("                self._\(name)(")
+                            scratch.append("            self._\(name)(")
                         }
 
                         if let parameters = behavior.function.structure.substructure {
@@ -182,15 +204,22 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         }
                         scratch.removeLast()
                         scratch.removeLast()
+
+                        if returnType != nil {
+                            scratch.append("))")
+                        }
+
                         scratch.append(")\n")
 
-                        scratch.append("            }\n")
-                        scratch.append("            return nil\n")
+                        if returnType == nil {
+                            scratch.append("            return nil\n")
+                        }
+
                         scratch.append("        }\n")
                     } else {
                         scratch.append("        safeRegisterRemoteBehavior(\"\(name)\") { [unowned self] (data) in\n")
                         if returnType != nil {
-                            scratch.append("            return self._\(name)()\n")
+                            scratch.append("            return try! JSONEncoder().encode(\(codableName(name))Response(response: self._\(name)()))\n")
                         } else {
                             scratch.append("            self._\(name)()\n")
                             scratch.append("            return nil\n")
@@ -242,7 +271,10 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     //    _beSetCoreAffinity(theAffinity:arg2:)
 
                     let (name, parameterLabels) = ast.parseFunctionDefinition(behavior.function.structure)
-                    let returnType = behavior.function.structure.typename
+                    var returnType = behavior.function.structure.typename
+                    if returnType == "Void" {
+                        returnType = nil
+                    }
 
                     // 2. the names and type of the parameters are in the substructures
                     scratch.append("    @discardableResult\n")
