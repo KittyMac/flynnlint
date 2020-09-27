@@ -91,6 +91,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                             scratch.append("    public func \(name)(_ sender: Actor, _ callback: @escaping (\(returnType)) -> Void) -> Self {\n")
                             scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", Data(), sender) {\n")
                             scratch.append("            callback(\n")
+                            scratch.append("                // swiftlint:disable:next force_try\n")
                             scratch.append("                (try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0)).response\n")
                             scratch.append("            )\n")
                             scratch.append("        }\n")
@@ -155,10 +156,12 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         }
                         scratch.append(")\n")
 
+                        scratch.append("        // swiftlint:disable:next force_try\n")
                         scratch.append("        let data = try! JSONEncoder().encode(msg)\n")
                         if returnType != nil {
                             scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", data, sender) {\n")
                             scratch.append("            callback(\n")
+                            scratch.append("                // swiftlint:disable:next force_try\n")
                             scratch.append("                (try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0).response)\n")
                             scratch.append("            )\n")
                             scratch.append("        }\n")
@@ -187,10 +190,13 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                     if parameterLabels.count > 0 {
                         scratch.append("        safeRegisterRemoteBehavior(\"\(name)\") { [unowned self] (data) in\n")
+                        scratch.append("            // swiftlint:disable:next force_try\n")
                         scratch.append("            let msg = try! JSONDecoder().decode(\(codableName(name))Request.self, from: data)\n")
 
                         if returnType != nil {
-                            scratch.append("            return try! JSONEncoder().encode(\(codableName(name))Response(response: self._\(name)(")
+                            scratch.append("            // swiftlint:disable:next force_try\n")
+                            scratch.append("            return try! JSONEncoder().encode(\n")
+                            scratch.append("                \(codableName(name))Response(response: self._\(name)(")
                         } else {
                             scratch.append("            self._\(name)(")
                         }
@@ -219,7 +225,9 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     } else {
                         scratch.append("        safeRegisterRemoteBehavior(\"\(name)\") { [unowned self] (data) in\n")
                         if returnType != nil {
-                            scratch.append("            return try! JSONEncoder().encode(\(codableName(name))Response(response: self._\(name)()))\n")
+                            scratch.append("            // swiftlint:disable:next force_try\n")
+                            scratch.append("            return try! JSONEncoder().encode(\n")
+                            scratch.append("                \(codableName(name))Response(response: self._\(name)()))\n")
                         } else {
                             scratch.append("            self._\(name)()\n")
                             scratch.append("            return nil\n")
