@@ -44,12 +44,37 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                 scratch.append("\n")
                 scratch.append("extension \(fullActorName) {\n\n")
 
+                var minParameterCount = 0
+                var returnCallbackParameters: [String] = []
+
+                let checkParametersForRemoteCallback = { (behavior: AST.Behavior) in
+                    minParameterCount = 0
+                    returnCallbackParameters = []
+                    if let parameters = behavior.function.structure.substructure {
+                        for parameter in parameters where parameter.kind == .varParameter {
+                            if let typename = parameter.typename {
+                                if parameter.name == "returnCallback" {
+                                    minParameterCount = 1
+
+                                    let (callbackParameters, _) = ast.parseClosureType(typename)
+                                    returnCallbackParameters = callbackParameters
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // 0. Create all Codable structs for message serializations (only if it has arguments)
                 for behavior in internals where behavior.function.file.path == syntax.file.path && behavior.function.structure.name != nil {
+                    checkParametersForRemoteCallback(behavior)
+
                     let (name, parameterLabels) = ast.parseFunctionDefinition(behavior.function.structure)
                     var returnType = behavior.function.structure.typename
                     if returnType == "Void" {
                         returnType = nil
+                    }
+                    if returnType == nil && returnCallbackParameters.count > 0 {
+                        returnType = returnCallbackParameters[0]
                     }
 
                     if let returnType = returnType {
@@ -58,15 +83,17 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         scratch.append("    }\n")
                     }
 
-                    if parameterLabels.count > 0 {
+                    if parameterLabels.count > minParameterCount {
                         scratch.append("    struct \(codableName(name))Request: Codable {\n")
                         if let parameters = behavior.function.structure.substructure {
                             var idx = 0
                             for parameter in parameters where parameter.kind == .varParameter {
                                 if  let typename = parameter.typename {
-                                    scratch.append("        let arg\(idx): \(typename)\n")
+                                    if parameter.name != "returnCallback" {
+                                        scratch.append("        let arg\(idx): \(typename)\n")
+                                        idx += 1
+                                    }
                                 }
-                                idx += 1
                             }
                         }
                         scratch.append("    }\n")
@@ -78,14 +105,18 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                 // 1. Create all external behaviors (two types, with and without return values)
 
                 for behavior in internals where behavior.function.file.path == syntax.file.path && behavior.function.structure.name != nil {
+                    checkParametersForRemoteCallback(behavior)
 
                     let (name, parameterLabels) = ast.parseFunctionDefinition(behavior.function.structure)
                     var returnType = behavior.function.structure.typename
                     if returnType == "Void" {
                         returnType = nil
                     }
+                    if returnType == nil && returnCallbackParameters.count > 0 {
+                        returnType = returnCallbackParameters[0]
+                    }
 
-                    if parameterLabels.count == 0 {
+                    if parameterLabels.count == minParameterCount {
                         if let returnType = returnType {
                             scratch.append("    @discardableResult\n")
                             scratch.append("    public func \(name)(_ sender: Actor, _ callback: @escaping (\(returnType)) -> Void) -> Self {\n")
@@ -112,7 +143,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         let parameterNameHeader = String(repeating: " ", count: functionNameHeader.count)
                         if let parameters = behavior.function.structure.substructure {
                             var idx = 0
-                            for parameter in parameters where parameter.kind == .varParameter {
+                            for parameter in parameters where parameter.kind == .varParameter && parameter.name != "returnCallback" {
                                 let label = parameterLabels[idx]
 
                                 if let typename = parameter.typename,
@@ -145,9 +176,11 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                             var idx = 0
                             for parameter in parameters where parameter.kind == .varParameter {
                                 if let name = parameter.name {
-                                    scratch.append("arg\(idx): \(name), ")
+                                    if parameter.name != "returnCallback" {
+                                        scratch.append("arg\(idx): \(name), ")
+                                        idx += 1
+                                    }
                                 }
-                                idx += 1
                             }
                             if idx > 0 {
                                 scratch.removeLast()
@@ -181,58 +214,111 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                 scratch.append("    public func unsafeRegisterAllBehaviors() {\n")
 
                 for behavior in internals where behavior.function.file.path == syntax.file.path && behavior.function.structure.name != nil {
+                    checkParametersForRemoteCallback(behavior)
 
                     let (name, parameterLabels) = ast.parseFunctionDefinition(behavior.function.structure)
                     var returnType = behavior.function.structure.typename
                     if returnType == "Void" {
                         returnType = nil
                     }
+                    if returnType == nil && returnCallbackParameters.count > 0 {
+                        returnType = returnCallbackParameters[0]
+                    }
 
-                    if parameterLabels.count > 0 {
-                        scratch.append("        safeRegisterRemoteBehavior(\"\(name)\") { [unowned self] (data) in\n")
-                        scratch.append("            // swiftlint:disable:next force_try\n")
-                        scratch.append("            let msg = try! JSONDecoder().decode(\(codableName(name))Request.self, from: data)\n")
+                    if returnCallbackParameters.count > 0 {
 
-                        if returnType != nil {
+                        if parameterLabels.count > minParameterCount {
+                            scratch.append("        safeRegisterDelayedRemoteBehavior(\"\(name)\") { [unowned self] (data, callback) in\n")
                             scratch.append("            // swiftlint:disable:next force_try\n")
-                            scratch.append("            return try! JSONEncoder().encode(\n")
-                            scratch.append("                \(codableName(name))Response(response: self._\(name)(")
-                        } else {
+                            scratch.append("            let msg = try! JSONDecoder().decode(\(codableName(name))Request.self, from: data)\n")
+
                             scratch.append("            self._\(name)(")
-                        }
-
-                        if let parameters = behavior.function.structure.substructure {
-                            var idx = 0
-                            for parameter in parameters where parameter.kind == .varParameter {
-                                scratch.append("msg.arg\(idx), ")
-                                idx += 1
+                            if let parameters = behavior.function.structure.substructure {
+                                var idx = 0
+                                for parameter in parameters where parameter.kind == .varParameter && parameter.name != "returnCallback" {
+                                    scratch.append("msg.arg\(idx), ")
+                                    idx += 1
+                                }
                             }
-                        }
-                        scratch.removeLast()
-                        scratch.removeLast()
 
-                        if returnType != nil {
-                            scratch.append("))")
-                        }
+                            scratch.removeLast()
+                            scratch.removeLast()
 
-                        scratch.append(")\n")
+                            scratch.append(") { (returnValue:\(returnCallbackParameters[0])) in \n")
+                            scratch.append("                callback(\n")
+                            scratch.append("                    // swiftlint:disable:next force_try\n")
+                            scratch.append("                    try! JSONEncoder().encode(\n")
+                            scratch.append("                        \(codableName(name))Response(response: returnValue))\n")
+                            scratch.append("                )\n")
+                            scratch.append("            }\n")
 
-                        if returnType == nil {
-                            scratch.append("            return nil\n")
-                        }
-
-                        scratch.append("        }\n")
-                    } else {
-                        scratch.append("        safeRegisterRemoteBehavior(\"\(name)\") { [unowned self] (data) in\n")
-                        if returnType != nil {
-                            scratch.append("            // swiftlint:disable:next force_try\n")
-                            scratch.append("            return try! JSONEncoder().encode(\n")
-                            scratch.append("                \(codableName(name))Response(response: self._\(name)()))\n")
+                            scratch.append("        }\n")
                         } else {
-                            scratch.append("            self._\(name)()\n")
-                            scratch.append("            return nil\n")
+                            scratch.append("        safeRegisterDelayedRemoteBehavior(\"\(name)\") { [unowned self] (data, callback) in\n")
+                            scratch.append("            self._\(name)() { (returnValue:\(returnCallbackParameters[0])) in \n")
+                            scratch.append("                callback(\n")
+                            scratch.append("                    // swiftlint:disable:next force_try\n")
+                            scratch.append("                    try! JSONEncoder().encode(\n")
+                            scratch.append("                        \(codableName(name))Response(response: returnValue))\n")
+                            scratch.append("                )\n")
+                            scratch.append("            }\n")
+                            scratch.append("        }\n")
                         }
-                        scratch.append("        }\n")
+
+                    } else {
+
+                        if parameterLabels.count > minParameterCount {
+                            scratch.append("        safeRegisterRemoteBehavior(\"\(name)\") { [unowned self] (data) in\n")
+                            scratch.append("            // swiftlint:disable:next force_try\n")
+                            scratch.append("            let msg = try! JSONDecoder().decode(\(codableName(name))Request.self, from: data)\n")
+
+                            if returnType != nil {
+                                scratch.append("            // swiftlint:disable:next force_try\n")
+                                scratch.append("            return try! JSONEncoder().encode(\n")
+                                scratch.append("                \(codableName(name))Response(response: self._\(name)(")
+                            } else {
+                                scratch.append("            self._\(name)(")
+                            }
+
+                            if let parameters = behavior.function.structure.substructure {
+                                var idx = 0
+                                for parameter in parameters where parameter.kind == .varParameter && parameter.name != "returnCallback" {
+                                    scratch.append("msg.arg\(idx), ")
+                                    idx += 1
+                                }
+                            }
+
+                            if returnCallbackParameters.count > 0 {
+
+                            }
+
+                            scratch.removeLast()
+                            scratch.removeLast()
+
+                            if returnType != nil {
+                                scratch.append("))")
+                            }
+
+                            scratch.append(")\n")
+
+                            if returnType == nil {
+                                scratch.append("            return nil\n")
+                            }
+
+                            scratch.append("        }\n")
+                        } else {
+                            scratch.append("        safeRegisterRemoteBehavior(\"\(name)\") { [unowned self] (data) in\n")
+                            if returnType != nil {
+                                scratch.append("            // swiftlint:disable:next force_try\n")
+                                scratch.append("            return try! JSONEncoder().encode(\n")
+                                scratch.append("                \(codableName(name))Response(response: self._\(name)()))\n")
+                            } else {
+                                scratch.append("            self._\(name)()\n")
+                                scratch.append("            return nil\n")
+                            }
+                            scratch.append("        }\n")
+                        }
+
                     }
                 }
                 if internals.count == 0 {
