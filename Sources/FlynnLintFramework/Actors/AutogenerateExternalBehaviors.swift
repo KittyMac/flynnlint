@@ -357,7 +357,30 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                 var scratch = ""
                 scratch.append("\n")
                 scratch.append("extension \(fullActorName) {\n\n")
+
+                var minParameterCount = 0
+                var returnCallbackParameters: [String] = []
+
+                let checkParametersForRemoteCallback = { (behavior: AST.Behavior) in
+                    minParameterCount = 0
+                    returnCallbackParameters = []
+                    if let parameters = behavior.function.structure.substructure {
+                        for parameter in parameters where parameter.kind == .varParameter {
+                            if let typename = parameter.typename {
+                                if parameter.name == "returnCallback" {
+                                    minParameterCount = 1
+
+                                    let (callbackParameters, _) = ast.parseClosureType(typename)
+                                    returnCallbackParameters = callbackParameters
+                                }
+                            }
+                        }
+                    }
+                }
+
                 for behavior in internals where behavior.function.file.path == syntax.file.path && behavior.function.structure.name != nil {
+                    checkParametersForRemoteCallback(behavior)
+
                     didHaveBehavior = true
 
                     // Note: The information we need comes from two places:
@@ -369,16 +392,19 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     if returnType == "Void" {
                         returnType = nil
                     }
+                    if returnType == nil && returnCallbackParameters.count > 0 {
+                        returnType = returnCallbackParameters[0]
+                    }
 
                     // 2. the names and type of the parameters are in the substructures
                     scratch.append("    @discardableResult\n")
                     let functionNameHeader = "    public func \(name)("
                     scratch.append(functionNameHeader)
                     let parameterNameHeader = String(repeating: " ", count: functionNameHeader.count)
-                    if parameterLabels.count > 0 {
+                    if parameterLabels.count > minParameterCount {
                         if let parameters = behavior.function.structure.substructure {
                             var idx = 0
-                            for parameter in parameters where parameter.kind == .varParameter {
+                            for parameter in parameters where parameter.kind == .varParameter && parameter.name != "returnCallback" {
                                 let label = parameterLabels[idx]
 
                                 if idx != 0 {
@@ -400,13 +426,24 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     }
 
                     if let returnType = returnType {
-                        if parameterLabels.count > 0 {
+                        if parameterLabels.count > minParameterCount {
                             scratch.append(parameterNameHeader)
                         }
                         scratch.append("_ sender: Actor,\n")
-                        scratch.append("\(parameterNameHeader)_ callback: @escaping ((\(returnType)) -> Void)")
+
+                        if returnCallbackParameters.count > 0 {
+                            scratch.append("\(parameterNameHeader)_ callback: @escaping ((")
+                            for type in returnCallbackParameters {
+                                scratch.append("\(type), ")
+                            }
+                            scratch.removeLast()
+                            scratch.removeLast()
+                            scratch.append(") -> Void)")
+                        } else {
+                            scratch.append("\(parameterNameHeader)_ callback: @escaping ((\(returnType)) -> Void)")
+                        }
                     } else {
-                        if parameterLabels.count > 0 {
+                        if parameterLabels.count > minParameterCount {
                             scratch.removeLast()
                             scratch.removeLast()
                         }
@@ -415,11 +452,16 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                     if returnType != nil {
                         scratch.append("        unsafeSend() {\n")
-                        scratch.append("            let result = self._\(name)(")
+
+                        if returnCallbackParameters.count == 0 {
+                            scratch.append("            let result = self._\(name)(")
+                        } else {
+                            scratch.append("            self._\(name)(")
+                        }
 
                         if let parameters = behavior.function.structure.substructure {
                             var idx = 0
-                            for parameter in parameters where parameter.kind == .varParameter {
+                            for parameter in parameters where parameter.kind == .varParameter && parameter.name != "returnCallback" {
                                 let label = parameterLabels[idx]
                                 if label == "_" {
                                     scratch.append("\(parameter.name!), ")
@@ -428,23 +470,49 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                 }
                                 idx += 1
                             }
-                            scratch.removeLast()
-                            scratch.removeLast()
+                            if idx > 0 {
+                                scratch.removeLast()
+                                scratch.removeLast()
+                            }
                         }
-                        scratch.append(")\n")
-                        scratch.append("            sender.unsafeSend { callback(result) }\n")
+
+                        if returnCallbackParameters.count > 0 {
+                            scratch.append(") { ")
+                            for idx in 0..<returnCallbackParameters.count {
+                                scratch.append("arg\(idx), ")
+                            }
+                            scratch.removeLast()
+                            scratch.removeLast()
+                            scratch.append(" in \n")
+
+                            scratch.append("                sender.unsafeSend {\n")
+                            scratch.append("                    callback(")
+                            for idx in 0..<returnCallbackParameters.count {
+                                scratch.append("arg\(idx), ")
+                            }
+                            scratch.removeLast()
+                            scratch.removeLast()
+                            scratch.append(")\n")
+
+                            scratch.append("                }\n")
+                            scratch.append("            }\n")
+                        } else {
+                            scratch.append(")\n")
+                            scratch.append("            sender.unsafeSend { callback(result) }\n")
+                        }
+
                         scratch.append("        }\n")
                         scratch.append("        return self\n")
                         scratch.append("    }\n")
                     } else {
-                        if parameterLabels.count == 0 {
+                        if parameterLabels.count == minParameterCount {
                             scratch.append("        unsafeSend(_\(name))\n")
                         } else {
                             scratch.append("        unsafeSend { self._\(name)(")
 
                             if let parameters = behavior.function.structure.substructure {
                                 var idx = 0
-                                for parameter in parameters where parameter.kind == .varParameter {
+                                for parameter in parameters where parameter.kind == .varParameter && parameter.name != "returnCallback" {
                                     let label = parameterLabels[idx]
                                     if label == "_" {
                                         scratch.append("\(parameter.name!), ")
