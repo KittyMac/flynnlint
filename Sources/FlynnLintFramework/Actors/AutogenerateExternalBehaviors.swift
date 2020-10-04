@@ -451,12 +451,12 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     scratch.append(") -> Self {\n")
 
                     if returnType != nil {
-                        scratch.append("        unsafeSend() {\n")
+                        scratch.append("        unsafeSend() { [weak self] in\n")
 
                         if returnCallbackParameters.count == 0 {
-                            scratch.append("            let result = self._\(name)(")
+                            scratch.append("            let result = self!._\(name)(")
                         } else {
-                            scratch.append("            self._\(name)(")
+                            scratch.append("            self!._\(name)(")
                         }
 
                         if let parameters = behavior.function.structure.substructure {
@@ -508,7 +508,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         if parameterLabels.count == minParameterCount {
                             scratch.append("        unsafeSend(_\(name))\n")
                         } else {
-                            scratch.append("        unsafeSend { self._\(name)(")
+                            scratch.append("        unsafeSend { [weak self] in self!._\(name)(")
 
                             if let parameters = behavior.function.structure.substructure {
                                 var idx = 0
