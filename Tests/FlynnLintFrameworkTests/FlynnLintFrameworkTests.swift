@@ -46,6 +46,12 @@ class FlynnLintTests: XCTestCase {
         flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/cutlass/Cutlass")
         flynnlint.finish()
     }
+    
+    func testSOServerFramework() throws {
+        let flynnlint = FlynnLint()
+        flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/starbaseorion10/Server/Sources/SOServerFramework")
+        flynnlint.finish()
+    }
 
     func testOneRuleOneCode() throws {
         let rule = PrivateFunctionInActorRule()
