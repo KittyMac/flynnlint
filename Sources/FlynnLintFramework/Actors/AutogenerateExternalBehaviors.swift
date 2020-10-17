@@ -46,8 +46,10 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                 var minParameterCount = 0
                 var returnCallbackParameters: [String] = []
+                var hasReturnCallback = false
 
                 let checkParametersForRemoteCallback = { (behavior: AST.Behavior) in
+                    hasReturnCallback = false
                     minParameterCount = 0
                     returnCallbackParameters = []
                     if let parameters = behavior.function.structure.substructure {
@@ -58,6 +60,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                                     let (callbackParameters, _) = ast.parseClosureType(typename)
                                     returnCallbackParameters = callbackParameters
+                                    hasReturnCallback = true
                                 }
                             }
                         }
@@ -167,8 +170,10 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                             scratch.append("\(parameterNameHeader)_ callback: @escaping (\(returnType)) -> Void,\n")
                         }
 
-                        scratch.removeLast()
-                        scratch.removeLast()
+                        if scratch.hasSuffix(",\n") {
+                            scratch.removeLast()
+                            scratch.removeLast()
+                        }
                         scratch.append(" ) -> Self {\n")
 
                         scratch.append("        let msg = \(codableName(name))Request(")
@@ -182,7 +187,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                     }
                                 }
                             }
-                            if idx > 0 {
+                            if scratch.hasSuffix(", ") {
                                 scratch.removeLast()
                                 scratch.removeLast()
                             }
@@ -225,7 +230,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         returnType = returnCallbackParameters[0]
                     }
 
-                    if returnCallbackParameters.count > 0 {
+                    if hasReturnCallback {
 
                         if parameterLabels.count > minParameterCount {
                             scratch.append("        safeRegisterDelayedRemoteBehavior(\"\(name)\") { [unowned self] (data, callback) in\n")
@@ -241,26 +246,47 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                 }
                             }
 
-                            scratch.removeLast()
-                            scratch.removeLast()
+                            if scratch.hasSuffix(", ") {
+                                scratch.removeLast()
+                                scratch.removeLast()
+                            }
 
-                            scratch.append(") { (returnValue:\(returnCallbackParameters[0])) in \n")
-                            scratch.append("                callback(\n")
-                            scratch.append("                    // swiftlint:disable:next force_try\n")
-                            scratch.append("                    try! JSONEncoder().encode(\n")
-                            scratch.append("                        \(codableName(name))Response(response: returnValue))\n")
-                            scratch.append("                )\n")
+                            if returnCallbackParameters.count > 0 {
+                                scratch.append(") { (returnValue:\(returnCallbackParameters[0])) in \n")
+                            } else {
+                                scratch.append(") { \n")
+                            }
+
+                            if returnCallbackParameters.count > 0 {
+                                scratch.append("                callback(\n")
+                                scratch.append("                    // swiftlint:disable:next force_try\n")
+                                scratch.append("                    try! JSONEncoder().encode(\n")
+                                scratch.append("                        \(codableName(name))Response(response: returnValue))\n")
+                                scratch.append("                )\n")
+                            } else {
+                                scratch.append("                callback(Data())\n")
+                            }
                             scratch.append("            }\n")
 
                             scratch.append("        }\n")
                         } else {
                             scratch.append("        safeRegisterDelayedRemoteBehavior(\"\(name)\") { [unowned self] (data, callback) in\n")
-                            scratch.append("            self._\(name)() { (returnValue:\(returnCallbackParameters[0])) in \n")
-                            scratch.append("                callback(\n")
-                            scratch.append("                    // swiftlint:disable:next force_try\n")
-                            scratch.append("                    try! JSONEncoder().encode(\n")
-                            scratch.append("                        \(codableName(name))Response(response: returnValue))\n")
-                            scratch.append("                )\n")
+
+                            if returnCallbackParameters.count > 0 {
+                                scratch.append("            self._\(name)() { (returnValue:\(returnCallbackParameters[0])) in \n")
+                            } else {
+                                scratch.append("            self._\(name)() { \n")
+                            }
+
+                            if returnCallbackParameters.count > 0 {
+                                scratch.append("                callback(\n")
+                                scratch.append("                    // swiftlint:disable:next force_try\n")
+                                scratch.append("                    try! JSONEncoder().encode(\n")
+                                scratch.append("                        \(codableName(name))Response(response: returnValue))\n")
+                                scratch.append("                )\n")
+                            } else {
+                                scratch.append("                callback(Data())\n")
+                            }
                             scratch.append("            }\n")
                             scratch.append("        }\n")
                         }
@@ -288,12 +314,10 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                 }
                             }
 
-                            if returnCallbackParameters.count > 0 {
-
+                            if scratch.hasSuffix(", ") {
+                                scratch.removeLast()
+                                scratch.removeLast()
                             }
-
-                            scratch.removeLast()
-                            scratch.removeLast()
 
                             if returnType != nil {
                                 scratch.append("))")
@@ -360,8 +384,10 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                 var minParameterCount = 0
                 var returnCallbackParameters: [String] = []
+                var hasReturnCallback = false
 
                 let checkParametersForRemoteCallback = { (behavior: AST.Behavior) in
+                    hasReturnCallback = false
                     minParameterCount = 0
                     returnCallbackParameters = []
                     if let parameters = behavior.function.structure.substructure {
@@ -372,6 +398,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                                     let (callbackParameters, _) = ast.parseClosureType(typename)
                                     returnCallbackParameters = callbackParameters
+                                    hasReturnCallback = true
                                 }
                             }
                         }
@@ -392,8 +419,8 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     if returnType == "Void" {
                         returnType = nil
                     }
-                    if returnType == nil && returnCallbackParameters.count > 0 {
-                        returnType = returnCallbackParameters[0]
+                    if returnType == nil && hasReturnCallback {
+                        returnType = "Void"
                     }
 
                     // 2. the names and type of the parameters are in the substructures
@@ -431,19 +458,21 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         }
                         scratch.append("_ sender: Actor,\n")
 
-                        if returnCallbackParameters.count > 0 {
+                        if hasReturnCallback {
                             scratch.append("\(parameterNameHeader)_ callback: @escaping ((")
                             for type in returnCallbackParameters {
                                 scratch.append("\(type), ")
                             }
-                            scratch.removeLast()
-                            scratch.removeLast()
+                            if scratch.hasSuffix(", ") {
+                                scratch.removeLast()
+                                scratch.removeLast()
+                            }
                             scratch.append(") -> Void)")
                         } else {
                             scratch.append("\(parameterNameHeader)_ callback: @escaping ((\(returnType)) -> Void)")
                         }
                     } else {
-                        if parameterLabels.count > minParameterCount {
+                        if scratch.hasSuffix(",\n") {
                             scratch.removeLast()
                             scratch.removeLast()
                         }
@@ -453,7 +482,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     if returnType != nil {
                         scratch.append("        unsafeSend() {\n")
 
-                        if returnCallbackParameters.count == 0 {
+                        if hasReturnCallback == false {
                             scratch.append("            let result = self._\(name)(")
                         } else {
                             scratch.append("            self._\(name)(")
@@ -470,28 +499,34 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                 }
                                 idx += 1
                             }
-                            if idx > 0 {
+                            if scratch.hasSuffix(", ") {
                                 scratch.removeLast()
                                 scratch.removeLast()
                             }
                         }
 
-                        if returnCallbackParameters.count > 0 {
+                        if hasReturnCallback {
                             scratch.append(") { ")
                             for idx in 0..<returnCallbackParameters.count {
                                 scratch.append("arg\(idx), ")
                             }
-                            scratch.removeLast()
-                            scratch.removeLast()
-                            scratch.append(" in \n")
+                            if scratch.hasSuffix(", ") {
+                                scratch.removeLast()
+                                scratch.removeLast()
+                                scratch.append(" in \n")
+                            } else {
+                                scratch.append("\n")
+                            }
 
                             scratch.append("                sender.unsafeSend {\n")
                             scratch.append("                    callback(")
                             for idx in 0..<returnCallbackParameters.count {
                                 scratch.append("arg\(idx), ")
                             }
-                            scratch.removeLast()
-                            scratch.removeLast()
+                            if scratch.hasSuffix(", ") {
+                                scratch.removeLast()
+                                scratch.removeLast()
+                            }
                             scratch.append(")\n")
 
                             scratch.append("                }\n")
@@ -521,8 +556,10 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                     }
                                     idx += 1
                                 }
-                                scratch.removeLast()
-                                scratch.removeLast()
+                                if scratch.hasSuffix(", ") {
+                                    scratch.removeLast()
+                                    scratch.removeLast()
+                                }
                             }
                             scratch.append(") }\n")
                         }

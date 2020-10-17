@@ -379,7 +379,7 @@ struct AST {
         var parameterLabels: [String] = []
         var returnType = ""
 
-        let regex = #"\(\s*([\w\d\?]*),?\s*([\w\d\?]*),?\s*([\w\d\?]*),?\s*([\w\d\?]*),?\s*([\w\d\?]*),?\s*([\w\d\?]*),?\s*([\w\d\?]*),?\s*([\w\d\?]*),?\s*([\w\d\?]*),?\s*([\w\d\?]*),?\s*([\w\d\?]*),?\)\s*->\s*([\w\d\?]*)"#
+        let regex = #"\(\s*([\.\w\d\?]*),?\s*([\.\w\d\?]*),?\s*([\.\w\d\?]*),?\s*([\.\w\d\?]*),?\s*([\.\w\d\?]*),?\s*([\.\w\d\?]*),?\s*([\.\w\d\?]*),?\s*([\.\w\d\?]*),?\s*([\.\w\d\?]*),?\s*([\.\w\d\?]*),?\s*([\.\w\d\?]*),?\)\s*->\s*([\.\w\d\?]*)"#
         typename.matches(regex) { (_, groups) in
             // (String, Int, Any) -> Void
 
