@@ -37,13 +37,12 @@ struct PrivateFunctionInRemoteActorRule: Rule {
             Example("class SomeActor: RemoteActor { internal func safeFoo() { } }\n"),
             Example("class SomeActor: RemoteActor { func safeFoo() { } }\n"),
             Example("class SomeActor: RemoteActor { override func safeFlowProcess() { } }\n"),
-            Example("class RemoteActor { public func unsafeSend() { } }\n"),
 
             Example("""
                 class SomeActor: RemoteActor {
                     public func bePrint() {
                         let serialized: [String: Codable] = ["foo" = "bar"]
-                        self.unsafeSend(serialized)
+                        self.unsafeSendToRemote(serialized)
                     }
                 }
             """),
@@ -68,6 +67,7 @@ struct PrivateFunctionInRemoteActorRule: Rule {
 
             Example("class SomeActor: RemoteActor { public func _bePrint(_ string: String) { } }\n"),
             Example("class SomeActor: RemoteActor { fileprivate func _bePrint(_ string: String) { } }\n"),
+            Example("class RemoteActor { public func unsafeSend() { } }\n"),
 
             Example("class SomeActor: RemoteActor { public func foo() { } }\n"),
             Example("class SomeActor: RemoteActor { fileprivate func foo() { } }\n"),
