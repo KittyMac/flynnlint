@@ -353,7 +353,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                 if let returnType = returnType, returnType.hasPrefix("(") {
                                     let (parts, _) = ast.parseTupleType(returnType)
                                     var idx = 0
-                                    scratch.append("            let nonTupleResponse = \(codableName(name))Response(\n")
+                                    scratch.append("            let boxedResponse = \(codableName(name))Response(\n")
                                     for _ in parts {
                                         scratch.append("                response\(idx): response.\(idx),\n")
                                         idx += 1
@@ -364,10 +364,11 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                     }
                                     scratch.append("            )\n")
                                     scratch.append("            // swiftlint:disable:next force_try\n")
-                                    scratch.append("            return try! JSONEncoder().encode(nonTupleResponse)\n")
+                                    scratch.append("            return try! JSONEncoder().encode(boxedResponse)\n")
                                 } else {
+                                    scratch.append("            let boxedResponse = \(codableName(name))Response(response: response)\n")
                                     scratch.append("            // swiftlint:disable:next force_try\n")
-                                    scratch.append("            return try! JSONEncoder().encode(response)\n")
+                                    scratch.append("            return try! JSONEncoder().encode(boxedResponse)\n")
                                 }
                             } else {
                                 scratch.append("            return nil\n")
