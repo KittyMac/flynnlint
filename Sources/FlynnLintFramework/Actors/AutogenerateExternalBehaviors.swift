@@ -82,7 +82,19 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                     if let returnType = returnType {
                         scratch.append("    struct \(codableName(name))Response: Codable {\n")
-                        scratch.append("        let response: \(returnType)\n")
+
+                        // if the returnType is a tuple
+                        if returnType.hasPrefix("(") {
+                            let (parts, _) = ast.parseTupleType(returnType)
+                            var idx = 0
+                            for part in parts {
+                                scratch.append("        let response\(idx): \(part)\n")
+                                idx += 1
+                            }
+                        } else {
+                            scratch.append("        let response: \(returnType)\n")
+                        }
+
                         scratch.append("    }\n")
                     }
 
@@ -198,10 +210,31 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         scratch.append("        let data = try! JSONEncoder().encode(msg)\n")
                         if returnType != nil {
                             scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", data, sender) {\n")
-                            scratch.append("            callback(\n")
-                            scratch.append("                // swiftlint:disable:next force_try\n")
-                            scratch.append("                (try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0).response)\n")
-                            scratch.append("            )\n")
+
+                            if let returnType = returnType, returnType.hasPrefix("(") {
+                                let (parts, _) = ast.parseTupleType(returnType)
+                                var idx = 0
+
+                                scratch.append("            // swiftlint:disable:next force_try\n")
+                                scratch.append("            let msg = try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0)\n")
+                                scratch.append("            callback((\n")
+                                for _ in parts {
+                                    scratch.append("                msg.response\(idx),\n")
+                                    idx += 1
+                                }
+                                if scratch.hasSuffix(",\n") {
+                                    scratch.removeLast(2)
+                                    scratch.append("\n")
+                                }
+                                scratch.append("            ))\n")
+
+                            } else {
+                                scratch.append("            callback(\n")
+                                scratch.append("                // swiftlint:disable:next force_try\n")
+                                scratch.append("                (try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0).response)\n")
+                                scratch.append("            )\n")
+                            }
+
                             scratch.append("        }\n")
                         } else {
                             scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", data, nil, nil)\n")
@@ -299,13 +332,10 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                             scratch.append("            let msg = try! JSONDecoder().decode(\(codableName(name))Request.self, from: data)\n")
 
                             if returnType != nil {
-                                scratch.append("            // swiftlint:disable:next force_try\n")
-                                scratch.append("            return try! JSONEncoder().encode(\n")
-                                scratch.append("                \(codableName(name))Response(response: self._\(name)(")
+                                scratch.append("            let response = self._\(name)(")
                             } else {
                                 scratch.append("            self._\(name)(")
                             }
-
                             if let parameters = behavior.function.structure.substructure {
                                 var idx = 0
                                 for parameter in parameters where parameter.kind == .varParameter && parameter.name != "returnCallback" {
@@ -313,19 +343,33 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                     idx += 1
                                 }
                             }
-
                             if scratch.hasSuffix(", ") {
                                 scratch.removeLast()
                                 scratch.removeLast()
                             }
-
-                            if returnType != nil {
-                                scratch.append("))")
-                            }
-
                             scratch.append(")\n")
 
-                            if returnType == nil {
+                            if returnType != nil {
+                                if let returnType = returnType, returnType.hasPrefix("(") {
+                                    let (parts, _) = ast.parseTupleType(returnType)
+                                    var idx = 0
+                                    scratch.append("            let nonTupleResponse = \(codableName(name))Response(\n")
+                                    for _ in parts {
+                                        scratch.append("                response\(idx): response.\(idx),\n")
+                                        idx += 1
+                                    }
+                                    if scratch.hasSuffix(",\n") {
+                                        scratch.removeLast(2)
+                                        scratch.append("\n")
+                                    }
+                                    scratch.append("            )\n")
+                                    scratch.append("            // swiftlint:disable:next force_try\n")
+                                    scratch.append("            return try! JSONEncoder().encode(nonTupleResponse)\n")
+                                } else {
+                                    scratch.append("            // swiftlint:disable:next force_try\n")
+                                    scratch.append("            return try! JSONEncoder().encode(response)\n")
+                                }
+                            } else {
                                 scratch.append("            return nil\n")
                             }
 

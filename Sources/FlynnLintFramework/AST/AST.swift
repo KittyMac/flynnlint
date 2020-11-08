@@ -396,4 +396,26 @@ struct AST {
         }
         return (parameterLabels, returnType)
     }
+
+    func parseTupleType(_ typename: String) -> ([String], String) {
+        var parameterLabels: [String] = []
+        var returnType = ""
+
+        let regex = #"\(\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\)"#
+        typename.matches(regex) { (_, groups) in
+            // (String, Int, Any)
+
+            if let last = groups.last {
+                returnType = last
+            }
+
+            for idx in 1..<groups.count-1 {
+                let param = groups[idx]
+                if param.count > 0 {
+                    parameterLabels.append(param)
+                }
+            }
+        }
+        return (parameterLabels, returnType)
+    }
 }
