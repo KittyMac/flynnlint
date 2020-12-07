@@ -19,7 +19,7 @@ extension String {
         return self[range]
     }
 
-    func matches(_ pattern: String, _ callback: ((NSTextCheckingResult, [String]) -> Void)) {
+    func matches(_ pattern: String, _ callback: @escaping ((NSTextCheckingResult, [String]) -> Void)) {
         do {
             let body = self
             let regex = try NSRegularExpression(pattern: pattern, options: [])
@@ -116,7 +116,7 @@ struct FileSyntax {
         return firstOffendingMatchOffset
     }
 
-    func matches(_ pattern: String, _ callback: ((NSTextCheckingResult, [String]) -> Void)) {
+    func matches(_ pattern: String, _ callback: @escaping ((NSTextCheckingResult, [String]) -> Void)) {
         do {
             let body = self.file.contents
             let structure = self.structure

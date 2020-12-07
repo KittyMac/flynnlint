@@ -147,4 +147,10 @@ class FlynnLintTests: XCTestCase {
         }
     }
 
+    static var allTests = [
+        ("testOneRuleOneCode", testOneRuleOneCode),
+        ("testAllRulesOneCode", testAllRulesOneCode),
+        ("testOneRule", testOneRule),
+        ("testAllRules", testAllRules),
+    ]
 }
