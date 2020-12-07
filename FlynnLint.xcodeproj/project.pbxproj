@@ -1620,7 +1620,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "FLYNNLINTSWIFTPM=${SRCROOT}/.build/checkouts/flynn/meta/FlynnLint\nFLYNNLINTXCODE=${BUILD_ROOT}/../../SourcePackages/checkouts/flynn/meta/FlynnLint\n\nif [ -f \"${FLYNNLINTSWIFTPM}\" ]; then\n    ${FLYNNLINTSWIFTPM} ${SRCROOT}\nelif [ -f \"${FLYNNLINTXCODE}\" ]; then\n    ${FLYNNLINTXCODE} ${SRCROOT}\nelse\n    echo \"warning: Unable to find FlynnLint, aborting...\"\nfi\n";
+			shellScript = "FLYNNLINTSWIFTPM=${SRCROOT}/.build/checkouts/flynn/meta/FlynnLint\nFLYNNLINTXCODE=${BUILD_ROOT}/../../SourcePackages/checkouts/flynn/meta/FlynnLint\n\nif [ -f \"${FLYNNLINTSWIFTPM}\" ]; then\n    ${FLYNNLINTSWIFTPM} ${SRCROOT}/Sources ${SRCROOT}/Tests\nelif [ -f \"${FLYNNLINTXCODE}\" ]; then\n    ${FLYNNLINTXCODE} ${SRCROOT}/Sources ${SRCROOT}/Tests\nelse\n    echo \"warning: Unable to find FlynnLint, aborting...\"\nfi\n";
 		};
 		465C468A24E06724008A5BB7 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;

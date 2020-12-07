@@ -10,8 +10,11 @@ import XCTest
 @testable import FlynnLintFramework
 
 class FlynnLintTests: XCTestCase {
-
-    override func setUpWithError() throws { }
+    var packageRoot = ""
+    
+    override func setUpWithError() throws {
+        packageRoot = #file.replacingOccurrences(of: "/Tests/FlynnLintFrameworkTests/FlynnLintFrameworkTests.swift", with: "")
+    }
 
     override func tearDownWithError() throws { }
 
@@ -146,8 +149,16 @@ class FlynnLintTests: XCTestCase {
             //XCTAssert(task.terminationStatus == 0)
         }
     }
+    
+    func testLocalDir() throws {
+        let flynnlint = FlynnLint()
+        flynnlint.process(directory: "\(packageRoot)/meta/fail")
+        print("\(packageRoot)/Tests/sample")
+        flynnlint.finish()
+    }
 
     static var allTests = [
+        ("testLocalDir", testLocalDir),
         ("testOneRuleOneCode", testOneRuleOneCode),
         ("testAllRulesOneCode", testAllRulesOneCode),
         ("testOneRule", testOneRule),
