@@ -13,6 +13,9 @@ flynn: build
 clean:
 	rm -rf .build
 
+test:
+	swift test -v
+
 update:
 	swift package update
 
