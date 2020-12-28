@@ -91,6 +91,12 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                 scratch.append("        let response\(idx): \(part)\n")
                                 idx += 1
                             }
+                        } else if returnCallbackParameters.count > 0 {
+                            var idx = 0
+                            for part in returnCallbackParameters {
+                                scratch.append("        let response\(idx): \(part)\n")
+                                idx += 1
+                            }
                         } else {
                             scratch.append("        let response: \(returnType)\n")
                         }
@@ -132,7 +138,34 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     }
 
                     if parameterLabels.count == minParameterCount {
-                        if let returnType = returnType {
+                        if returnCallbackParameters.count > 0 {
+                            scratch.append("    @discardableResult\n")
+                            scratch.append("    public func \(name)(_ sender: Actor, _ callback: @escaping (")
+                            for part in returnCallbackParameters {
+                                scratch.append("\(part), ")
+                            }
+                            if scratch.hasSuffix(", ") {
+                                scratch.removeLast()
+                                scratch.removeLast()
+                            }
+                            scratch.append(") -> Void) -> Self {\n")
+                            scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", Data(), sender) {\n")
+                            scratch.append("            // swiftlint:disable:next force_try\n")
+                            scratch.append("            let response = (try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0))\n")
+                            scratch.append("            callback(\n")
+                            for idx in 0..<returnCallbackParameters.count {
+                                scratch.append("                response.response\(idx),\n")
+                            }
+                            if scratch.hasSuffix(",\n") {
+                                scratch.removeLast()
+                                scratch.removeLast()
+                            }
+                            scratch.append("\n")
+                            scratch.append("            )\n")
+                            scratch.append("        }\n")
+                            scratch.append("        return self\n")
+                            scratch.append("    }\n")
+                        } else if let returnType = returnType {
                             scratch.append("    @discardableResult\n")
                             scratch.append("    public func \(name)(_ sender: Actor, _ callback: @escaping (\(returnType)) -> Void) -> Self {\n")
                             scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", Data(), sender) {\n")
@@ -228,6 +261,11 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                 }
                                 scratch.append("            ))\n")
 
+                            } else if returnCallbackParameters.count > 0 {
+                                scratch.append("            callback(\n")
+                                scratch.append("                // swiftlint:disable:next force_try\n")
+                                scratch.append("                (try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0).response0)\n")
+                                scratch.append("            )\n")
                             } else {
                                 scratch.append("            callback(\n")
                                 scratch.append("                // swiftlint:disable:next force_try\n")
@@ -284,17 +322,22 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                 scratch.removeLast()
                             }
 
-                            if returnCallbackParameters.count > 0 {
-                                scratch.append(") { (returnValue:\(returnCallbackParameters[0])) in \n")
-                            } else {
-                                scratch.append(") { \n")
-                            }
+                            scratch.append(") { \n")
 
                             if returnCallbackParameters.count > 0 {
                                 scratch.append("                callback(\n")
                                 scratch.append("                    // swiftlint:disable:next force_try\n")
                                 scratch.append("                    try! JSONEncoder().encode(\n")
-                                scratch.append("                        \(codableName(name))Response(response: returnValue))\n")
+                                scratch.append("                        \(codableName(name))Response(\n")
+                                for idx in 0..<returnCallbackParameters.count {
+                                    scratch.append("                            response\(idx): $\(idx),\n")
+                                }
+                                if scratch.hasSuffix(",\n") {
+                                    scratch.removeLast()
+                                    scratch.removeLast()
+                                }
+                                scratch.append("\n                        )\n")
+                                scratch.append("                    )\n")
                                 scratch.append("                )\n")
                             } else {
                                 scratch.append("                callback(Data())\n")
@@ -305,8 +348,19 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         } else {
                             scratch.append("        safeRegisterDelayedRemoteBehavior(\"\(name)\") { [unowned self] (data, callback) in\n")
 
-                            if returnCallbackParameters.count > 0 {
-                                scratch.append("            self._\(name)() { (returnValue:\(returnCallbackParameters[0])) in \n")
+                            if returnCallbackParameters.count > 1 {
+                                var idx = 0
+                                scratch.append("            self._\(name)() { (")
+                                for part in returnCallbackParameters {
+                                    scratch.append("returnValue\(idx): \(part)),\n")
+                                    idx += 1
+                                }
+                                if scratch.hasSuffix(",\n") {
+                                    scratch.removeLast()
+                                    scratch.removeLast()
+                                }
+                                scratch.append(") in \n")
+                                
                             } else {
                                 scratch.append("            self._\(name)() { \n")
                             }
@@ -315,7 +369,16 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                 scratch.append("                callback(\n")
                                 scratch.append("                    // swiftlint:disable:next force_try\n")
                                 scratch.append("                    try! JSONEncoder().encode(\n")
-                                scratch.append("                        \(codableName(name))Response(response: returnValue))\n")
+                                scratch.append("                        \(codableName(name))Response(\n")
+                                for idx in 0..<returnCallbackParameters.count {
+                                    scratch.append("                            response\(idx): $\(idx),\n")
+                                }
+                                if scratch.hasSuffix(",\n") {
+                                    scratch.removeLast()
+                                    scratch.removeLast()
+                                }
+                                scratch.append("\n                        )\n")
+                                scratch.append("                    )\n")
                                 scratch.append("                )\n")
                             } else {
                                 scratch.append("                callback(Data())\n")
