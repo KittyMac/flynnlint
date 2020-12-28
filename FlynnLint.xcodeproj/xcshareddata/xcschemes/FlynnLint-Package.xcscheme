@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FlynnLint::FlynnLintFramework"
-               BuildableName = "FlynnLintFramework.framework"
-               BlueprintName = "FlynnLintFramework"
+               BlueprintIdentifier = "FlynnLint::flynnlint"
+               BuildableName = "flynnlint"
+               BlueprintName = "flynnlint"
                ReferencedContainer = "container:FlynnLint.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,16 +28,16 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FlynnLint::flynnlint"
-               BuildableName = "flynnlint"
-               BlueprintName = "flynnlint"
+               BlueprintIdentifier = "FlynnLint::FlynnLintFramework"
+               BuildableName = "FlynnLintFramework.framework"
+               BlueprintName = "FlynnLintFramework"
                ReferencedContainer = "container:FlynnLint.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">

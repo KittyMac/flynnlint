@@ -18,6 +18,14 @@ class FlynnLintTests: XCTestCase {
 
     override func tearDownWithError() throws { }
 
+    func testSO10() throws {
+        let flynnlint = FlynnLint()
+        flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/starbaseorion10/Server/.build/checkouts/Picaroon")
+        flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/starbaseorion10/Server/Sources")
+        flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/starbaseorion10/Server/Tests")
+        flynnlint.finish()
+    }
+    
     func testFlynn() throws {
         let flynnlint = FlynnLint()
         flynnlint.process(directory: "/Volumes/Development/Development/chimerasw2/flynn/Tests")

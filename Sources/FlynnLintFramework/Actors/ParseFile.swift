@@ -14,12 +14,13 @@ class ParseFile: Actor, Flowable {
     // input: path to source directory, path to swift file
     // output: SourceKitten File, SourceKitten Structure
     var safeFlowable = FlowableState()
-
+    
     private func _beFlow(_ args: FlowableArgs) {
         if args.isEmpty { return self.safeFlowToNextTarget(args) }
 
         let rootPath: String = args[x:0]
         let filePath: String = args[x:1]
+        
         if let file = File(path: filePath) {
             do {
                 let syntax = try StructureAndSyntax(file: file)

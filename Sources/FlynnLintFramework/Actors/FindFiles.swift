@@ -14,6 +14,8 @@ class FindFiles: Actor, Flowable {
     // output: paths to individual swift files
     var safeFlowable = FlowableState()
     private let extensions: [String]
+    
+    var filesProcessed:[String:Bool] = [:]
 
     init (_ extensions: [String]) {
         self.extensions = extensions
@@ -37,7 +39,11 @@ class FindFiles: Actor, Flowable {
                 let resourceValues = try fileURL.resourceValues(forKeys: Set(resourceKeys))
                 let pathExtension = (fileURL.path as NSString).pathExtension
                 if self.extensions.contains(pathExtension) && resourceValues.isDirectory == false {
-                    self.safeFlowToNextTarget([path, fileURL.path])
+                    // safeguard that we do not process the same file twice
+                    if filesProcessed[fileURL.path] == nil {
+                        filesProcessed[fileURL.path] = true
+                        self.safeFlowToNextTarget([path, fileURL.path])
+                    }
                 }
             }
         } catch {

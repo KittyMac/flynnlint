@@ -18,6 +18,22 @@ extension String {
         guard let range = Range(nsrange, in: self) else { return nil }
         return self[range]
     }
+    
+    func matches(_ regex: NSRegularExpression, _ callback: @escaping ((NSTextCheckingResult, [String]) -> Void)) {
+        let body = self
+        let nsrange = NSRange(location: Int(0), length: Int(count))
+        regex.enumerateMatches(in: body, options: [], range: nsrange) { (match, _, _) in
+            guard let match = match else { return }
+
+            var groups: [String] = []
+            for iii in 0..<match.numberOfRanges {
+                if let groupString = body.substring(with: match.range(at: iii)) {
+                    groups.append(String(groupString))
+                }
+            }
+            callback(match, groups)
+        }
+    }
 
     func matches(_ pattern: String, _ callback: @escaping ((NSTextCheckingResult, [String]) -> Void)) {
         do {

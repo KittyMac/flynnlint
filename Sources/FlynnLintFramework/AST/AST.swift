@@ -14,6 +14,15 @@ import Foundation
 import SourceKittenFramework
 import Flynn
 
+let functionDefinitionRegexString = #"(.*)\(([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?\)"#
+let functionDefinitionRegex = try! NSRegularExpression(pattern: functionDefinitionRegexString, options: [])
+
+let closureRegexString = #"\(\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\)\s*->\s*(\[?[\.\w\d\?]*\]?)"#
+let closureRegex = try! NSRegularExpression(pattern: closureRegexString, options: [])
+
+let tupleRegexString = #"\(\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\)"#
+let tupleRegex = try! NSRegularExpression(pattern: tupleRegexString, options: [])
+
 struct ASTSimpleType: Equatable, CustomStringConvertible {
     static func == (lhs: ASTSimpleType, rhs: ASTSimpleType) -> Bool {
         return  lhs.kind == rhs.kind
@@ -356,8 +365,7 @@ struct AST {
         var name = ""
 
         if let fullName = function.name {
-            let regex = #"(.*)\(([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?([\w\d]*:)?\)"#
-            fullName.matches(regex) { (_, groups) in
+            fullName.matches(functionDefinitionRegex) { (_, groups) in
                 // ["_beSetCoreAffinity(theAffinity:arg2:)", "_beSetCoreAffinity", "theAffinity:", "arg2:"]
 
                 name = groups[1]
@@ -380,10 +388,15 @@ struct AST {
     func parseClosureType(_ typename: String) -> ([String], String) {
         var parameterLabels: [String] = []
         var returnType = ""
+        
+        // the regex is expensive, try and detect when we can skip it
+        if typename.contains("->") == false {
+            return (parameterLabels, returnType)
+        }
 
-        let regex = #"\(\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\)\s*->\s*(\[?[\.\w\d\?]*\]?)"#
-        typename.matches(regex) { (_, groups) in
+        typename.matches(closureRegex) { (_, groups) in
             // (String, Int, Any) -> Void
+            // @esacping (String, Int, Any) -> Void
 
             if let last = groups.last {
                 returnType = last
@@ -402,9 +415,13 @@ struct AST {
     func parseTupleType(_ typename: String) -> ([String], String) {
         var parameterLabels: [String] = []
         var returnType = ""
+        
+        // the regex is expensive, try and detect when we can skip it
+        if typename.hasPrefix("(") == false {
+            return (parameterLabels, returnType)
+        }
 
-        let regex = #"\(\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\s*(\[?[\.\w\d\?]*\]?),?\)"#
-        typename.matches(regex) { (_, groups) in
+        typename.matches(tupleRegex) { (_, groups) in
             // (String, Int, Any)
 
             if let last = groups.last {

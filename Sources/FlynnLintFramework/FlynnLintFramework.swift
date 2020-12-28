@@ -19,15 +19,19 @@ public class FlynnLint {
 
     private var pipeline: Flowable?
     private var numErrors: Int = 0
+    
+    private var buildCombinedAST = BuildCombinedAST()
 
     public init() {
+        Flynn.startup()
+        
         let ruleset = Ruleset()
         let poolSize = max(1, Flynn.cores - 2)
 
         pipeline = FindFiles(["swift"]) |>
             Array(count: poolSize) { ParseFile() } |>
-            BuildCombinedAST() |>
-            AutogenerateExternalBehaviors() |>
+            buildCombinedAST |>
+            Array(count: poolSize) { AutogenerateExternalBehaviors() } |>
             Array(count: poolSize) { CheckRules(ruleset) } |>
             PrintError { (numErrors: Int) in
                 self.numErrors += numErrors
@@ -41,6 +45,8 @@ public class FlynnLint {
 
     @discardableResult
     public func finish() -> Int {
+        pipeline?.unsafeWait(0)
+        buildCombinedAST.unsafeWait(0)
         Flynn.shutdown()
         return numErrors
     }
