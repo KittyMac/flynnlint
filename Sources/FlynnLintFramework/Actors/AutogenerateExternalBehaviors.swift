@@ -210,7 +210,10 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                             }
                         }
 
-                        if let returnType = returnType {
+                        if returnCallbackParameters.count > 0 {
+                            scratch.append("\(parameterNameHeader)_ sender: Actor,\n")
+                            scratch.append("\(parameterNameHeader)_ callback: @escaping (\(returnCallbackParameters.joined(separator: ", "))) -> Void,\n")
+                        } else if let returnType = returnType {
                             scratch.append("\(parameterNameHeader)_ sender: Actor,\n")
                             scratch.append("\(parameterNameHeader)_ callback: @escaping (\(returnType)) -> Void,\n")
                         }
@@ -262,10 +265,27 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                 scratch.append("            ))\n")
 
                             } else if returnCallbackParameters.count > 0 {
+                                var idx = 0
+
+                                scratch.append("            // swiftlint:disable:next force_try\n")
+                                scratch.append("            let msg = try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0)\n")
+                                scratch.append("            callback(\n")
+                                for _ in returnCallbackParameters {
+                                    scratch.append("                msg.response\(idx),\n")
+                                    idx += 1
+                                }
+                                if scratch.hasSuffix(",\n") {
+                                    scratch.removeLast(2)
+                                    scratch.append("\n")
+                                }
+                                scratch.append("            )\n")
+                                
+                                /*
                                 scratch.append("            callback(\n")
                                 scratch.append("                // swiftlint:disable:next force_try\n")
                                 scratch.append("                (try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0).response0)\n")
                                 scratch.append("            )\n")
+                                 */
                             } else {
                                 scratch.append("            callback(\n")
                                 scratch.append("                // swiftlint:disable:next force_try\n")
