@@ -33,14 +33,14 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                                       _ newExtensionString: inout String,
                                                       _ actorSyntax: FileSyntax,
                                                       _ firstTime: Bool) -> Bool {
+        let fullActorName = AST.getFullName(syntax, actorSyntax)
+        
         if  actorSyntax.file == syntax.file &&
-            ast.isRemoteActor(actorSyntax) {
+            ast.isRemoteActor(fullActorName) {
 
             let (internals, _) = ast.getBehaviorsForActor(actorSyntax)
 
             if internals.count >= 0 {
-                let fullActorName = ast.getFullName(syntax, actorSyntax)
-
                 var scratch = ""
                 scratch.append("\n")
                 if firstTime {
@@ -433,7 +433,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                                 if let typename = parameter.typename,
                                     let name = parameter.name {
-                                    let typename = ast.getFullName(syntax, typename)
+                                    let typename = AST.getFullName(syntax, typename)
                                     if idx != 0 {
                                         scratch.append(parameterNameHeader)
                                     }
@@ -729,14 +729,14 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                                 _ numOfExtensions: inout Int,
                                                 _ newExtensionString: inout String,
                                                 _ actorSyntax: FileSyntax) {
+        let fullActorName = AST.getFullName(syntax, actorSyntax)
+        
         if  actorSyntax.file == syntax.file &&
-            ast.isActor(actorSyntax) {
+            ast.isActor(fullActorName) {
 
             let (internals, _) = ast.getBehaviorsForActor(actorSyntax)
 
             if internals.count > 0 {
-                let fullActorName = ast.getFullName(syntax, actorSyntax)
-
                 var didHaveBehavior = false
 
                 var scratch = ""
@@ -801,7 +801,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                                 if let typename = parameter.typename,
                                     let name = parameter.name {
-                                    let typename = ast.getFullName(syntax, typename)
+                                    let typename = AST.getFullName(syntax, typename)
                                     if label == name {
                                         scratch.append("\(name): \(typename),\n")
                                     } else {

@@ -275,33 +275,43 @@ struct AST {
         return false
     }
 
-    func isActor(_ syntax: FileSyntax) -> Bool {
+    func isActor(_ name: String) -> Bool {
         let actorName = "Actor"
+        if name == actorName {
+            return true
+        }
+        if let actualClass = getClassOrProtocol(name) {
+            return isSubclassOf(actualClass, actorName)
+        }
+        return false
+    }
+    
+    func isActor(_ syntax: FileSyntax) -> Bool {
         if let name = syntax.structure.name {
-            if name == actorName {
-                return true
-            }
-            if let actualClass = getClassOrProtocol(name) {
-                return isSubclassOf(actualClass, actorName)
-            }
+            return isActor(name)
         }
         return false
     }
 
-    func isRemoteActor(_ syntax: FileSyntax) -> Bool {
+    func isRemoteActor(_ name: String) -> Bool {
         let actorName = "RemoteActor"
+        if name == actorName {
+            return true
+        }
+        if let actualClass = getClassOrProtocol(name) {
+            return isSubclassOf(actualClass, actorName)
+        }
+        return false
+    }
+    
+    func isRemoteActor(_ syntax: FileSyntax) -> Bool {
         if let name = syntax.structure.name {
-            if name == actorName {
-                return true
-            }
-            if let actualClass = getClassOrProtocol(name) {
-                return isSubclassOf(actualClass, actorName)
-            }
+            return isRemoteActor(name)
         }
         return false
     }
 
-    private func recurseClassFullName(_ path: inout [String], _ current: SyntaxStructure, _ target: String) -> Bool {
+    private static func recurseClassFullName(_ path: inout [String], _ current: SyntaxStructure, _ target: String) -> Bool {
 
         if let substructures = current.substructure {
             for substructure in substructures {
@@ -331,12 +341,12 @@ struct AST {
         return true
     }
 
-    func getFullName(_ file: FileSyntax, _ target: FileSyntax) -> String {
+    static func getFullName(_ file: FileSyntax, _ target: FileSyntax) -> String {
         guard let name = target.structure.name else { return "Unknown" }
-        return getFullName(file, name)
+        return AST.getFullName(file, name)
     }
 
-    func getFullName(_ file: FileSyntax, _ targetName: String) -> String {
+    static func getFullName(_ file: FileSyntax, _ targetName: String) -> String {
         let isArray = targetName.hasPrefix("[")
 
         var actualTargetName = targetName
@@ -346,7 +356,7 @@ struct AST {
         }
 
         var names: [String] = []
-        _ = recurseClassFullName(&names, file.structure, actualTargetName)
+        _ = AST.recurseClassFullName(&names, file.structure, actualTargetName)
         if names.count == 0 {
             return targetName
         }

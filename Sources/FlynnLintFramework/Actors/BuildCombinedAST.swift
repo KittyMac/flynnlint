@@ -251,28 +251,31 @@ class ASTBuilder: Sequence {
 
     func add(_ fileSyntax: FileSyntax) {
         files.append(fileSyntax)
-        recursiveAdd(fileSyntax)
+        recursiveAdd(fileSyntax, fileSyntax)
     }
 
-    func recursiveAdd(_ fileSyntax: FileSyntax) {
-        let syntax = fileSyntax.structure
+    func recursiveAdd(_ subSyntax: FileSyntax,
+                      _ fileSyntax: FileSyntax) {
+        let syntax = subSyntax.structure
 
-        if let name = syntax.name {
+        if syntax.name != nil {
+            let fullName = AST.getFullName(fileSyntax, subSyntax)
+
             switch syntax.kind {
             case .class:
-                classes[name] = fileSyntax
+                classes[fullName] = subSyntax
             case .protocol, .extensionProtocol:
-                protocols[name] = fileSyntax
+                protocols[fullName] = subSyntax
             case .extension, .extensionEnum, .extensionStruct:
-                extensions.append(fileSyntax)
+                extensions.append(subSyntax)
             case .exprCall:
-                calls.append(fileSyntax)
+                calls.append(subSyntax)
             case .functionAccessorAddress, .functionAccessorDidset, .functionAccessorGetter, .functionAccessorModify,
                  .functionAccessorMutableaddress, .functionAccessorRead, .functionAccessorSetter,
                  .functionAccessorWillset, .functionConstructor, .functionDestructor, .functionFree,
                  .functionMethodClass, .functionMethodInstance, .functionMethodStatic, .functionOperator,
                  .functionOperatorInfix, .functionOperatorPostfix, .functionOperatorPrefix, .functionSubscript:
-                functions.append(fileSyntax)
+                functions.append(subSyntax)
             default:
                 //print("ASTBuilder: unhandled kind \(kind)...")
                 break
@@ -281,7 +284,8 @@ class ASTBuilder: Sequence {
 
         if let substructures = syntax.substructure {
             for substructure in substructures {
-                recursiveAdd(fileSyntax.clone(substructure))
+                recursiveAdd(subSyntax.clone(substructure),
+                             fileSyntax)
             }
         }
     }
