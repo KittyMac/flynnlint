@@ -42,6 +42,8 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                 var scratch = ""
                 scratch.append("\n")
+                scratch.append("import BinaryCodable\n")
+                scratch.append("\n")
                 scratch.append("extension \(fullActorName) {\n\n")
 
                 var minParameterCount = 0
@@ -79,9 +81,106 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     if returnType == nil && returnCallbackParameters.count > 0 {
                         returnType = returnCallbackParameters[0]
                     }
+                    
+                    let appendEncoderLineSingle: (String,String) -> Void = { name, type in
+                        if type == "Bool" {
+                            scratch.append("            try container.encode(\(name) ? 1 : 0)\n")
+                        } else if type == "Data" {
+                            scratch.append("            try container.encode(\(name).count)\n")
+                            scratch.append("            try container.encode(sequence: \(name))\n")
+                        } else if type == "String" {
+                            scratch.append("            try container.encode(\(name), encoding: .utf8, terminator: 0)\n")
+                        } else if type == "String?" {
+                            scratch.append("            try container.encode(\(name) ?? \"FLYNN_NULL\", encoding: .utf8, terminator: 0)\n")
+                        } else {
+                            scratch.append("            try container.encode(\(name))\n")
+                        }
+                    }
+                    
+                    let appendEncoderLineArray: (String,String) -> Void = { name, type in
+                        if type == "Bool" {
+                            scratch.append("                try container.encode(\(name) ? 1 : 0)\n")
+                        } else if type == "Data" {
+                            scratch.append("                try container.encode(\(name).count)\n")
+                            scratch.append("                try container.encode(sequence: \(name))\n")
+                        } else if type == "String" {
+                            scratch.append("                try container.encode(\(name), encoding: .utf8, terminator: 0)\n")
+                        } else if type == "String?" {
+                            scratch.append("                try container.encode(\(name) ?? \"FLYNN_NULL\", encoding: .utf8, terminator: 0)\n")
+                        } else {
+                            scratch.append("                try container.encode(\(name))\n")
+                        }
+                    }
+                    
+                    let appendEncoderLine: (String,String) -> Void = { name, type in
+                        if type.hasPrefix("[") && type.hasSuffix("]") {
+                            let single = type.trimmingCharacters(in: CharacterSet(charactersIn: "[]"))
+                            if single.hasSuffix("?") {
+                                scratch.append("            try container.encode(\(name).count ?? 0)\n")
+                            } else {
+                                scratch.append("            try container.encode(\(name).count)\n")
+                            }
+                            scratch.append("            for item in \(name) {\n")
+                            appendEncoderLineArray("item", single)
+                            scratch.append("            }\n")
+                            return
+                        }
+                        
+                        appendEncoderLineSingle(name, type)
+                    }
+                    
+                    let appendDecoderLineSingle: (String,String) -> Void = { name, type in
+                        if type == "Bool" {
+                            scratch.append("            \(name) = try container.decode(Int.self) == 0 ? false : true\n")
+                        } else if type == "Data" {
+                            scratch.append("            let \(name)Count = try container.decode(Int.self)\n")
+                            scratch.append("            \(name) = try container.decode(length: \(name)Count)\n")
+                        } else if type == "String" {
+                            scratch.append("            \(name) = try container.decodeString(encoding: .utf8, terminator: 0)\n")
+                        } else if type == "String?" {
+                            scratch.append("            let \(name)Check = try container.decodeString(encoding: .utf8, terminator: 0)\n")
+                            scratch.append("            \(name) = \(name)Check == \"FLYNN_NULL\" ? nil : \(name)Check\n")
+                        } else {
+                            scratch.append("            \(name) = try container.decode(\(type).self)\n")
+                        }
+                    }
+                    
+                    let appendDecoderLineArray: (String,String) -> Void = { name, type in
+                        if type == "Bool" {
+                            scratch.append("                \(name)Array.append(try container.decode(Int.self) == 0 ? false : true)\n")
+                        } else if type == "Data" {
+                            scratch.append("                let \(name)Count = try container.decode(Int.self)\n")
+                            scratch.append("                \(name)Array.append(try container.decode(length: \(name)Count))\n")
+                        } else if type == "String" {
+                            scratch.append("                \(name)Array.append(try container.decodeString(encoding: .utf8, terminator: 0))\n")
+                        } else if type == "String?" {
+                            scratch.append("                \(name)Item = try container.decodeString(encoding: .utf8, terminator: 0)\n")
+                            scratch.append("                if \(name)Item == \"FLYNN_NULL\" { \(name)Item = nil }\n")
+                            scratch.append("                \(name)Array.append(\(name)Item)\n")
+                        } else {
+                            scratch.append("                \(name)Array.append(try container.decode(\(type).self))\n")
+                        }
+                    }
+                    
+                    let appendDecoderLine: (String,String) -> Void = { name, type in
+                        if type.hasPrefix("[") && type.hasSuffix("]") {
+                            let single = type.trimmingCharacters(in: CharacterSet(charactersIn: "[]"))
+                            scratch.append("            let \(name)Count: Int = try container.decode(Int.self)\n")
+                            if single.hasSuffix("?") {
+                                scratch.append("            var \(name)Item: \(type)? = nil\n")
+                            }
+                            scratch.append("            var \(name)Array: \(type) = []\n")
+                            scratch.append("            for _ in 0..<\(name)Count {\n")
+                            appendDecoderLineArray(name, single)
+                            scratch.append("            }\n")
+                            scratch.append("            \(name) = \(name)Array\n")
+                            return
+                        }
+                        appendDecoderLineSingle(name, type)
+                    }
 
                     if let returnType = returnType {
-                        scratch.append("    struct \(codableName(name))Response: Codable {\n")
+                        scratch.append("    struct \(codableName(name))Response: BinaryEncodable, BinaryDecodable {\n")
 
                         // if the returnType is a tuple
                         if returnType.hasPrefix("(") {
@@ -100,12 +199,89 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         } else {
                             scratch.append("        let response: \(returnType)\n")
                         }
+                        
+                        // init
+                        scratch.append("\n")
+                        if returnType.hasPrefix("(") || returnCallbackParameters.count > 0 {
+                            var parts = returnCallbackParameters
+                            if returnType.hasPrefix("(") {
+                                parts = ast.parseTupleType(returnType).0
+                            }
+                            var idx = 0
+                            scratch.append("        init(")
+                            for part in parts {
+                                if idx > 0 {
+                                    scratch.append("             ")
+                                }
+                                scratch.append("response\(idx): \(part),\n")
+                                idx += 1
+                            }
+                            scratch.removeLast()
+                            scratch.removeLast()
+                            scratch.append(") {\n")
+                            idx = 0
+                            for _ in parts {
+                                scratch.append("             self.response\(idx) = response\(idx)\n")
+                                idx += 1
+                            }
+                            scratch.append("        }\n")
+                        } else {
+                            scratch.append("        init(response: \(returnType)) {\n")
+                            scratch.append("            self.response = response\n")
+                            scratch.append("        }\n")
+                        }
+                        
+                        
+                        // BinaryEncoder
+                        scratch.append("\n")
+                        if returnType.hasPrefix("(") || returnCallbackParameters.count > 0 {
+                            var parts = returnCallbackParameters
+                            if returnType.hasPrefix("(") {
+                                parts = ast.parseTupleType(returnType).0
+                            }
+                            var idx = 0
+                            scratch.append("        func encode(to encoder: BinaryEncoder) throws {\n")
+                            scratch.append("            var container = encoder.container()\n")
+                            for part in parts {
+                                appendEncoderLine("response\(idx)", part)
+                                idx += 1
+                            }
+                            scratch.append("        }\n")
+                        } else {
+                            scratch.append("        func encode(to encoder: BinaryEncoder) throws {\n")
+                            scratch.append("            var container = encoder.container()\n")
+                            appendEncoderLine("response", returnType)
+                            scratch.append("        }\n")
+                        }
+                        
+                        // BinaryDecoder
+                        scratch.append("\n")
+                        if returnType.hasPrefix("(") || returnCallbackParameters.count > 0 {
+                            var parts = returnCallbackParameters
+                            if returnType.hasPrefix("(") {
+                                parts = ast.parseTupleType(returnType).0
+                            }
+                            var idx = 0
+                            scratch.append("        init(from decoder: BinaryDecoder) throws {\n")
+                            scratch.append("            var container = decoder.container(maxLength: nil)\n")
+                            for part in parts {
+                                appendDecoderLine("response\(idx)", part)
+                                idx += 1
+                            }
+                            scratch.append("        }\n")
+                        } else {
+                            scratch.append("        init(from decoder: BinaryDecoder) throws {\n")
+                            scratch.append("            var container = decoder.container(maxLength: nil)\n")
+                            appendDecoderLine("response", returnType)
+                            scratch.append("        }\n")
+                        }
 
+                        
                         scratch.append("    }\n")
                     }
 
                     if parameterLabels.count > minParameterCount {
-                        scratch.append("    struct \(codableName(name))Request: Codable {\n")
+                        scratch.append("    struct \(codableName(name))Request: BinaryEncodable, BinaryDecodable {\n")
                         if let parameters = behavior.function.structure.substructure {
                             var idx = 0
                             for parameter in parameters where parameter.kind == .varParameter {
@@ -116,6 +292,64 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                     }
                                 }
                             }
+                            
+                            // init
+                            scratch.append("\n")
+                            scratch.append("        init(")
+                            idx = 0
+                            for parameter in parameters where parameter.kind == .varParameter {
+                                if  let typename = parameter.typename {
+                                    if parameter.name != "returnCallback" {
+                                        if idx > 0 {
+                                            scratch.append("             ")
+                                        }
+                                        scratch.append("arg\(idx): \(typename),\n")
+                                        idx += 1
+                                    }
+                                }
+                            }
+                            scratch.removeLast()
+                            scratch.removeLast()
+                            scratch.append(") {\n")
+                            idx = 0
+                            for parameter in parameters where parameter.kind == .varParameter {
+                                if parameter.name != "returnCallback" {
+                                    scratch.append("            self.arg\(idx) = arg\(idx)\n")
+                                    idx += 1
+                                }
+                            }
+                            scratch.append("        }\n")
+                            
+                            // BinaryEncoder
+                            scratch.append("\n")
+                            scratch.append("        func encode(to encoder: BinaryEncoder) throws {\n")
+                            scratch.append("            var container = encoder.container()\n")
+                            idx = 0
+                            for parameter in parameters where parameter.kind == .varParameter {
+                                if let typename = parameter.typename {
+                                    if parameter.name != "returnCallback" {
+                                        appendEncoderLine("arg\(idx)", typename)
+                                        idx += 1
+                                    }
+                                }
+                            }
+                            scratch.append("        }\n")
+                            
+                            // BinaryDecoder
+                            scratch.append("\n")
+                            scratch.append("        init(from decoder: BinaryDecoder) throws {\n")
+                            scratch.append("            var container = decoder.container(maxLength: nil)\n")
+                            idx = 0
+                            for parameter in parameters where parameter.kind == .varParameter {
+                                if let typename = parameter.typename {
+                                    if parameter.name != "returnCallback" {
+                                        appendDecoderLine("arg\(idx)", typename)
+                                        idx += 1
+                                    }
+                                }
+                            }
+                            scratch.append("        }\n")
+                            
                         }
                         scratch.append("    }\n")
                     }
@@ -151,7 +385,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                             scratch.append(") -> Void) -> Self {\n")
                             scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", Data(), sender) {\n")
                             scratch.append("            // swiftlint:disable:next force_try\n")
-                            scratch.append("            let response = (try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0))\n")
+                            scratch.append("            let response = (try! BinaryDataDecoder().decode(\(codableName(name))Response.self, from: $0))\n")
                             scratch.append("            callback(\n")
                             for idx in 0..<returnCallbackParameters.count {
                                 scratch.append("                response.response\(idx),\n")
@@ -171,7 +405,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                             scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", Data(), sender) {\n")
                             scratch.append("            callback(\n")
                             scratch.append("                // swiftlint:disable:next force_try\n")
-                            scratch.append("                (try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0)).response\n")
+                            scratch.append("                (try! BinaryDataDecoder().decode(\(codableName(name))Response.self, from: $0)).response\n")
                             scratch.append("            )\n")
                             scratch.append("        }\n")
                             scratch.append("        return self\n")
@@ -243,7 +477,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         scratch.append(")\n")
 
                         scratch.append("        // swiftlint:disable:next force_try\n")
-                        scratch.append("        let data = try! JSONEncoder().encode(msg)\n")
+                        scratch.append("        let data = try! BinaryDataEncoder().encode(msg)\n")
                         if returnType != nil {
                             scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", data, sender) {\n")
 
@@ -252,7 +486,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                 var idx = 0
 
                                 scratch.append("            // swiftlint:disable:next force_try\n")
-                                scratch.append("            let msg = try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0)\n")
+                                scratch.append("            let msg = try! BinaryDataDecoder().decode(\(codableName(name))Response.self, from: $0)\n")
                                 scratch.append("            callback((\n")
                                 for _ in parts {
                                     scratch.append("                msg.response\(idx),\n")
@@ -268,7 +502,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                 var idx = 0
 
                                 scratch.append("            // swiftlint:disable:next force_try\n")
-                                scratch.append("            let msg = try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0)\n")
+                                scratch.append("            let msg = try! BinaryDataDecoder().decode(\(codableName(name))Response.self, from: $0)\n")
                                 scratch.append("            callback(\n")
                                 for _ in returnCallbackParameters {
                                     scratch.append("                msg.response\(idx),\n")
@@ -280,16 +514,10 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                 }
                                 scratch.append("            )\n")
                                 
-                                /*
-                                scratch.append("            callback(\n")
-                                scratch.append("                // swiftlint:disable:next force_try\n")
-                                scratch.append("                (try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0).response0)\n")
-                                scratch.append("            )\n")
-                                 */
                             } else {
                                 scratch.append("            callback(\n")
                                 scratch.append("                // swiftlint:disable:next force_try\n")
-                                scratch.append("                (try! JSONDecoder().decode(\(codableName(name))Response.self, from: $0).response)\n")
+                                scratch.append("                (try! BinaryDataDecoder().decode(\(codableName(name))Response.self, from: $0).response)\n")
                                 scratch.append("            )\n")
                             }
 
@@ -326,7 +554,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         if parameterLabels.count > minParameterCount {
                             scratch.append("        safeRegisterDelayedRemoteBehavior(\"\(name)\") { [unowned self] (data, callback) in\n")
                             scratch.append("            // swiftlint:disable:next force_try\n")
-                            scratch.append("            let msg = try! JSONDecoder().decode(\(codableName(name))Request.self, from: data)\n")
+                            scratch.append("            let msg = try! BinaryDataDecoder().decode(\(codableName(name))Request.self, from: data)\n")
 
                             scratch.append("            self._\(name)(")
                             if let parameters = behavior.function.structure.substructure {
@@ -347,7 +575,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                             if returnCallbackParameters.count > 0 {
                                 scratch.append("                callback(\n")
                                 scratch.append("                    // swiftlint:disable:next force_try\n")
-                                scratch.append("                    try! JSONEncoder().encode(\n")
+                                scratch.append("                    try! BinaryDataEncoder().encode(\n")
                                 scratch.append("                        \(codableName(name))Response(\n")
                                 for idx in 0..<returnCallbackParameters.count {
                                     scratch.append("                            response\(idx): $\(idx),\n")
@@ -388,7 +616,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                             if returnCallbackParameters.count > 0 {
                                 scratch.append("                callback(\n")
                                 scratch.append("                    // swiftlint:disable:next force_try\n")
-                                scratch.append("                    try! JSONEncoder().encode(\n")
+                                scratch.append("                    try! BinaryDataEncoder().encode(\n")
                                 scratch.append("                        \(codableName(name))Response(\n")
                                 for idx in 0..<returnCallbackParameters.count {
                                     scratch.append("                            response\(idx): $\(idx),\n")
@@ -412,7 +640,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         if parameterLabels.count > minParameterCount {
                             scratch.append("        safeRegisterRemoteBehavior(\"\(name)\") { [unowned self] (data) in\n")
                             scratch.append("            // swiftlint:disable:next force_try\n")
-                            scratch.append("            let msg = try! JSONDecoder().decode(\(codableName(name))Request.self, from: data)\n")
+                            scratch.append("            let msg = try! BinaryDataDecoder().decode(\(codableName(name))Request.self, from: data)\n")
 
                             if returnType != nil {
                                 scratch.append("            let response = self._\(name)(")
@@ -447,11 +675,11 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                     }
                                     scratch.append("            )\n")
                                     scratch.append("            // swiftlint:disable:next force_try\n")
-                                    scratch.append("            return try! JSONEncoder().encode(boxedResponse)\n")
+                                    scratch.append("            return try! BinaryDataEncoder().encode(boxedResponse)\n")
                                 } else {
                                     scratch.append("            let boxedResponse = \(codableName(name))Response(response: response)\n")
                                     scratch.append("            // swiftlint:disable:next force_try\n")
-                                    scratch.append("            return try! JSONEncoder().encode(boxedResponse)\n")
+                                    scratch.append("            return try! BinaryDataEncoder().encode(boxedResponse)\n")
                                 }
                             } else {
                                 scratch.append("            return nil\n")
@@ -462,7 +690,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                             scratch.append("        safeRegisterRemoteBehavior(\"\(name)\") { [unowned self] (data) in\n")
                             if returnType != nil {
                                 scratch.append("            // swiftlint:disable:next force_try\n")
-                                scratch.append("            return try! JSONEncoder().encode(\n")
+                                scratch.append("            return try! BinaryDataEncoder().encode(\n")
                                 scratch.append("                \(codableName(name))Response(response: self._\(name)()))\n")
                             } else {
                                 scratch.append("            self._\(name)()\n")
@@ -507,6 +735,8 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                 var didHaveBehavior = false
 
                 var scratch = ""
+                scratch.append("\n")
+                scratch.append("import BinaryCodable\n")
                 scratch.append("\n")
                 scratch.append("extension \(fullActorName) {\n\n")
 
