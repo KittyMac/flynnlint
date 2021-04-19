@@ -87,7 +87,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     
                     let appendEncoderLineSingle: (String,String) -> Void = { name, type in
                         if type == "Bool" {
-                            scratch.append("            try container.encode(\(name) ? 1 : 0)\n")
+                            scratch.append("            try container.encode(Int8(\(name) ? 1 : 0))\n")
                         } else if type == "Data" {
                             scratch.append("            try container.encode(\(name).count)\n")
                             scratch.append("            try container.encode(sequence: \(name))\n")
@@ -102,7 +102,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     
                     let appendEncoderLineArray: (String,String) -> Void = { name, type in
                         if type == "Bool" {
-                            scratch.append("                try container.encode(\(name) ? 1 : 0)\n")
+                            scratch.append("                try container.encode(Int8(\(name) ? 1 : 0))\n")
                         } else if type == "Data" {
                             scratch.append("                try container.encode(\(name).count)\n")
                             scratch.append("                try container.encode(sequence: \(name))\n")
@@ -134,9 +134,9 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     
                     let appendDecoderLineSingle: (String,String) -> Void = { name, type in
                         if type == "Bool" {
-                            scratch.append("            \(name) = try container.decode(Int.self) == 0 ? false : true\n")
+                            scratch.append("            \(name) = try container.decode(Int8.self) == 0 ? false : true\n")
                         } else if type == "Data" {
-                            scratch.append("            let \(name)Count = try container.decode(Int.self)\n")
+                            scratch.append("            let \(name)Count = Int(try container.decode(Int32.self))\n")
                             scratch.append("            \(name) = try container.decode(length: \(name)Count)\n")
                         } else if type == "String" {
                             scratch.append("            \(name) = try container.decodeString(encoding: .utf8, terminator: 0)\n")
@@ -150,9 +150,9 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     
                     let appendDecoderLineArray: (String,String) -> Void = { name, type in
                         if type == "Bool" {
-                            scratch.append("                \(name)Array.append(try container.decode(Int.self) == 0 ? false : true)\n")
+                            scratch.append("                \(name)Array.append(try container.decode(Int8.self) == 0 ? false : true)\n")
                         } else if type == "Data" {
-                            scratch.append("                let \(name)Count = try container.decode(Int.self)\n")
+                            scratch.append("                let \(name)Count = Int(try container.decode(Int32.self))\n")
                             scratch.append("                \(name)Array.append(try container.decode(length: \(name)Count))\n")
                         } else if type == "String" {
                             scratch.append("                \(name)Array.append(try container.decodeString(encoding: .utf8, terminator: 0))\n")
@@ -168,7 +168,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     let appendDecoderLine: (String,String) -> Void = { name, type in
                         if type.hasPrefix("[") && type.hasSuffix("]") {
                             let single = type.trimmingCharacters(in: CharacterSet(charactersIn: "[]"))
-                            scratch.append("            let \(name)Count: Int = try container.decode(Int.self)\n")
+                            scratch.append("            let \(name)Count: Int = Int(try container.decode(Int32.self))\n")
                             if single.hasSuffix("?") {
                                 scratch.append("            var \(name)Item: \(type)? = nil\n")
                             }
