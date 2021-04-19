@@ -31,7 +31,8 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                                       _ ast: AST,
                                                       _ numOfExtensions: inout Int,
                                                       _ newExtensionString: inout String,
-                                                      _ actorSyntax: FileSyntax) {
+                                                      _ actorSyntax: FileSyntax,
+                                                      _ firstTime: Bool) -> Bool {
         if  actorSyntax.file == syntax.file &&
             ast.isRemoteActor(actorSyntax) {
 
@@ -42,8 +43,10 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                 var scratch = ""
                 scratch.append("\n")
-                scratch.append("import BinaryCodable\n")
-                scratch.append("\n")
+                if firstTime {
+                    scratch.append("import BinaryCodable\n")
+                    scratch.append("\n")
+                }
                 scratch.append("extension \(fullActorName) {\n\n")
 
                 var minParameterCount = 0
@@ -715,7 +718,9 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                 numOfExtensions += 1
             }
+            return true
         }
+        return false
     }
 
     // MARK: - ACTOR
@@ -735,8 +740,6 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                 var didHaveBehavior = false
 
                 var scratch = ""
-                scratch.append("\n")
-                scratch.append("import BinaryCodable\n")
                 scratch.append("\n")
                 scratch.append("extension \(fullActorName) {\n\n")
 
@@ -980,22 +983,29 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                               actorSyntax)
                 }
 
+                var first = true
                 for (_, actorSyntax) in ast.classes.sorted(by: { $0.0 > $1.0 }) {
-                    createRemoteActorExtensionIfRequired(syntax,
-                                                         ast,
-                                                         &numOfExtensions,
-                                                         &newExtensionString,
-                                                         actorSyntax)
+                    if createRemoteActorExtensionIfRequired(syntax,
+                                                            ast,
+                                                            &numOfExtensions,
+                                                            &newExtensionString,
+                                                            actorSyntax,
+                                                            first) {
+                        first = false
+                    }
                 }
 
                 for actorSyntax in ast.extensions {
                     // Note: we don't want to do extensions which were
                     // created previously by FlynnLint... but how?
-                    createRemoteActorExtensionIfRequired(syntax,
-                                                         ast,
-                                                         &numOfExtensions,
-                                                         &newExtensionString,
-                                                         actorSyntax)
+                    if createRemoteActorExtensionIfRequired(syntax,
+                                                            ast,
+                                                            &numOfExtensions,
+                                                            &newExtensionString,
+                                                            actorSyntax,
+                                                            first) {
+                        first = false
+                    }
                 }
 
                 // Four scenarios we want to make sure we handle:
