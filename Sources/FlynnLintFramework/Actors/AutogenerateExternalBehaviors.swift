@@ -917,7 +917,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     scratch.append(") -> Self {\n")
 
                     if returnType != nil {
-                        scratch.append("        unsafeSend() {\n")
+                        scratch.append("        unsafeSend {\n")
 
                         if hasReturnCallback == false {
                             scratch.append("            let result = self._\(name)(")
