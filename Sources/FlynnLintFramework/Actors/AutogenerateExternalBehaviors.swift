@@ -33,10 +33,11 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                                       _ newExtensionString: inout String,
                                                       _ actorSyntax: FileSyntax,
                                                       _ firstTime: Bool) -> Bool {
-        let fullActorName = AST.getFullName(syntax, actorSyntax)
-        
-        if  actorSyntax.file == syntax.file &&
-            ast.isRemoteActor(fullActorName) {
+        if  actorSyntax.file == syntax.file {
+            let fullActorName = AST.getFullName(syntax,
+                                                actorSyntax.ancestry,
+                                                actorSyntax)
+            guard ast.isRemoteActor(fullActorName) else { return false }
 
             let (internals, _) = ast.getBehaviorsForActor(actorSyntax)
 
@@ -625,7 +626,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                 scratch.removeLast()
                             }
 
-                            scratch.append(") { \n")
+                            scratch.append(") {\n")
 
                             if returnCallbackParameters.count > 0 {
                                 scratch.append("                callback(\n")
@@ -653,11 +654,11 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                             scratch.append("        }\n")
                         } else {
-                            scratch.append("        safeRegisterDelayedRemoteBehavior(\"\(name)\") { [unowned self] (data, callback) in\n")
+                            scratch.append("        safeRegisterDelayedRemoteBehavior(\"\(name)\") { [unowned self] (_, callback) in\n")
 
                             if returnCallbackParameters.count > 1 {
                                 var idx = 0
-                                scratch.append("            self._\(name)() { (")
+                                scratch.append("            self._\(name) { (")
                                 for part in returnCallbackParameters {
                                     scratch.append("returnValue\(idx): \(part)),\n")
                                     idx += 1
@@ -666,10 +667,10 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                     scratch.removeLast()
                                     scratch.removeLast()
                                 }
-                                scratch.append(") in \n")
+                                scratch.append(") in\n")
                                 
                             } else {
-                                scratch.append("            self._\(name)() { \n")
+                                scratch.append("            self._\(name) {\n")
                             }
 
                             if returnCallbackParameters.count > 0 {
@@ -762,7 +763,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                             scratch.append("        }\n")
                         } else {
-                            scratch.append("        safeRegisterRemoteBehavior(\"\(name)\") { [unowned self] (data) in\n")
+                            scratch.append("        safeRegisterRemoteBehavior(\"\(name)\") { [unowned self] (_) in\n")
                             if returnType != nil {
                                 scratch.append("            // swiftlint:disable:next force_try\n")
                                 if binaryCodable {
@@ -805,7 +806,9 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                                 _ numOfExtensions: inout Int,
                                                 _ newExtensionString: inout String,
                                                 _ actorSyntax: FileSyntax) {
-        let fullActorName = AST.getFullName(syntax, actorSyntax)
+        let fullActorName = AST.getFullName(syntax,
+                                            actorSyntax.ancestry,
+                                            actorSyntax)
         
         if  actorSyntax.file == syntax.file &&
             ast.isActor(fullActorName) {
@@ -950,7 +953,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                             if scratch.hasSuffix(", ") {
                                 scratch.removeLast()
                                 scratch.removeLast()
-                                scratch.append(" in \n")
+                                scratch.append(" in\n")
                             } else {
                                 scratch.append("\n")
                             }

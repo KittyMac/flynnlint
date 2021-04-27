@@ -69,19 +69,40 @@ struct FileSyntax {
     let rootPath: String
     let file: File
     let structure: SyntaxStructure
+    let ancestry: [FileSyntax]
     let tokens: [SyntaxToken]
     let blacklist: [String]
 
-    init(_ rootPath: String, _ file: File, _ structure: SyntaxStructure, _ tokens: [SyntaxToken], _ blacklist: [String]) {
+    init(_ rootPath: String,
+         _ file: File,
+         _ structure: SyntaxStructure,
+         _ ancestry: [FileSyntax],
+         _ tokens: [SyntaxToken],
+         _ blacklist: [String]) {
         self.rootPath = rootPath
         self.file = file
         self.structure = structure
         self.tokens = tokens
         self.blacklist = blacklist
+        self.ancestry = ancestry
+    }
+    
+    func clone(ancestry: [FileSyntax]) -> FileSyntax {
+        return FileSyntax(rootPath,
+                          file,
+                          structure,
+                          ancestry,
+                          tokens,
+                          blacklist)
     }
 
-    func clone(_ substructure: SyntaxStructure) -> FileSyntax {
-        return FileSyntax(rootPath, file, substructure, tokens, blacklist)
+    func clone(substructure: SyntaxStructure) -> FileSyntax {
+        return FileSyntax(rootPath,
+                          file,
+                          substructure,
+                          ancestry,
+                          tokens,
+                          blacklist)
     }
 
     func match(_ pattern: String) -> Int64? {
@@ -251,21 +272,22 @@ class ASTBuilder: Sequence {
 
     func add(_ fileSyntax: FileSyntax) {
         files.append(fileSyntax)
-        recursiveAdd(fileSyntax, fileSyntax)
+        recursiveAdd([], fileSyntax, fileSyntax)
     }
 
-    func recursiveAdd(_ subSyntax: FileSyntax,
+    func recursiveAdd(_ ancestory: [FileSyntax],
+                      _ subSyntax: FileSyntax,
                       _ fileSyntax: FileSyntax) {
         let syntax = subSyntax.structure
-
+        
         if syntax.name != nil {
-            let fullName = AST.getFullName(fileSyntax, subSyntax)
-
             switch syntax.kind {
             case .class:
-                classes[fullName] = subSyntax
+                let fullName = AST.getFullName(fileSyntax, ancestory, subSyntax)
+                classes[fullName] = subSyntax.clone(ancestry: ancestory)
             case .protocol, .extensionProtocol:
-                protocols[fullName] = subSyntax
+                let fullName = AST.getFullName(fileSyntax, ancestory, subSyntax)
+                protocols[fullName] = subSyntax.clone(ancestry: ancestory)
             case .extension, .extensionEnum, .extensionStruct:
                 extensions.append(subSyntax)
             case .exprCall:
@@ -284,7 +306,8 @@ class ASTBuilder: Sequence {
 
         if let substructures = syntax.substructure {
             for substructure in substructures {
-                recursiveAdd(subSyntax.clone(substructure),
+                recursiveAdd(ancestory + [subSyntax],
+                             subSyntax.clone(substructure: substructure),
                              fileSyntax)
             }
         }

@@ -32,7 +32,12 @@ class ParseFile: Actor, Flowable {
                     }
                 }
 
-                let fileSyntax = FileSyntax(rootPath, file, syntax.structure, syntax.syntax, blacklist)
+                let fileSyntax = FileSyntax(rootPath,
+                                            file,
+                                            syntax.structure,
+                                            [],
+                                            syntax.syntax,
+                                            blacklist)
 
                 self.safeFlowToNextTarget([fileSyntax])
             } catch {

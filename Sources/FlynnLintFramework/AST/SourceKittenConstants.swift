@@ -36,6 +36,8 @@ extension SyntaxStructure {
     var runtimename: String? { return self["key.runtime_name"] as? String }
     var substructure: [SyntaxStructure]? { return self["key.substructure"] as? [SyntaxStructure] }
     var typename: String? { return self["key.typename"] as? String }
+    
+    var substructureExists: Bool { return self["key.substructure"] != nil }
 }
 
 public struct StructureAndSyntax {

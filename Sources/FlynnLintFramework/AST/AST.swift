@@ -158,7 +158,7 @@ struct AST {
             function.kind == .functionMethodInstance &&
             function.accessibility == .private {
                 internalBehaviors[name]?.append(Behavior(actor: actor,
-                                                         behavior: actor.clone(function)))
+                                                         behavior: actor.clone(substructure: function)))
         }
     }
 
@@ -179,7 +179,7 @@ struct AST {
             function.kind == .functionMethodInstance &&
             (function.accessibility == .public || function.accessibility == .open) {
                 externalBehaviors[name]?.append(Behavior(actor: actor,
-                                                         behavior: actor.clone(function)))
+                                                         behavior: actor.clone(substructure: function)))
         }
     }
 
@@ -311,42 +311,84 @@ struct AST {
         return false
     }
 
-    private static func recurseClassFullName(_ path: inout [String], _ current: SyntaxStructure, _ target: String) -> Bool {
-
+    private static func recurseClassFullName(_ path: inout [String],
+                                             _ current: SyntaxStructure,
+                                             _ target: String) -> Bool {
+        guard current.substructureExists else { return true }
+        
         if let substructures = current.substructure {
             for substructure in substructures {
-                if substructure.name == target {
-                    if let name = substructure.name {
-                        if  substructure.kind == .class ||
-                            substructure.kind == .extension ||
-                            substructure.kind == .extensionEnum ||
-                            substructure.kind == .extensionStruct {
-                            path.append(name)
-                            return false
-                        }
-                    }
-                }
-
-                if let name = substructure.name {
-                    path.append(name)
-
-                    if recurseClassFullName(&path, substructure, target) == false {
+                guard let name = substructure.name else { continue }
+                guard let kind = substructure.kind else { continue }
+                
+                if  kind == .class ||
+                    kind == .enum ||
+                    kind == .struct ||
+                    kind == .extension ||
+                    kind == .extensionEnum ||
+                    kind == .extensionStruct {
+                
+                    if name == target {
+                        path.append(name)
                         return false
                     }
 
+                    path.append(name)
+                    if recurseClassFullName(&path, substructure, target) == false {
+                        return false
+                    }
                     path.removeLast()
                 }
             }
         }
         return true
     }
+    
+    static func getFullName(_ file: FileSyntax,
+                            _ ancestry: [FileSyntax],
+                            _ target: FileSyntax) -> String {
+        guard let name = target.structure.name else { return getFullName(file, target) }
+        guard let kind = target.structure.kind else { return getFullName(file, target) }
+        
+        if  kind == .class ||
+            kind == .enum ||
+            kind == .struct ||
+            kind == .extension ||
+            kind == .extensionEnum ||
+            kind == .extensionStruct {
+            
+            var fullName = name
+            
+            for parent in ancestry.reversed() {
+                guard let parentName = parent.structure.name else { break }
+                guard let parentKind = parent.structure.kind else { break }
+                
+                if  parentKind == .class ||
+                    parentKind == .enum ||
+                    parentKind == .struct ||
+                    parentKind == .extension ||
+                    parentKind == .extensionEnum ||
+                    parentKind == .extensionStruct {
+                    fullName = "\(parentName).\(fullName)"
+                } else {
+                    break
+                }
+            }
+                        
+            return fullName
+        }
+        
+        return getFullName(file, target)
+    }
 
-    static func getFullName(_ file: FileSyntax, _ target: FileSyntax) -> String {
+    static func getFullName(_ file: FileSyntax,
+                            _ target: FileSyntax) -> String {
         guard let name = target.structure.name else { return "Unknown" }
         return AST.getFullName(file, name)
     }
 
-    static func getFullName(_ file: FileSyntax, _ targetName: String) -> String {
+    static func getFullName(_ file: FileSyntax,
+                            _ targetName: String) -> String {
         let isArray = targetName.hasPrefix("[")
 
         var actualTargetName = targetName
