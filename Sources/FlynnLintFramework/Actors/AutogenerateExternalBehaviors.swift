@@ -389,6 +389,8 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     checkParametersForRemoteCallback(behavior)
 
                     let (name, parameterLabels) = ast.parseFunctionDefinition(behavior.function.structure)
+                    let namespaces = String(repeating: " ", count: name.count)
+                    
                     var returnType = behavior.function.structure.typename
                     if returnType == "Void" {
                         returnType = nil
@@ -400,7 +402,9 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                     if parameterLabels.count == minParameterCount {
                         if returnCallbackParameters.count > 0 {
                             scratch.append("    @discardableResult\n")
-                            scratch.append("    public func \(name)(_ sender: Actor, _ callback: @escaping (")
+                            scratch.append("    public func \(name)(_ sender: Actor,\n")
+                            scratch.append("                \(namespaces) _ error: @escaping () -> Void,\n")
+                            scratch.append("                \(namespaces) _ callback: @escaping (")
                             for part in returnCallbackParameters {
                                 scratch.append("\(part), ")
                             }
@@ -409,7 +413,8 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                                 scratch.removeLast()
                             }
                             scratch.append(") -> Void) -> Self {\n")
-                            scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", Data(), sender) {\n")
+                            
+                            scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", Data(), sender, error) {\n")
                             scratch.append("            // swiftlint:disable:next force_try\n")
                             if binaryCodable {
                                 scratch.append("            let response = (try! BinaryDataDecoder().decode(\(codableName(name))Response.self, from: $0))\n")
@@ -431,8 +436,10 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                             scratch.append("    }\n")
                         } else if let returnType = returnType {
                             scratch.append("    @discardableResult\n")
-                            scratch.append("    public func \(name)(_ sender: Actor, _ callback: @escaping (\(returnType)) -> Void) -> Self {\n")
-                            scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", Data(), sender) {\n")
+                            scratch.append("    public func \(name)(_ sender: Actor,\n")
+                            scratch.append("                \(namespaces) _ error: @escaping () -> Void,\n")
+                            scratch.append("                \(namespaces) _ callback: @escaping (\(returnType)) -> Void) -> Self {\n")
+                            scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", Data(), sender, error) {\n")
                             scratch.append("            callback(\n")
                             scratch.append("                // swiftlint:disable:next force_try\n")
                             if binaryCodable {
@@ -447,7 +454,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                         } else {
                             scratch.append("    @discardableResult\n")
                             scratch.append("    public func \(name)() -> Self {\n")
-                            scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", Data(), nil, nil)\n")
+                            scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", Data(), nil, nil, nil)\n")
                             scratch.append("        return self\n")
                             scratch.append("    }\n")
                         }
@@ -480,17 +487,20 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                         if returnCallbackParameters.count > 0 {
                             scratch.append("\(parameterNameHeader)_ sender: Actor,\n")
+                            scratch.append("\(parameterNameHeader)_ error: @escaping () -> Void,\n")
                             scratch.append("\(parameterNameHeader)_ callback: @escaping (\(returnCallbackParameters.joined(separator: ", "))) -> Void,\n")
                         } else if let returnType = returnType {
                             scratch.append("\(parameterNameHeader)_ sender: Actor,\n")
+                            scratch.append("\(parameterNameHeader)_ error: @escaping () -> Void,\n")
                             scratch.append("\(parameterNameHeader)_ callback: @escaping (\(returnType)) -> Void,\n")
                         }
+                        
 
                         if scratch.hasSuffix(",\n") {
                             scratch.removeLast()
                             scratch.removeLast()
                         }
-                        scratch.append(" ) -> Self {\n")
+                        scratch.append(") -> Self {\n")
 
                         scratch.append("        let msg = \(codableName(name))Request(")
                         if let parameters = behavior.function.structure.substructure {
@@ -517,7 +527,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
                             scratch.append("        let data = try! JSONEncoder().encode(msg)\n")
                         }
                         if returnType != nil {
-                            scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", data, sender) {\n")
+                            scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", data, sender, error) {\n")
 
                             if let returnType = returnType, returnType.hasPrefix("(") {
                                 let (parts, _) = ast.parseTupleType(returnType)
@@ -573,7 +583,7 @@ class AutogenerateExternalBehaviors: Actor, Flowable {
 
                             scratch.append("        }\n")
                         } else {
-                            scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", data, nil, nil)\n")
+                            scratch.append("        unsafeSendToRemote(\"\(fullActorName)\", \"\(name)\", data, nil, nil, nil)\n")
                         }
                         scratch.append("        return self\n")
                         scratch.append("    }\n")
