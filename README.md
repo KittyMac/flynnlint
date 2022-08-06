@@ -1,3 +1,7 @@
+# FlynnLint has been deprecated as it has been integrated into [Flynn as a Swift Package Manager Build Tool](http://github.com/KittyMac/Flynn).
+
+
+
 A tool which enforces best practices for safety while using Flynn, the actor-model programming framework for Swift.
 
 FlynnLint is included as a macOS executable in Flynn, and [what it is and how to use is is documented there](https://github.com/KittyMac/flynn/blob/master/docs/FLYNNLINT.md). Generally you don't need to reference this reposity directly, unless you want to build it from source or use in on non-macOS platforms.
